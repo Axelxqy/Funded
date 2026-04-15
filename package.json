@@ -1,0 +1,21 @@
+{
+  "name": "funded",
+  "version": "1.0.0",
+  "description": "A Fund Raiser Website that allows people to help person in needs by funding!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Axelxqy/Funded.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Axelxqy/Funded/issues"
+  },
+  "homepage": "https://github.com/Axelxqy/Funded#readme"
+}
