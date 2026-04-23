@@ -6,10 +6,10 @@ dotenv.config({ path: "keys.env" });
 const pool = new Pool({
   host: process.env.PGHOST,
   user: process.env.PGUSER,
-  password: process.env.PASSWORD,
+  password: process.env.PGPASSWORD,
   database: process.env.PGDATABASE,
   port: process.env.PGPORT,
-  ssl: {rejectUnauthorized: false}
+  ssl: false
 });
 
 pool.on('connect', ()=>{

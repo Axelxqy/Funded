@@ -33,6 +33,7 @@
         </div>
 
         <div class="field-group">
+          <label for="signupPasswordInput" class="field-label">Password</label>
           <div class="password-wrap">
             <input
               id="signupPasswordInput"
@@ -48,11 +49,54 @@
 
           <div id="signupPasswordRules" class="password-rules hidden">
             <p id="signup-rule-length" class="rule-item invalid">• At least 8 characters</p>
-            <p id="signup-rule-number" class="rule-item invalid">• At least one Numeric digit 0-9</p>
+            <p id="signup-rule-number" class="rule-item invalid">• At least one numeric digit (0-9)</p>
             <p id="signup-rule-lower" class="rule-item invalid">• At least one lower case letter</p>
             <p id="signup-rule-upper" class="rule-item invalid">• At least one upper case letter</p>
             <p id="signup-rule-special" class="rule-item invalid">• At least one special character (! @ # $ %)</p>
           </div>
+        </div>
+
+        <div class="field-group">
+          <label for="signupFnameInput" class="field-label">First Name</label>
+          <input
+            id="signupFnameInput"
+            class="input"
+            type="text"
+            placeholder="First Name"
+          />
+          <p id="signupFnameError" class="error-text hidden"></p>
+        </div>
+
+        <div class="field-group">
+          <label for="signupLnameInput" class="field-label">Last Name</label>
+          <input
+            id="signupLnameInput"
+            class="input"
+            type="text"
+            placeholder="Last Name"
+          />
+          <p id="signupLnameError" class="error-text hidden"></p>
+        </div>
+
+        <div class="field-group">
+          <label for="signupDobInput" class="field-label">Date of Birth</label>
+          <input
+            id="signupDobInput"
+            class="input"
+            type="date"
+          />
+          <p id="signupDobError" class="error-text hidden"></p>
+        </div>
+
+        <div class="field-group">
+          <label for="signupPhoneInput" class="field-label">Phone Number</label>
+          <input
+            id="signupPhoneInput"
+            class="input"
+            type="text"
+            placeholder="Phone Number"
+          />
+          <p id="signupPhoneError" class="error-text hidden"></p>
         </div>
 
         <button id="signupBtn" class="primary-btn signup-btn" type="button">Sign up</button>
