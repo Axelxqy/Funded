@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-bg">
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="bg-shape shape-3"></div>
+    <div class="bg-shape shape-4"></div>
+
+    <section class="screen active">
+      <div class="card signup-card">
+        <h2 class="title left">Create an account</h2>
+        <p class="signin-text bigger-signin-text">
+          Already have an account? <a href="login.html">Sign in</a>
+        </p>
+
+        <div class="field-group">
+          <label for="signupEmailInput" class="field-label">Email Address</label>
+          <input
+            id="signupEmailInput"
+            class="input"
+            type="text"
+            placeholder="example@email.com"
+            autocomplete="email"
+          />
+          <p id="signupEmailError" class="error-text hidden"></p>
+        </div>
+
+        <div class="field-group">
+          <div class="password-wrap">
+            <input
+              id="signupPasswordInput"
+              class="input normal-border"
+              type="password"
+              placeholder="Password"
+              autocomplete="new-password"
+            />
+            <button id="toggleSignupPassword" class="eye-btn" type="button">👁</button>
+          </div>
+
+          <p id="signupPasswordError" class="error-text hidden"></p>
+
+          <div id="signupPasswordRules" class="password-rules hidden">
+            <p id="signup-rule-length" class="rule-item invalid">• At least 8 characters</p>
+            <p id="signup-rule-number" class="rule-item invalid">• At least one Numeric digit 0-9</p>
+            <p id="signup-rule-lower" class="rule-item invalid">• At least one lower case letter</p>
+            <p id="signup-rule-upper" class="rule-item invalid">• At least one upper case letter</p>
+            <p id="signup-rule-special" class="rule-item invalid">• At least one special character (! @ # $ %)</p>
+          </div>
+        </div>
+
+        <button id="signupBtn" class="primary-btn signup-btn" type="button">Sign up</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="signupController.js"></script>
+</body>
+</html>
