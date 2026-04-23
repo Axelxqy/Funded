@@ -1,5 +1,6 @@
 require("dotenv").config();
 
+const open = require("open");
 const express = require("express");
 const cors = require("cors");
 const http = require("http");
@@ -34,9 +35,9 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "boundary", "login.html"));
 });
 
-app.get("/", (req, res) => {
-  res.send("Server is running");
-});
+// app.get("/", (req, res) => {
+//   res.send("Server is running");
+// });
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
@@ -48,6 +49,8 @@ io.on("connection", (socket) => {
 
 const PORT = 3000;
 
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
   console.log(`Server running on http://localhost:${PORT}`);
+
+  await open(`http://localhost:${PORT}`);
 });
