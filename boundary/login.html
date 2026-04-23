@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-bg">
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="bg-shape shape-3"></div>
+    <div class="bg-shape shape-4"></div>
+
+    <section class="screen active">
+      <div class="card signin-card">
+        <h1 class="title center">Welcome</h1>
+        <p class="subtitle center">Sign in to GoFundMe or sign up to continue.</p>
+
+        <div class="field-group">
+          <label for="emailInput" class="field-label">Email Address</label>
+          <input
+            id="emailInput"
+            class="input"
+            type="text"
+            placeholder="example@email.com"
+            autocomplete="email"
+          />
+          <p id="emailError" class="error-text hidden"></p>
+        </div>
+
+        <div class="field-group">
+          <div class="password-wrap">
+            <input
+              id="passwordInput"
+              class="input normal-border"
+              type="password"
+              placeholder="Password"
+              autocomplete="current-password"
+            />
+            <button id="togglePassword" class="eye-btn" type="button">👁</button>
+          </div>
+
+          <p id="passwordError" class="error-text hidden"></p>
+        </div>
+
+        <a href="#" class="forgot-link">Forgot your password?</a>
+
+        <button id="signInBtn" class="primary-btn" type="button">Sign in</button>
+
+        <p class="bottom-text bigger-bottom-text">
+          DON'T HAVE AN ACCOUNT?
+          <a href="signup.html" class="signup-link">Sign Up Now</a>
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <script src="loginController.js"></script>
+</body>
+</html>
