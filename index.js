@@ -44,18 +44,8 @@ io.on("connection", (socket) => {
   });
 });
 
-app.get("/test", (req, res) => {
-  res.json({ message: "Backend is running" });
-});
-
-app.get("/test-db", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT NOW()");
-    res.json({ success: true, time: result.rows[0] });
-  } catch (error) {
-    console.error("DB test error:", error);
-    res.status(500).json({ success: false, error: error.message });
-  }
+app.get("/", (req, res) => {
+  res.send("Server is running");
 });
 const PORT = 3000;
 
