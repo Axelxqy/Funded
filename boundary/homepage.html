@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Homepage</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-bg">
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="bg-shape shape-3"></div>
+    <div class="bg-shape shape-4"></div>
+
+    <div class="page-content">
+      <nav class="navbar">
+        <div class="logo">logo</div>
+
+        <div class="nav-center">
+          <div class="search-box">
+            <span class="search-icon">⌕</span>
+            <input type="text" placeholder="Search" />
+          </div>
+
+          <a href="#" class="nav-link">Home</a>
+
+          <div class="dropdown">
+            <button class="nav-drop" id="donateBtn" type="button">Donate</button>
+            <div class="dropdown-menu" id="donateMenu">
+              <a href="#">Browse Campaign</a>
+              <a href="#">My Donations</a>
+            </div>
+          </div>
+
+          <div class="dropdown">
+            <button class="nav-drop" id="fundraiseBtn" type="button">Fundraise</button>
+            <div class="dropdown-menu" id="fundraiseMenu">
+              <a href="#">Start A Campaign</a>
+              <a href="#">My Campaigns</a>
+            </div>
+          </div>
+
+          <div class="profile-dropdown">
+            <button class="profile-btn" id="profileBtn" type="button">
+              <span class="profile-circle"></span>
+              <span class="profile-text">tc</span>
+              <span class="caret">▼</span>
+            </button>
+
+            <div class="profile-menu" id="profileMenu">
+              <a href="#">Profile</a>
+              <a href="#">Your impact</a>
+              <a href="#">Account settings</a>
+              <a href="#">Sign out</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <section class="hero-top">
+        <div class="top-pattern">
+          <div class="pattern-shape p1"></div>
+          <div class="pattern-shape p2"></div>
+          <div class="pattern-shape p3"></div>
+          <div class="pattern-shape p4"></div>
+          <div class="pattern-dot d1"></div>
+          <div class="pattern-dot d2"></div>
+          <div class="pattern-dot d3"></div>
+          <div class="pattern-dot d4"></div>
+          <div class="pattern-dot d5"></div>
+          <div class="pattern-dot d6"></div>
+        </div>
+
+        <div class="hero">
+          <h1>Connect Fundraisers with Donors</h1>
+          <p>Support meaningful causes or start your own fundraising today</p>
+
+          <div class="hero-buttons">
+            <button class="hero-btn" type="button">Start Fundraising</button>
+            <button class="hero-btn" type="button">Donate Now</button>
+          </div>
+        </div>
+
+        <section class="slideshow-section">
+          <div class="slideshow-wrapper">
+            <button class="slide-arrow left-arrow" id="prevSlide" type="button">&#10094;</button>
+
+            <div class="slideshow-window">
+              <div class="slideshow-track" id="slideshowTrack">
+                <div class="slide-card"><img src="https://images.pexels.com/photos/6646918/pexels-photo-6646918.jpeg?auto=compress&cs=tinysrgb&w=900" alt="slide 1"></div>
+                <div class="slide-card"><img src="https://images.pexels.com/photos/6994982/pexels-photo-6994982.jpeg?auto=compress&cs=tinysrgb&w=900" alt="slide 2"></div>
+                <div class="slide-card"><img src="https://images.pexels.com/photos/7551676/pexels-photo-7551676.jpeg?auto=compress&cs=tinysrgb&w=900" alt="slide 3"></div>
+                <div class="slide-card"><img src="https://images.pexels.com/photos/6647037/pexels-photo-6647037.jpeg?auto=compress&cs=tinysrgb&w=900" alt="slide 4"></div>
+              </div>
+            </div>
+
+            <button class="slide-arrow right-arrow" id="nextSlide" type="button">&#10095;</button>
+          </div>
+        </section>
+      </section>
+
+      <section class="programs">
+        <div class="program-card">
+          <div class="program-title">"WE CARE"<br />SPONSOR-A-STUDENT PROGRAM</div>
+          <div class="program-image sponsor-style">
+            <img src="https://images.pexels.com/photos/8613089/pexels-photo-8613089.jpeg?auto=compress&cs=tinysrgb&w=900" alt="Sponsor program" />
+            <div class="yellow-ribbon">SPONSOR A STUDENT</div>
+          </div>
+          <div class="program-btn-wrap">
+            <button class="program-btn" type="button">Full Sponsor</button>
+            <button class="program-btn" type="button">Any Amount</button>
+          </div>
+        </div>
+
+        <div class="program-card">
+          <div class="program-title">MEDICAL FUND</div>
+          <div class="program-image">
+            <img src="https://images.pexels.com/photos/7551680/pexels-photo-7551680.jpeg?auto=compress&cs=tinysrgb&w=900" alt="Medical fund" />
+          </div>
+          <div class="program-btn-wrap">
+            <button class="program-btn" type="button">Donate Now</button>
+          </div>
+        </div>
+
+        <div class="program-card">
+          <div class="program-title">OTHER AID PROGRAMME</div>
+          <div class="program-image">
+            <img src="https://images.pexels.com/photos/6647117/pexels-photo-6647117.jpeg?auto=compress&cs=tinysrgb&w=900" alt="Aid programme" />
+          </div>
+          <div class="program-btn-wrap">
+            <button class="program-btn" type="button">Donate Now</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="process-section">
+        <div class="process-left">
+          <div class="social-card">
+            <div class="small-info-dot">i</div>
+
+            <div class="phone-box">
+              <div class="social-icons">
+                <div class="social-icon gmail">G</div>
+                <div class="social-icon whatsapp">W</div>
+                <div class="social-icon facebook">f</div>
+                <div class="social-icon instagram">I</div>
+                <div class="social-icon messenger">✉</div>
+                <div class="social-icon linkedin">in</div>
+                <div class="social-icon tiktok">♪</div>
+              </div>
+            </div>
+
+            <button class="ready-btn" type="button">Ready to share</button>
+          </div>
+        </div>
+
+        <div class="process-right">
+          <h2>Learn more about process</h2>
+
+          <div class="step">
+            <div class="step-no">1</div>
+            <div class="step-text">
+              <h3>Create your campaign</h3>
+              <p>Fill in your campaign details including title, category, goal amount, and description to start your fundraising.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-no">2</div>
+            <div class="step-text">
+              <h3>Share and attract donors</h3>
+              <p>Share your campaign with friends and let donors discover and support your cause.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-no">3</div>
+            <div class="step-text">
+              <h3>Track and receive donations</h3>
+              <p>Monitor your campaign progress, view donors, and receive funds securely.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta-section">
+        <p class="cta-text">Make a difference today!</p>
+        <button class="donate-big-btn" type="button">DONATE NOW</button>
+      </section>
+
+      <section class="faq-section">
+        <h2 class="faq-title">FAQ</h2>
+
+        <details class="faq-item">
+          <summary>How can I make a donation to UNICEF?</summary>
+          <p>Select a campaign, click donate, and complete the payment process.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>Why a monthly donation?</summary>
+          <p>Monthly donations help provide stable and continuous support for fundraising activities.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>How do I contact UNICEF Malaysia?</summary>
+          <p>You can contact us through email or the contact page.</p>
+        </details>
+      </section>
+
+      <footer class="footer">
+        <div class="footer-logo">logo</div>
+
+        <div class="footer-contact">
+          Email: abc@gmail.com<br />
+          Tel:123456789
+        </div>
+
+        <div class="footer-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Legal</a>
+          <a href="#">Contact Us</a>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <script src="homepageController.js"></script>
+</body>
+</html>
