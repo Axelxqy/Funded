@@ -31,6 +31,8 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.static('boundary'));
+app.use('/controller', express.static('controller'));
 app.use("/auth", authRoutes);
 
 // ==========================
