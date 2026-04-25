@@ -8,7 +8,7 @@ const path = require("path");
 const { Server } = require("socket.io");
 const cookieParser = require("cookie-parser");
 const pool = require("./helper/db");
-const authRoutes = require("./controller/authRoutes");
+const authRoutes = require("./boundary/controller/authRoutes");
 
 const app = express();
 const server = http.createServer(app);

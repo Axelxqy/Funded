@@ -1,4 +1,4 @@
-const pool = require("../helper/db");
+const pool = require("../../helper/db");
 
 const signup = async (req, res) => {
   const { email, password, f_name, l_name, dob, phone } = req.body;

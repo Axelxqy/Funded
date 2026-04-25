@@ -3,228 +3,239 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Homepage</title>
+
+  <title>Helping Hands - Homepage</title>
+
   <link rel="stylesheet" href="homepage.css" />
 </head>
+
 <body>
-  <div class="app-bg">
-    <div class="bg-shape shape-1"></div>
-    <div class="bg-shape shape-2"></div>
-    <div class="bg-shape shape-3"></div>
-    <div class="bg-shape shape-4"></div>
 
-    <div class="page-content">
-      <nav class="navbar">
-        <div class="logo">logo</div>
+  <!-- HEADER SAME AS BROWSE CAMPAIGN -->
+  <header class="topbar">
+    <div class="header-left">
+      <a href="homepage.html" class="brand-logo">
+        <svg class="brand-icon" viewBox="0 0 64 64" aria-hidden="true">
+          <path d="M32 18C28 10 15 10 15 23C15 33 32 43 32 43C32 43 49 33 49 23C49 10 36 10 32 18Z" />
+          <path d="M15 38C20 39 25 43 29 48" />
+          <path d="M49 38C44 39 39 43 35 48" />
+          <path d="M13 36C8 39 9 49 19 52C24 54 29 55 32 58" />
+          <path d="M51 36C56 39 55 49 45 52C40 54 35 55 32 58" />
+        </svg>
 
-        <div class="nav-center">
-          <div class="search-box">
-            <span class="search-icon">⌕</span>
-            <input type="text" placeholder="Search" />
-          </div>
-
-          <a href="#" class="nav-link">Home</a>
-
-          <div class="dropdown">
-            <button class="nav-drop" id="donateBtn" type="button">Donate</button>
-            <div class="dropdown-menu" id="donateMenu">
-              <a href="#">Browse Campaign</a>
-              <a href="#">My Donations</a>
-            </div>
-          </div>
-
-          <div class="dropdown">
-            <button class="nav-drop" id="fundraiseBtn" type="button">Fundraise</button>
-            <div class="dropdown-menu" id="fundraiseMenu">
-              <a href="#">Start A Campaign</a>
-              <a href="#">My Campaigns</a>
-            </div>
-          </div>
-
-          <div class="profile-dropdown">
-            <button class="profile-btn" id="profileBtn" type="button">
-              <span class="profile-circle"></span>
-              <span class="profile-text">tc</span>
-              <span class="caret">▼</span>
-            </button>
-
-            <div class="profile-menu" id="profileMenu">
-              <a href="#">Profile</a>
-              <a href="#">Your impact</a>
-              <a href="#">Account settings</a>
-              <a href="#">Sign out</a>
-            </div>
-          </div>
+        <div class="brand-text">
+          <div class="brand-title">Helping Hands</div>
+          <div class="brand-subtitle">Fundraising Platform</div>
         </div>
-      </nav>
-
-      <section class="hero-top">
-        <div class="top-pattern">
-          <div class="pattern-shape p1"></div>
-          <div class="pattern-shape p2"></div>
-          <div class="pattern-shape p3"></div>
-          <div class="pattern-shape p4"></div>
-          <div class="pattern-dot d1"></div>
-          <div class="pattern-dot d2"></div>
-          <div class="pattern-dot d3"></div>
-          <div class="pattern-dot d4"></div>
-          <div class="pattern-dot d5"></div>
-          <div class="pattern-dot d6"></div>
-        </div>
-
-        <div class="hero">
-          <h1>Connect Fundraisers with Donors</h1>
-          <p>Support meaningful causes or start your own fundraising today</p>
-
-          <div class="hero-buttons">
-            <button class="hero-btn" type="button">Start Fundraising</button>
-            <button class="hero-btn" type="button">Donate Now</button>
-          </div>
-        </div>
-
-        <section class="slideshow-section">
-          <div class="slideshow-wrapper">
-            <button class="slide-arrow left-arrow" id="prevSlide" type="button">&#10094;</button>
-
-            <div class="slideshow-window">
-              <div class="slideshow-track" id="slideshowTrack">
-                <div class="slide-card"><img src="https://images.pexels.com/photos/6646918/pexels-photo-6646918.jpeg?auto=compress&cs=tinysrgb&w=900" alt="slide 1"></div>
-                <div class="slide-card"><img src="https://images.pexels.com/photos/6994982/pexels-photo-6994982.jpeg?auto=compress&cs=tinysrgb&w=900" alt="slide 2"></div>
-                <div class="slide-card"><img src="https://images.pexels.com/photos/7551676/pexels-photo-7551676.jpeg?auto=compress&cs=tinysrgb&w=900" alt="slide 3"></div>
-                <div class="slide-card"><img src="https://images.pexels.com/photos/6647037/pexels-photo-6647037.jpeg?auto=compress&cs=tinysrgb&w=900" alt="slide 4"></div>
-              </div>
-            </div>
-
-            <button class="slide-arrow right-arrow" id="nextSlide" type="button">&#10095;</button>
-          </div>
-        </section>
-      </section>
-
-      <section class="programs">
-        <div class="program-card">
-          <div class="program-title">"WE CARE"<br />SPONSOR-A-STUDENT PROGRAM</div>
-          <div class="program-image sponsor-style">
-            <img src="https://images.pexels.com/photos/8613089/pexels-photo-8613089.jpeg?auto=compress&cs=tinysrgb&w=900" alt="Sponsor program" />
-            <div class="yellow-ribbon">SPONSOR A STUDENT</div>
-          </div>
-          <div class="program-btn-wrap">
-            <button class="program-btn" type="button">Full Sponsor</button>
-            <button class="program-btn" type="button">Any Amount</button>
-          </div>
-        </div>
-
-        <div class="program-card">
-          <div class="program-title">MEDICAL FUND</div>
-          <div class="program-image">
-            <img src="https://images.pexels.com/photos/7551680/pexels-photo-7551680.jpeg?auto=compress&cs=tinysrgb&w=900" alt="Medical fund" />
-          </div>
-          <div class="program-btn-wrap">
-            <button class="program-btn" type="button">Donate Now</button>
-          </div>
-        </div>
-
-        <div class="program-card">
-          <div class="program-title">OTHER AID PROGRAMME</div>
-          <div class="program-image">
-            <img src="https://images.pexels.com/photos/6647117/pexels-photo-6647117.jpeg?auto=compress&cs=tinysrgb&w=900" alt="Aid programme" />
-          </div>
-          <div class="program-btn-wrap">
-            <button class="program-btn" type="button">Donate Now</button>
-          </div>
-        </div>
-      </section>
-
-      <section class="process-section">
-        <div class="process-left">
-          <div class="social-card">
-            <div class="small-info-dot">i</div>
-
-            <div class="phone-box">
-              <div class="social-icons">
-                <div class="social-icon gmail">G</div>
-                <div class="social-icon whatsapp">W</div>
-                <div class="social-icon facebook">f</div>
-                <div class="social-icon instagram">I</div>
-                <div class="social-icon messenger">✉</div>
-                <div class="social-icon linkedin">in</div>
-                <div class="social-icon tiktok">♪</div>
-              </div>
-            </div>
-
-            <button class="ready-btn" type="button">Ready to share</button>
-          </div>
-        </div>
-
-        <div class="process-right">
-          <h2>Learn more about process</h2>
-
-          <div class="step">
-            <div class="step-no">1</div>
-            <div class="step-text">
-              <h3>Create your campaign</h3>
-              <p>Fill in your campaign details including title, category, goal amount, and description to start your fundraising.</p>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-no">2</div>
-            <div class="step-text">
-              <h3>Share and attract donors</h3>
-              <p>Share your campaign with friends and let donors discover and support your cause.</p>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-no">3</div>
-            <div class="step-text">
-              <h3>Track and receive donations</h3>
-              <p>Monitor your campaign progress, view donors, and receive funds securely.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="cta-section">
-        <p class="cta-text">Make a difference today!</p>
-        <button class="donate-big-btn" type="button">DONATE NOW</button>
-      </section>
-
-      <section class="faq-section">
-        <h2 class="faq-title">FAQ</h2>
-
-        <details class="faq-item">
-          <summary>How can I make a donation to UNICEF?</summary>
-          <p>Select a campaign, click donate, and complete the payment process.</p>
-        </details>
-
-        <details class="faq-item">
-          <summary>Why a monthly donation?</summary>
-          <p>Monthly donations help provide stable and continuous support for fundraising activities.</p>
-        </details>
-
-        <details class="faq-item">
-          <summary>How do I contact UNICEF Malaysia?</summary>
-          <p>You can contact us through email or the contact page.</p>
-        </details>
-      </section>
-
-      <footer class="footer">
-        <div class="footer-logo">logo</div>
-
-        <div class="footer-contact">
-          Email: abc@gmail.com<br />
-          Tel:123456789
-        </div>
-
-        <div class="footer-links">
-          <a href="#">Privacy Policy</a>
-          <a href="#">Legal</a>
-          <a href="#">Contact Us</a>
-        </div>
-      </footer>
+      </a>
     </div>
-  </div>
 
-  <script src="homepageController.js"></script>
+    <div class="header-center">
+      <div class="header-search">
+        <span>🔍</span>
+        <input type="text" placeholder="Search campaigns" />
+      </div>
+    </div>
+
+    <nav class="header-right">
+      <a href="homepage.html" class="nav-link active">Home</a>
+
+      <!-- DONEE DROPDOWN -->
+      <div class="nav-dropdown" id="donateDropdown">
+        <button class="nav-link nav-button" id="donateMenuBtn" type="button">
+          Donee <span class="small-arrow">▼</span>
+        </button>
+
+        <div class="nav-dropdown-menu">
+          <a href="browseCampaign.html" class="nav-dropdown-item">Browse Campaigns</a>
+          <a href="myDonation.html" class="nav-dropdown-item">My Donations</a>
+        </div>
+      </div>
+
+      <!-- FUNDRAISE DROPDOWN -->
+      <div class="nav-dropdown" id="fundraiseDropdown">
+        <button class="nav-link nav-button" id="fundraiseMenuBtn" type="button">
+          Fundraise <span class="small-arrow">▼</span>
+        </button>
+
+        <div class="nav-dropdown-menu">
+          <a href="startCampaign.html" class="nav-dropdown-item">Start a Campaign</a>
+          <a href="myCampaign.html" class="nav-dropdown-item">My Campaigns</a>
+        </div>
+      </div>
+
+      <!-- ABOUT DROPDOWN -->
+      <div class="nav-dropdown" id="aboutDropdown">
+        <button class="nav-link nav-button" id="aboutMenuBtn" type="button">
+          About <span class="small-arrow">▼</span>
+        </button>
+
+        <div class="nav-dropdown-menu">
+          <a href="aboutUs.html" class="nav-dropdown-item">About Us</a>
+        </div>
+      </div>
+
+      <div class="profile-divider"></div>
+
+      <div class="profile-box">
+        <div class="avatar"></div>
+        <div class="profile-name">tc <span>▲</span></div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero-section">
+    <div class="hero-left">
+      <h1>
+        Together, we can <br />
+        <span>make a difference</span>
+      </h1>
+
+      <p>
+        Support meaningful causes and help create
+        <br />
+        a better tomorrow for everyone.
+      </p>
+
+      <a href="browseCampaign.html" class="hero-btn">DONATE NOW</a>
+    </div>
+
+    <div class="hero-right">
+      <img src="hero-heart.jpg" alt="Hands holding green heart" />
+    </div>
+
+    <div class="hero-wave"></div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-it-works">
+    <h2>How It Works</h2>
+    <p class="section-subtitle">Making an impact is simple</p>
+
+    <div class="steps-row">
+      <a href="browseCampaign.html" class="step-item step-link">
+        <div class="step-icon">⌕</div>
+        <h3>1. Find a Campaign</h3>
+        <p>Browse and discover causes that matter to you.</p>
+      </a>
+
+      <div class="step-line"></div>
+
+      <a href="browseCampaign.html" class="step-item step-link">
+        <div class="step-icon">♡</div>
+        <h3>2. Make a Donation</h3>
+        <p>Your donation helps bring hope and support to those in need.</p>
+      </a>
+
+      <div class="step-line"></div>
+
+      <a href="myDonation.html" class="step-item step-link">
+        <div class="step-icon">👥</div>
+        <h3>3. Create Change</h3>
+        <p>Together, we build stronger communities.</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- EXPLORE CAUSES -->
+  <section class="causes-section">
+    <h2>Explore Causes</h2>
+    <p class="section-subtitle">Choose a cause close to your heart</p>
+
+    <div class="causes-grid">
+      <a href="browseCampaign.html" class="cause-card cause-green cause-link">
+        <div class="cause-card-icon">♡</div>
+        <h3>Health</h3>
+        <p>Support medical care and health initiatives</p>
+      </a>
+
+      <a href="browseCampaign.html" class="cause-card cause-yellow cause-link">
+        <div class="cause-card-icon">🐾</div>
+        <h3>Animals</h3>
+        <p>Help protect and care for animals</p>
+      </a>
+
+      <a href="browseCampaign.html" class="cause-card cause-blue cause-link">
+        <div class="cause-card-icon">🎓</div>
+        <h3>Education</h3>
+        <p>Empower learning and brighten futures</p>
+      </a>
+
+      <a href="browseCampaign.html" class="cause-card cause-purple cause-link">
+        <div class="cause-card-icon">🤲</div>
+        <h3>Community</h3>
+        <p>Support people and strengthen communities</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- FEATURED CAMPAIGNS -->
+  <section class="featured-section">
+    <h2>Featured Campaigns</h2>
+    <p class="section-subtitle">Real stories. Real impact.</p>
+
+    <div class="featured-grid">
+      <a href="campaignDetail.html?id=1" class="campaign-card campaign-link">
+        <img
+          src="https://images.pexels.com/photos/6994982/pexels-photo-6994982.jpeg?auto=compress&cs=tinysrgb&w=900"
+          alt="Provide Meals for Children"
+        />
+
+        <div class="campaign-content">
+          <h3>Provide Meals for Children</h3>
+          <p>Help us provide nutritious meals for children in need.</p>
+        </div>
+      </a>
+
+      <a href="campaignDetail.html?id=4" class="campaign-card campaign-link">
+        <img
+          src="https://images.pexels.com/photos/1108099/pexels-photo-1108099.jpeg?auto=compress&cs=tinysrgb&w=900"
+          alt="Shelter and Care for Animals"
+        />
+
+        <div class="campaign-content">
+          <h3>Shelter and Care for Animals</h3>
+          <p>Support shelters to give animals a safe and loving home.</p>
+        </div>
+      </a>
+
+      <a href="campaignDetail.html?id=2" class="campaign-card campaign-link">
+        <img
+          src="https://images.pexels.com/photos/8422135/pexels-photo-8422135.jpeg?auto=compress&cs=tinysrgb&w=900"
+          alt="Education for Every Child"
+        />
+
+        <div class="campaign-content">
+          <h3>Education for Every Child</h3>
+          <p>Provide learning resources and opportunities for kids.</p>
+        </div>
+      </a>
+    </div>
+
+    <a href="browseCampaign.html" class="bottom-donate-btn">DONATE NOW</a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-col">
+      <h4>Donee</h4>
+      <a href="browseCampaign.html">Browse Campaigns</a>
+      <a href="myDonation.html">My Donations</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Fundraise</h4>
+      <a href="startCampaign.html">Start a Campaign</a>
+      <a href="myCampaign.html">My Campaigns</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>About</h4>
+      <a href="aboutUs.html">About Us</a>
+    </div>
+  </footer>
+
+  <script src="../controller/homepageController.js"></script>
 </body>
 </html>

@@ -194,7 +194,11 @@ signupBtn.addEventListener("click", async function () {
     const data = await response.json();
 
     if (!response.ok) {
-      alert(data.message || "Signup failed.");
+      if (data.message === "Email already registered.") {
+        showError(signupEmailInput, signupEmailError, "This email is already registered.");
+      } else {
+        alert(data.message || "Signup failed.");
+      }
       return;
     }
 

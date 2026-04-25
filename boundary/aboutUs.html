@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>About Us - Helping Hands</title>
+
+  <link rel="stylesheet" href="aboutUs.css" />
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="topbar">
+    <div class="header-left">
+      <a href="homepage.html" class="brand-logo">
+        <svg class="brand-icon" viewBox="0 0 64 64" aria-hidden="true">
+          <path d="M32 18C28 10 15 10 15 23C15 33 32 43 32 43C32 43 49 33 49 23C49 10 36 10 32 18Z" />
+          <path d="M15 38C20 39 25 43 29 48" />
+          <path d="M49 38C44 39 39 43 35 48" />
+          <path d="M13 36C8 39 9 49 19 52C24 54 29 55 32 58" />
+          <path d="M51 36C56 39 55 49 45 52C40 54 35 55 32 58" />
+        </svg>
+
+        <div class="brand-text">
+          <div class="brand-title">Helping Hands</div>
+          <div class="brand-subtitle">Fundraising Platform</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="header-center">
+      <div class="header-search">
+        <span>🔍</span>
+        <input type="text" placeholder="Search campaigns" />
+      </div>
+    </div>
+
+    <nav class="header-right">
+      <a href="homepage.html" class="nav-link">Home</a>
+
+      <!-- DONEE DROPDOWN -->
+      <div class="nav-dropdown" id="donateDropdown">
+        <button class="nav-link nav-button" id="donateMenuBtn" type="button">
+          Donee <span class="small-arrow">▼</span>
+        </button>
+
+        <div class="nav-dropdown-menu">
+          <a href="browseCampaign.html" class="nav-dropdown-item">Browse Campaigns</a>
+          <a href="myDonation.html" class="nav-dropdown-item">My Donations</a>
+        </div>
+      </div>
+
+      <!-- FUNDRAISE DROPDOWN -->
+      <div class="nav-dropdown" id="fundraiseDropdown">
+        <button class="nav-link nav-button" id="fundraiseMenuBtn" type="button">
+          Fundraise <span class="small-arrow">▼</span>
+        </button>
+
+        <div class="nav-dropdown-menu">
+          <a href="startCampaign.html" class="nav-dropdown-item">Start a Campaign</a>
+          <a href="myCampaign.html" class="nav-dropdown-item">My Campaigns</a>
+        </div>
+      </div>
+
+      <!-- ABOUT DROPDOWN -->
+      <div class="nav-dropdown" id="aboutDropdown">
+        <button class="nav-link active nav-button" id="aboutMenuBtn" type="button">
+          About <span class="small-arrow">▼</span>
+        </button>
+
+        <div class="nav-dropdown-menu">
+          <a href="aboutUs.html" class="nav-dropdown-item">About Us</a>
+        </div>
+      </div>
+
+      <div class="profile-divider"></div>
+
+      <div class="profile-box">
+        <div class="avatar"></div>
+        <div class="profile-name">tc <span>▲</span></div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- MAIN -->
+  <main class="about-page">
+
+    <!-- HERO -->
+    <section class="about-hero">
+      <div class="about-hero-text">
+        <h1>About Helping Hands</h1>
+        <h2>Together, we can create a better future.</h2>
+
+        <p>
+          Helping Hands is a trusted fundraising platform connecting kind-hearted
+          people with meaningful causes. We make it easy to start, share, and
+          support campaigns that create real impact in our communities.
+        </p>
+      </div>
+
+      <div class="about-hero-image">
+        <img src="hero-heart.jpg" alt="Hands holding a green heart" />
+      </div>
+    </section>
+
+    <!-- MISSION -->
+    <section class="mission-section">
+      <div class="mission-text">
+        <h2>Our Mission</h2>
+
+        <p>
+          To empower individuals and communities by providing a transparent,
+          secure, and user-friendly platform for fundraising and charitable giving.
+        </p>
+      </div>
+
+      <div class="mission-cards">
+        <div class="mission-card">
+          <div class="mission-icon">💚</div>
+          <h3>Empower</h3>
+          <p>We empower people to make a difference through fundraising.</p>
+        </div>
+
+        <div class="mission-card">
+          <div class="mission-icon">🛡</div>
+          <h3>Trust & Transparency</h3>
+          <p>We operate with integrity and ensure transparent use of funds.</p>
+        </div>
+
+        <div class="mission-card">
+          <div class="mission-icon">👥</div>
+          <h3>Community</h3>
+          <p>We build stronger communities through compassion and support.</p>
+        </div>
+
+        <div class="mission-card">
+          <div class="mission-icon">🌐</div>
+          <h3>Impact</h3>
+          <p>We are committed to creating lasting and positive impact.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STORY -->
+    <section class="story-section">
+      <div class="story-text">
+        <h2>Our Story</h2>
+
+        <p>
+          Helping Hands was founded with a simple belief: everyone deserves the
+          opportunity to give and make a difference.
+        </p>
+
+        <p>
+          What started as a small idea has grown into a platform that supports
+          thousands of campaigns and donors across the country.
+        </p>
+
+        <p>
+          We continue to innovate and partner with organizations that share our
+          passion for building a better tomorrow.
+        </p>
+      </div>
+
+      <div class="story-image">
+        <img
+          src="https://images.unsplash.com/photo-1593113598332-cd59a93c6132?auto=format&fit=crop&w=1000&q=80"
+          alt="Volunteers packing donations"
+        />
+      </div>
+    </section>
+
+    <!-- VALUES -->
+    <section class="values-section">
+      <h2>Our Values</h2>
+
+      <div class="values-grid">
+        <div class="value-card">
+          <div class="value-icon">🏅</div>
+
+          <div>
+            <h3>Integrity</h3>
+            <p>We uphold honesty and accountability in everything we do.</p>
+          </div>
+        </div>
+
+        <div class="value-card">
+          <div class="value-icon">🤝</div>
+
+          <div>
+            <h3>Compassion</h3>
+            <p>We care deeply about people and the causes they support.</p>
+          </div>
+        </div>
+
+        <div class="value-card">
+          <div class="value-icon">💡</div>
+
+          <div>
+            <h3>Innovation</h3>
+            <p>We continually improve our platform to serve you better.</p>
+          </div>
+        </div>
+
+        <div class="value-card">
+          <div class="value-icon">👥</div>
+
+          <div>
+            <h3>Inclusivity</h3>
+            <p>We welcome everyone to join us in making a positive change.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER SAME AS HOMEPAGE -->
+  <footer class="site-footer">
+    <div class="footer-col">
+      <h4>Donee</h4>
+      <a href="browseCampaign.html">Browse Campaigns</a>
+      <a href="myDonation.html">My Donations</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Fundraise</h4>
+      <a href="startCampaign.html">Start a Campaign</a>
+      <a href="myCampaign.html">My Campaigns</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>About</h4>
+      <a href="aboutUs.html">About Us</a>
+    </div>
+  </footer>
+
+  <script src="../controller/aboutUsController.js"></script>
+</body>
+</html>
