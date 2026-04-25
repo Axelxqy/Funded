@@ -25,13 +25,62 @@ function setupDropdown(buttonId, dropdownId) {
 setupDropdown("donateMenuBtn", "donateDropdown");
 setupDropdown("fundraiseMenuBtn", "fundraiseDropdown");
 setupDropdown("aboutMenuBtn", "aboutDropdown");
+setupDropdown("profileMenuBtn", "profileDropdown");
 
-document.addEventListener("click", function () {
-  document.querySelectorAll(".nav-dropdown").forEach(function (item) {
-    item.classList.remove("open");
+/* =========================
+   HEADER PROFILE
+========================= */
+const headerAvatar = document.getElementById("headerAvatar");
+const headerName = document.getElementById("headerName");
+const signOutBtn = document.getElementById("signOutBtn");
+
+function getLoggedInUser() {
+  const saved = localStorage.getItem("loggedInUser");
+
+  if (!saved) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(saved);
+  } catch (error) {
+    return null;
+  }
+}
+
+function renderHeaderProfile() {
+  const user = getLoggedInUser();
+
+  if (!user) {
+    if (headerAvatar) headerAvatar.textContent = "U";
+    if (headerName) headerName.textContent = "User";
+    return;
+  }
+
+  const firstName = user.f_name || "";
+  const email = user.email || "";
+  const initial = (firstName || email || "U").charAt(0).toUpperCase();
+
+  if (headerAvatar) {
+    headerAvatar.textContent = initial;
+  }
+
+  if (headerName) {
+    headerName.textContent = firstName || "User";
+  }
+}
+
+if (signOutBtn) {
+  signOutBtn.addEventListener("click", function () {
+    localStorage.removeItem("loggedInUser");
   });
-});
+}
 
+renderHeaderProfile();
+
+/* =========================
+   CAMPAIGN DATA
+========================= */
 const campaigns = [
   {
     id: 1,
@@ -147,8 +196,6 @@ const detailPanels = document.querySelectorAll(".detail-panel");
 
 /* =========================
    FAVOURITE LOCAL STORAGE
-   Must match browseCampaignController.js
-   and favoriteCampaignController.js
 ========================= */
 function getFavoriteIds() {
   const saved = localStorage.getItem("fav_id");
@@ -314,13 +361,17 @@ function renderDonors() {
 /* =========================
    EVENT LISTENERS
 ========================= */
-backBtn.addEventListener("click", function () {
-  window.location.href = "browseCampaign.html";
-});
+if (backBtn) {
+  backBtn.addEventListener("click", function () {
+    window.location.href = "browseCampaign.html";
+  });
+}
 
-detailHeart.addEventListener("click", function () {
-  toggleFavorite(currentCampaignId);
-});
+if (detailHeart) {
+  detailHeart.addEventListener("click", function () {
+    toggleFavorite(currentCampaignId);
+  });
+}
 
 detailTabs.forEach(function (tab) {
   tab.addEventListener("click", function () {
@@ -328,43 +379,129 @@ detailTabs.forEach(function (tab) {
   });
 });
 
-scrollDonateBtn.addEventListener("click", function () {
-  activateDetailTab("donatePanel");
-  document.getElementById("donatePanel").scrollIntoView({
-    behavior: "smooth"
+if (scrollDonateBtn) {
+  scrollDonateBtn.addEventListener("click", function () {
+    activateDetailTab("donatePanel");
+    document.getElementById("donatePanel").scrollIntoView({
+      behavior: "smooth"
+    });
   });
-});
+}
 
-donationInput.addEventListener("input", function () {
-  const value = Number(donationInput.value) || 0;
-  donationSummary.textContent = "SGD " + value;
-});
+if (donationInput) {
+  donationInput.addEventListener("input", function () {
+    const value = Number(donationInput.value) || 0;
+    donationSummary.textContent = "SGD " + value;
+  });
+}
 
-donateNowBtn.addEventListener("click", function () {
-  const amount = Number(donationInput.value) || 0;
+function getDonationRecords() {
+  const saved = localStorage.getItem("donation_records");
 
-  if (amount <= 0) {
-    alert("Please enter a donation amount first.");
-    return;
+  if (!saved) {
+    return [];
   }
 
-  const donors = getDonors();
+  try {
+    return JSON.parse(saved);
+  } catch (error) {
+    return [];
+  }
+}
 
-  donors.unshift({
-    name: "Anonymous",
-    amount: amount,
-    time: formatDateTime()
+function saveDonationRecords(records) {
+  localStorage.setItem("donation_records", JSON.stringify(records));
+}
+
+function getTodayDateOnly() {
+  const now = new Date();
+  const d = String(now.getDate()).padStart(2, "0");
+
+  const months = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
+
+  const m = months[now.getMonth()];
+  const y = now.getFullYear();
+
+  return `${d} ${m} ${y}`;
+}
+
+function getSelectedPaymentMethod() {
+  const checkedPayment = document.querySelector("input[name='paymentMethod']:checked");
+
+  if (!checkedPayment) {
+    return "Credit Card";
+  }
+
+  const label = checkedPayment.closest(".payment-option");
+
+  if (!label) {
+    return "Credit Card";
+  }
+
+  const text = label.textContent.trim();
+
+  if (text.includes("PayNow")) {
+    return "PayNow";
+  }
+
+  return "Credit Card";
+}
+
+if (donateNowBtn) {
+  donateNowBtn.addEventListener("click", function () {
+    const amount = Number(donationInput.value) || 0;
+
+    if (amount <= 0) {
+      alert("Please enter a donation amount first.");
+      return;
+    }
+
+    const donors = getDonors();
+
+    donors.unshift({
+      name: "Anonymous",
+      amount: amount,
+      time: formatDateTime()
+    });
+
+    saveDonors(donors);
+
+    const donationRecords = getDonationRecords();
+
+    const newDonation = {
+      donation_id: Date.now(),
+      campaign_id: currentCampaignId,
+      amount: amount,
+      date: getTodayDateOnly(),
+      payment_method: getSelectedPaymentMethod(),
+      status: "Successful"
+    };
+
+    donationRecords.unshift(newDonation);
+    saveDonationRecords(donationRecords);
+
+    donationInput.value = "";
+    donationSummary.textContent = "SGD 0";
+
+    activateDetailTab("donorsPanel");
+    renderDonors();
+
+    alert("Donation successful. Thank you for your support!");
+
+    window.location.href = "myDonationView.html?id=" + currentCampaignId;
   });
+}
 
-  saveDonors(donors);
-
-  donationInput.value = "";
-  donationSummary.textContent = "SGD 0";
-
-  activateDetailTab("donorsPanel");
-  renderDonors();
-
-  alert("Donation successful. Thank you for your support!");
+/* =========================
+   CLOSE DROPDOWNS
+========================= */
+document.addEventListener("click", function () {
+  document.querySelectorAll(".nav-dropdown").forEach(function (item) {
+    item.classList.remove("open");
+  });
 });
 
 openDetail();

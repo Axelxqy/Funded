@@ -9,7 +9,9 @@ function setupDropdown(buttonId, dropdownId) {
     event.stopPropagation();
 
     document.querySelectorAll(".nav-dropdown").forEach(function (item) {
-      if (item !== dropdown) item.classList.remove("open");
+      if (item !== dropdown) {
+        item.classList.remove("open");
+      }
     });
 
     dropdown.classList.toggle("open");
@@ -23,13 +25,62 @@ function setupDropdown(buttonId, dropdownId) {
 setupDropdown("donateMenuBtn", "donateDropdown");
 setupDropdown("fundraiseMenuBtn", "fundraiseDropdown");
 setupDropdown("aboutMenuBtn", "aboutDropdown");
+setupDropdown("profileMenuBtn", "profileDropdown");
 
-document.addEventListener("click", function () {
-  document.querySelectorAll(".nav-dropdown").forEach(function (item) {
-    item.classList.remove("open");
+/* =========================
+   HEADER PROFILE
+========================= */
+const headerAvatar = document.getElementById("headerAvatar");
+const headerName = document.getElementById("headerName");
+const signOutBtn = document.getElementById("signOutBtn");
+
+function getLoggedInUser() {
+  const saved = localStorage.getItem("loggedInUser");
+
+  if (!saved) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(saved);
+  } catch (error) {
+    return null;
+  }
+}
+
+function renderHeaderProfile() {
+  const user = getLoggedInUser();
+
+  if (!user) {
+    if (headerAvatar) headerAvatar.textContent = "U";
+    if (headerName) headerName.textContent = "User";
+    return;
+  }
+
+  const firstName = user.f_name || "";
+  const email = user.email || "";
+  const initial = (firstName || email || "U").charAt(0).toUpperCase();
+
+  if (headerAvatar) {
+    headerAvatar.textContent = initial;
+  }
+
+  if (headerName) {
+    headerName.textContent = firstName || "User";
+  }
+}
+
+if (signOutBtn) {
+  signOutBtn.addEventListener("click", function () {
+    localStorage.removeItem("loggedInUser");
   });
-});
+}
 
+renderHeaderProfile();
+
+/* =========================
+   CAMPAIGN DATA
+========================= */
 const campaigns = [
   {
     id: 1,
@@ -46,7 +97,7 @@ const campaigns = [
     image: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=900&q=80",
     poster: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=900&q=80",
     shortDesc: "Help us provide nutritious meals for children in need. Your support ensures that no child goes to bed hungry.",
-    about: "We aim to provide healthy and balanced meals to children from underprivileged families and vulnerable communities. Proper nutrition is essential for their growth, learning, and overall well-being. Your donation will help us prepare and deliver meals, source essential ingredients, and support long-term food programs."
+    about: "We aim to provide healthy and balanced meals to children from underprivileged families and vulnerable communities."
   },
   {
     id: 2,
@@ -63,7 +114,7 @@ const campaigns = [
     image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=900&q=80",
     poster: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=900&q=80",
     shortDesc: "Help us bring health, joy and connection to vulnerable seniors through our kindness initiative.",
-    about: "This initiative supports elderly members of the community by funding check-ups, companionship activities, outreach services, and well-being programmes that reduce loneliness and improve quality of life."
+    about: "This initiative supports elderly members of the community."
   },
   {
     id: 3,
@@ -80,7 +131,7 @@ const campaigns = [
     image: "https://images.unsplash.com/photo-1618477462146-050d2767eac4?auto=format&fit=crop&w=900&q=80",
     poster: "https://images.unsplash.com/photo-1593113598332-cd59a93c6132?auto=format&fit=crop&w=900&q=80",
     shortDesc: "Your support helps provide urgent relief aid and humanitarian assistance for affected communities.",
-    about: "Funds raised will support emergency relief operations, humanitarian logistics, medical assistance, and essential supplies for affected families and communities."
+    about: "Funds raised will support emergency relief operations."
   },
   {
     id: 4,
@@ -97,16 +148,49 @@ const campaigns = [
     image: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=900&q=80",
     poster: "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=900&q=80",
     shortDesc: "Support medical treatment and care for rescued animals in need through this SOSD fundraiser.",
-    about: "Donations help cover rescue, surgery, medicine, foster care, recovery treatment, and ongoing medical support for vulnerable animals."
+    about: "Donations help cover rescue, surgery, medicine, foster care, and recovery treatment."
   }
 ];
 
+/* =========================
+   DONATION DATA
+========================= */
 const donationRecords = [
-  { campaignId: 1, amount: 100, date: "20 May 2026", paymentMethod: "PayNow", status: "Successful" },
-  { campaignId: 4, amount: 30, date: "05 May 2026", paymentMethod: "Credit Card", status: "Successful" },
-  { campaignId: 2, amount: 50, date: "28 Apr 2026", paymentMethod: "Credit Card", status: "Successful" },
-  { campaignId: 2, amount: 25, date: "18 Apr 2026", paymentMethod: "PayNow", status: "Successful" },
-  { campaignId: 3, amount: 80, date: "12 Apr 2026", paymentMethod: "PayNow", status: "Successful" }
+  {
+    campaignId: 1,
+    amount: 100,
+    date: "20 May 2026",
+    paymentMethod: "PayNow",
+    status: "Successful"
+  },
+  {
+    campaignId: 4,
+    amount: 30,
+    date: "05 May 2026",
+    paymentMethod: "Credit Card",
+    status: "Successful"
+  },
+  {
+    campaignId: 2,
+    amount: 50,
+    date: "28 Apr 2026",
+    paymentMethod: "Credit Card",
+    status: "Successful"
+  },
+  {
+    campaignId: 2,
+    amount: 25,
+    date: "18 Apr 2026",
+    paymentMethod: "PayNow",
+    status: "Successful"
+  },
+  {
+    campaignId: 3,
+    amount: 80,
+    date: "12 Apr 2026",
+    paymentMethod: "PayNow",
+    status: "Successful"
+  }
 ];
 
 const donationTableBody = document.getElementById("donationTableBody");
@@ -118,11 +202,17 @@ const firstDonation = document.getElementById("firstDonation");
 const latestDonation = document.getElementById("latestDonation");
 
 function getCampaignById(id) {
-  return campaigns.find(campaign => campaign.id === id);
+  return campaigns.find(function (campaign) {
+    return campaign.id === id;
+  });
 }
 
 function renderStats(records) {
-  const uniqueCampaignIds = new Set(records.map(record => record.campaignId));
+  const uniqueCampaignIds = new Set(
+    records.map(function (record) {
+      return record.campaignId;
+    })
+  );
 
   totalCampaigns.textContent = uniqueCampaignIds.size;
   totalDonations.textContent = records.length;
@@ -133,13 +223,18 @@ function renderStats(records) {
 function renderDonations() {
   const keyword = donationSearch.value.toLowerCase();
 
-  const visibleRecords = donationRecords.filter(record => {
+  const visibleRecords = donationRecords.filter(function (record) {
     const campaign = getCampaignById(record.campaignId);
-    if (!campaign) return false;
 
-    return campaign.title.toLowerCase().includes(keyword) ||
-           campaign.category.toLowerCase().includes(keyword) ||
-           record.date.toLowerCase().includes(keyword);
+    if (!campaign) {
+      return false;
+    }
+
+    return (
+      campaign.title.toLowerCase().includes(keyword) ||
+      campaign.category.toLowerCase().includes(keyword) ||
+      record.date.toLowerCase().includes(keyword)
+    );
   });
 
   renderStats(donationRecords);
@@ -154,10 +249,11 @@ function renderDonations() {
     return;
   }
 
-  visibleRecords.forEach(record => {
+  visibleRecords.forEach(function (record) {
     const campaign = getCampaignById(record.campaignId);
 
     const row = document.createElement("tr");
+
     row.innerHTML = `
       <td>
         <div class="campaign-cell">
@@ -168,25 +264,48 @@ function renderDonations() {
           </div>
         </div>
       </td>
-      <td><span class="category-pill ${campaign.categoryClass}">${campaign.category}</span></td>
+
+      <td>
+        <span class="category-pill ${campaign.categoryClass}">
+          ${campaign.category}
+        </span>
+      </td>
+
       <td>${record.date}</td>
       <td>SGD ${record.amount}</td>
-      <td><span class="status-pill">${record.status}</span></td>
+
       <td>
-        <button class="view-campaign-btn" data-id="${campaign.id}" type="button">👁 View Campaign</button>
+        <span class="status-pill">${record.status}</span>
+      </td>
+
+      <td>
+        <button class="view-campaign-btn" data-id="${campaign.id}" type="button">
+          👁 View Campaign
+        </button>
       </td>
     `;
 
     donationTableBody.appendChild(row);
   });
 
-  document.querySelectorAll(".view-campaign-btn").forEach(button => {
+  document.querySelectorAll(".view-campaign-btn").forEach(function (button) {
     button.addEventListener("click", function () {
-      window.location.href = `campaignDetail.html?id=${button.dataset.id}`;
+      window.location.href = "mydonationView.html?id=" + button.dataset.id;
     });
   });
 }
 
-donationSearch.addEventListener("input", renderDonations);
+if (donationSearch) {
+  donationSearch.addEventListener("input", renderDonations);
+}
+
+/* =========================
+   CLOSE DROPDOWNS
+========================= */
+document.addEventListener("click", function () {
+  document.querySelectorAll(".nav-dropdown").forEach(function (item) {
+    item.classList.remove("open");
+  });
+});
 
 renderDonations();

@@ -25,6 +25,55 @@ function setupDropdown(buttonId, dropdownId) {
 setupDropdown("donateMenuBtn", "donateDropdown");
 setupDropdown("fundraiseMenuBtn", "fundraiseDropdown");
 setupDropdown("aboutMenuBtn", "aboutDropdown");
+setupDropdown("profileMenuBtn", "profileDropdown");
+
+const headerAvatar = document.getElementById("headerAvatar");
+const headerName = document.getElementById("headerName");
+const signOutBtn = document.getElementById("signOutBtn");
+
+function getLoggedInUser() {
+  const saved = localStorage.getItem("loggedInUser");
+
+  if (!saved) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(saved);
+  } catch (error) {
+    return null;
+  }
+}
+
+function renderHeaderProfile() {
+  const user = getLoggedInUser();
+
+  if (!user) {
+    if (headerAvatar) headerAvatar.textContent = "U";
+    if (headerName) headerName.textContent = "User";
+    return;
+  }
+
+  const firstName = user.f_name || "";
+  const email = user.email || "";
+  const initial = (firstName || email || "U").charAt(0).toUpperCase();
+
+  if (headerAvatar) {
+    headerAvatar.textContent = initial;
+  }
+
+  if (headerName) {
+    headerName.textContent = firstName || "User";
+  }
+}
+
+if (signOutBtn) {
+  signOutBtn.addEventListener("click", function () {
+    localStorage.removeItem("loggedInUser");
+  });
+}
+
+renderHeaderProfile();
 
 const campaigns = [
   {
@@ -118,9 +167,6 @@ const searchBtn = document.getElementById("searchBtn");
 const causesDropdown = document.getElementById("causesDropdown");
 const causesBtn = document.getElementById("causesBtn");
 
-/* =========================
-   FAVOURITE LOCAL STORAGE
-========================= */
 function getFavoriteIds() {
   const saved = localStorage.getItem("fav_id");
 
@@ -158,9 +204,6 @@ function toggleFavorite(id) {
   renderCards();
 }
 
-/* =========================
-   FILTER CAMPAIGNS
-========================= */
 function getVisibleCampaigns() {
   let visibleCampaigns = campaigns.slice();
 
@@ -191,9 +234,6 @@ function getVisibleCampaigns() {
   return visibleCampaigns;
 }
 
-/* =========================
-   RENDER CAMPAIGN CARDS
-========================= */
 function renderCards() {
   if (!campaignGrid) return;
 
@@ -202,23 +242,15 @@ function renderCards() {
   const visibleCampaigns = getVisibleCampaigns();
 
   if (exploreText) {
-    if (activeCampaignTab === "favorite") {
-      exploreText.textContent =
-        "Explore favorite campaign" + (visibleCampaigns.length === 1 ? "" : "s");
-    } else {
-      exploreText.textContent =
-        "Explore " +
-        visibleCampaigns.length +
-        " campaign" +
-        (visibleCampaigns.length === 1 ? "" : "s");
-    }
+    exploreText.textContent =
+      "Explore " +
+      visibleCampaigns.length +
+      " campaign" +
+      (visibleCampaigns.length === 1 ? "" : "s");
   }
 
   if (visibleCampaigns.length === 0) {
-    campaignGrid.innerHTML =
-      activeCampaignTab === "favorite"
-        ? `<div class="empty-message">No favorite campaigns yet</div>`
-        : `<div class="empty-message">No campaign found.</div>`;
+    campaignGrid.innerHTML = `<div class="empty-message">No campaign found.</div>`;
     return;
   }
 
@@ -267,9 +299,6 @@ function renderCards() {
   });
 }
 
-/* =========================
-   TAB EVENT
-========================= */
 campaignTabs.forEach(function (tab) {
   tab.addEventListener("click", function () {
     campaignTabs.forEach(function (item) {
@@ -277,17 +306,19 @@ campaignTabs.forEach(function (tab) {
     });
 
     tab.classList.add("active");
-    activeCampaignTab = tab.dataset.tab;
+    activeCampaignTab = tab.dataset.tab || "all";
     renderCards();
   });
 });
 
-/* =========================
-   CAUSES DROPDOWN
-========================= */
 if (causesBtn && causesDropdown) {
   causesBtn.addEventListener("click", function (event) {
     event.stopPropagation();
+
+    document.querySelectorAll(".nav-dropdown").forEach(function (item) {
+      item.classList.remove("open");
+    });
+
     causesDropdown.classList.toggle("open");
   });
 }
@@ -304,9 +335,6 @@ document.querySelectorAll(".chip-item").forEach(function (item) {
   });
 });
 
-/* =========================
-   SEARCH
-========================= */
 if (searchBtn && campaignSearch) {
   searchBtn.addEventListener("click", function () {
     searchKeyword = campaignSearch.value;
@@ -319,9 +347,6 @@ if (searchBtn && campaignSearch) {
   });
 }
 
-/* =========================
-   CLOSE DROPDOWNS
-========================= */
 document.addEventListener("click", function () {
   document.querySelectorAll(".nav-dropdown").forEach(function (item) {
     item.classList.remove("open");

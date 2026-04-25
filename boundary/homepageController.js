@@ -25,9 +25,26 @@ function setupDropdown(buttonId, dropdownId) {
 setupDropdown("donateMenuBtn", "donateDropdown");
 setupDropdown("fundraiseMenuBtn", "fundraiseDropdown");
 setupDropdown("aboutMenuBtn", "aboutDropdown");
+setupDropdown("profileMenuBtn", "profileDropdown");
 
 document.addEventListener("click", function () {
   document.querySelectorAll(".nav-dropdown").forEach(function (item) {
     item.classList.remove("open");
   });
+});
+
+const observer = new IntersectionObserver(
+  function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+        observer.unobserve(entry.target);
+      }
+    });
+  },
+  { threshold: 0.15 }
+);
+
+document.querySelectorAll(".reveal, .reveal-stagger").forEach(function (element) {
+  observer.observe(element);
 });

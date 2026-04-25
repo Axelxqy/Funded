@@ -13,9 +13,17 @@
   font-family: Arial, Helvetica, sans-serif;
 }
 
+html,
 body {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
   background: #ffffff;
   color: #1f2a30;
+  display: flex;
+  flex-direction: column;
 }
 
 a {
@@ -24,7 +32,7 @@ a {
 }
 
 /* =========================
-   HEADER - SAME AS BROWSE CAMPAIGN
+   HEADER
 ========================= */
 .topbar {
   width: 100%;
@@ -48,6 +56,7 @@ a {
   flex-shrink: 0;
 }
 
+/* SAME LOGO STYLE AS BROWSE CAMPAIGN */
 .brand-logo {
   display: flex;
   align-items: center;
@@ -97,7 +106,7 @@ a {
   width: 100%;
   max-width: 330px;
   height: 46px;
-  background: #fff;
+  background: #ffffff;
   border: 1px solid #e3e7df;
   border-radius: 14px;
   display: flex;
@@ -176,7 +185,7 @@ a {
   top: calc(100% + 12px);
   left: 0;
   min-width: 185px;
-  background: #fff;
+  background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
   overflow: hidden;
@@ -213,10 +222,15 @@ a {
   background: rgba(0, 0, 0, 0.12);
 }
 
-.profile-box {
+.profile-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
+}
+
+.profile-menu {
+  right: 0;
+  left: auto;
 }
 
 .avatar {
@@ -227,46 +241,45 @@ a {
   border: 2px solid rgba(255, 255, 255, 0.9);
 }
 
-.profile-name {
-  font-size: 14px;
-  color: #222;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
 /* =========================
    HERO SECTION
 ========================= */
 .hero-section {
   position: relative;
+  min-height: 420px;
   display: flex;
-  align-items: stretch;
-  height: 370px;
-  background: linear-gradient(
-    90deg,
-    #f7fbf7 0%,
-    #f7fbf7 44%,
-    #f4f8f2 60%,
-    #ffffff 100%
-  );
+  align-items: center;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(247, 251, 247, 0.98) 0%,
+      rgba(247, 251, 247, 0.95) 30%,
+      rgba(247, 251, 247, 0.78) 47%,
+      rgba(247, 251, 247, 0.35) 65%,
+      rgba(247, 251, 247, 0.08) 100%
+    ),
+    url("https://images.pexels.com/photos/6994985/pexels-photo-6994985.jpeg?auto=compress&cs=tinysrgb&w=2000");
+  background-size: 100% 110%;
+  background-position: center right;
+  background-repeat: no-repeat;
   overflow: hidden;
 }
 
 .hero-left {
-  width: 58%;
-  padding-left: 100px;
-  padding-top: 62px;
-  z-index: 3;
+  width: 100%;
+  max-width: 720px;
+  padding: 70px 0 70px 100px;
+  position: relative;
+  z-index: 2;
 }
 
 .hero-left h1 {
-  font-size: 43px;
-  line-height: 1.25;
+  font-size: 60px;
+  line-height: 1.15;
   font-weight: 800;
   color: #102934;
-  margin-bottom: 15px;
-  letter-spacing: -0.8px;
+  margin-bottom: 20px;
+  letter-spacing: -1px;
 }
 
 .hero-left h1 span {
@@ -274,71 +287,32 @@ a {
 }
 
 .hero-left p {
-  font-size: 17px;
-  line-height: 1.55;
+  font-size: 20px;
+  line-height: 1.6;
   color: #37444b;
-  margin-bottom: 29px;
+  margin-bottom: 32px;
 }
 
 .hero-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 174px;
-  height: 48px;
+  width: 190px;
+  height: 54px;
   background: #50984f;
   color: #ffffff;
   text-decoration: none;
-  border-radius: 17px;
+  border-radius: 18px;
   font-size: 17px;
   font-weight: 800;
   letter-spacing: 0.3px;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 
 .hero-btn:hover {
   background: #417d3f;
-}
-
-.hero-right {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 48%;
-  height: 100%;
-  z-index: 1;
-}
-
-.hero-right::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(247, 251, 247, 0.95) 0%,
-    rgba(247, 251, 247, 0.72) 17%,
-    rgba(247, 251, 247, 0.18) 38%,
-    rgba(247, 251, 247, 0) 100%
-  );
-  z-index: 2;
-}
-
-.hero-right img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center right;
-  display: block;
-}
-
-.hero-wave {
-  position: absolute;
-  left: -5%;
-  bottom: -66px;
-  width: 110%;
-  height: 120px;
-  background: #ffffff;
-  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-  z-index: 5;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(80, 152, 79, 0.35);
 }
 
 /* =========================
@@ -375,6 +349,15 @@ section h2 {
 .step-item {
   width: 230px;
   text-align: center;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border-radius: 16px;
+  padding: 18px 12px;
+}
+
+.step-item:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 28px rgba(65, 131, 73, 0.15);
+  background: #f5fbf3;
 }
 
 .step-icon {
@@ -388,6 +371,17 @@ section h2 {
   justify-content: center;
   font-size: 36px;
   margin: 0 auto 16px;
+  transition: background 0.25s, transform 0.25s;
+}
+
+.step-item:hover .step-icon {
+  background: #d6edcf;
+  transform: scale(1.1);
+}
+
+.step-icon svg {
+  width: 36px;
+  height: 36px;
 }
 
 .step-item h3 {
@@ -428,11 +422,23 @@ section h2 {
   border-radius: 14px;
   padding: 24px 16px;
   text-align: center;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+}
+
+.cause-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.12);
 }
 
 .cause-card-icon {
   font-size: 42px;
   margin-bottom: 14px;
+}
+
+.cause-card-icon svg {
+  width: 42px;
+  height: 42px;
 }
 
 .cause-card h3 {
@@ -504,6 +510,12 @@ section h2 {
   border-radius: 10px;
   overflow: hidden;
   text-align: left;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.campaign-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.13);
 }
 
 .campaign-card img {
@@ -535,15 +547,18 @@ section h2 {
   width: 210px;
   height: 52px;
   background: #51944e;
-  color: #fff;
+  color: #ffffff;
   text-decoration: none;
   border-radius: 16px;
   font-size: 20px;
   font-weight: 700;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 
 .bottom-donate-btn:hover {
   background: #417d3f;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(80, 152, 79, 0.35);
 }
 
 /* =========================
@@ -569,7 +584,7 @@ section h2 {
   font-size: 13px;
   color: #283238;
   text-decoration: none;
-  margin-bottom: 0px;
+  margin-bottom: 6px;
 }
 
 .footer-col a:hover {
@@ -584,19 +599,63 @@ section h2 {
 .campaign-link {
   text-decoration: none;
   color: inherit;
-}
-
-.step-link,
-.cause-link,
-.campaign-link {
   display: block;
 }
 
-.step-link:hover,
-.cause-link:hover,
-.campaign-link:hover {
-  transform: translateY(-3px);
-  transition: 0.2s ease;
+/* =========================
+   SCROLL ANIMATION
+========================= */
+.reveal {
+  opacity: 0;
+  transform: translateY(48px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(48px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal-stagger.visible > *:nth-child(1) {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0s;
+}
+
+.reveal-stagger.visible > *:nth-child(2) {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.12s;
+}
+
+.reveal-stagger.visible > *:nth-child(3) {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.24s;
+}
+
+.reveal-stagger.visible > *:nth-child(4) {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.36s;
+}
+
+.reveal-stagger.visible > *:nth-child(5) {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.48s;
+}
+
+.reveal-stagger.visible > *:nth-child(6) {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.6s;
 }
 
 /* =========================
@@ -608,7 +667,7 @@ section h2 {
   }
 
   .hero-left h1 {
-    font-size: 40px;
+    font-size: 48px;
   }
 
   .causes-grid,
@@ -647,27 +706,22 @@ section h2 {
 
 @media (max-width: 850px) {
   .hero-section {
-    height: auto;
-    min-height: 520px;
+    min-height: 500px;
+    background-position: center;
   }
 
   .hero-left {
-    width: 100%;
-    padding: 60px 30px;
+    padding: 50px 30px;
     text-align: center;
+    margin: 0 auto;
   }
 
   .hero-left h1 {
-    font-size: 40px;
+    font-size: 42px;
   }
 
   .hero-left p {
-    font-size: 16px;
-  }
-
-  .hero-right {
-    width: 100%;
-    opacity: 0.35;
+    font-size: 17px;
   }
 
   .steps-row {

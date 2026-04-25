@@ -8,7 +8,7 @@ const path = require("path");
 const { Server } = require("socket.io");
 const cookieParser = require("cookie-parser");
 const pool = require("./helper/db");
-const authRoutes = require("./boundary/controller/authRoutes");
+const authRoutes = require("./controller/authRoutes");
 
 const app = express();
 const server = http.createServer(app);
@@ -28,11 +28,11 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "boundary")));
-
+app.use("/style", express.static(path.join(__dirname, "style")));
 app.use("/auth", authRoutes);
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "boundary", "login.html"));
+  res.sendFile(path.join(__dirname, "boundary", "homepage.html"));
 });
 
 // app.get("/", (req, res) => {

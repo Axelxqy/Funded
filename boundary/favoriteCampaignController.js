@@ -25,7 +25,62 @@ function setupDropdown(buttonId, dropdownId) {
 setupDropdown("donateMenuBtn", "donateDropdown");
 setupDropdown("fundraiseMenuBtn", "fundraiseDropdown");
 setupDropdown("aboutMenuBtn", "aboutDropdown");
+setupDropdown("profileMenuBtn", "profileDropdown");
 
+/* =========================
+   HEADER PROFILE
+========================= */
+const headerAvatar = document.getElementById("headerAvatar");
+const headerName = document.getElementById("headerName");
+const signOutBtn = document.getElementById("signOutBtn");
+
+function getLoggedInUser() {
+  const saved = localStorage.getItem("loggedInUser");
+
+  if (!saved) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(saved);
+  } catch (error) {
+    return null;
+  }
+}
+
+function renderHeaderProfile() {
+  const user = getLoggedInUser();
+
+  if (!user) {
+    if (headerAvatar) headerAvatar.textContent = "U";
+    if (headerName) headerName.textContent = "User";
+    return;
+  }
+
+  const firstName = user.f_name || "";
+  const email = user.email || "";
+  const initial = (firstName || email || "U").charAt(0).toUpperCase();
+
+  if (headerAvatar) {
+    headerAvatar.textContent = initial;
+  }
+
+  if (headerName) {
+    headerName.textContent = firstName || "User";
+  }
+}
+
+if (signOutBtn) {
+  signOutBtn.addEventListener("click", function () {
+    localStorage.removeItem("loggedInUser");
+  });
+}
+
+renderHeaderProfile();
+
+/* =========================
+   CAMPAIGN DATA
+========================= */
 const campaigns = [
   {
     id: 1,
@@ -154,7 +209,11 @@ function renderFavoriteCampaigns() {
   favoriteGrid.innerHTML = "";
 
   if (favoriteCountText) {
-    favoriteCountText.textContent = "Explore favorite campaigns";
+    favoriteCountText.textContent =
+      "Explore " +
+      favoriteCampaigns.length +
+      " favorite campaign" +
+      (favoriteCampaigns.length === 1 ? "" : "s");
   }
 
   if (favoriteCampaigns.length === 0) {
@@ -222,6 +281,11 @@ function renderFavoriteCampaigns() {
 if (causesBtn && causesDropdown) {
   causesBtn.addEventListener("click", function (event) {
     event.stopPropagation();
+
+    document.querySelectorAll(".nav-dropdown").forEach(function (item) {
+      item.classList.remove("open");
+    });
+
     causesDropdown.classList.toggle("open");
   });
 }

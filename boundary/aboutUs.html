@@ -6,7 +6,7 @@
 
   <title>About Us - Helping Hands</title>
 
-  <link rel="stylesheet" href="aboutUs.css" />
+  <link rel="stylesheet" href="../style/aboutUs.css" />
 </head>
 
 <body>
@@ -77,9 +77,18 @@
 
       <div class="profile-divider"></div>
 
-      <div class="profile-box">
-        <div class="avatar"></div>
-        <div class="profile-name">tc <span>▲</span></div>
+      <!-- PROFILE DROPDOWN -->
+      <div class="nav-dropdown" id="profileDropdown">
+        <button class="nav-link nav-button profile-btn" id="profileMenuBtn" type="button">
+          <div class="avatar small-avatar" id="headerAvatar">U</div>
+          <span id="headerName">User</span>
+          <span class="small-arrow">▼</span>
+        </button>
+
+        <div class="nav-dropdown-menu profile-menu">
+          <a href="profile.html" class="nav-dropdown-item">Profile</a>
+          <a href="login.html" class="nav-dropdown-item" id="signOutBtn">Sign out</a>
+        </div>
       </div>
     </nav>
   </header>
@@ -237,6 +246,6 @@
     </div>
   </footer>
 
-  <script src="../controller/aboutUsController.js"></script>
+  <script src="/aboutUsController.js"></script>
 </body>
 </html>

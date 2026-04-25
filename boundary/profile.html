@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Favourite Campaigns - Helping Hands</title>
+  <title>Profile - Helping Hands</title>
 
-  <link rel="stylesheet" href="../style/favoriteCampaign.css" />
+  <link rel="stylesheet" href="../style/profile.css" />
 </head>
 
 <body>
@@ -33,16 +33,15 @@
     <div class="header-center">
       <div class="header-search">
         <span>🔍</span>
-        <input type="text" placeholder="Search campaigns" id="headerSearchInput" />
+        <input type="text" placeholder="Search campaigns" />
       </div>
     </div>
 
     <nav class="header-right">
       <a href="homepage.html" class="nav-link">Home</a>
 
-      <!-- DONEE DROPDOWN -->
       <div class="nav-dropdown" id="donateDropdown">
-        <button class="nav-link active nav-button" id="donateMenuBtn" type="button">
+        <button class="nav-link nav-button" id="donateMenuBtn" type="button">
           Donee <span class="small-arrow">▼</span>
         </button>
 
@@ -52,7 +51,6 @@
         </div>
       </div>
 
-      <!-- FUNDRAISE DROPDOWN -->
       <div class="nav-dropdown" id="fundraiseDropdown">
         <button class="nav-link nav-button" id="fundraiseMenuBtn" type="button">
           Fundraise <span class="small-arrow">▼</span>
@@ -64,7 +62,6 @@
         </div>
       </div>
 
-      <!-- ABOUT DROPDOWN -->
       <div class="nav-dropdown" id="aboutDropdown">
         <button class="nav-link nav-button" id="aboutMenuBtn" type="button">
           About <span class="small-arrow">▼</span>
@@ -77,7 +74,6 @@
 
       <div class="profile-divider"></div>
 
-      <!-- PROFILE DROPDOWN -->
       <div class="nav-dropdown" id="profileDropdown">
         <button class="nav-link nav-button profile-btn" id="profileMenuBtn" type="button">
           <div class="avatar small-avatar" id="headerAvatar">U</div>
@@ -94,75 +90,59 @@
   </header>
 
   <!-- MAIN -->
-  <main class="page-wrap">
+  <main class="profile-page">
+    <aside class="profile-sidebar">
+      <div class="profile-avatar" id="profileAvatar">U</div>
 
-    <section>
-      <div class="campaign-tabs">
-        <a href="browseCampaign.html" class="campaign-tab">CAMPAIGNS</a>
-        <button class="campaign-tab active" type="button">FAVOURITE</button>
-      </div>
+      <h2 id="profileFullName">User Name</h2>
+      <p id="profileEmail">user@email.com</p>
+    </aside>
 
-      <div class="campaign-area">
-        <div class="filter-row">
-          <div class="filter-left">
-            <span class="filter-text">Filter by</span>
+    <section class="profile-content">
+      <h1>Personal Information</h1>
 
-            <div class="chip-dropdown" id="causesDropdown">
-              <button class="chip" id="causesBtn" type="button">
-                Causes ▼
-              </button>
+      <form class="profile-form" id="profileForm">
+        <input type="hidden" id="userIdInput" />
 
-              <div class="chip-menu">
-                <button class="chip-item" data-category="all" type="button">All</button>
-                <button class="chip-item" data-category="Health" type="button">Health</button>
-                <button class="chip-item" data-category="Education" type="button">Education</button>
-                <button class="chip-item" data-category="Disaster" type="button">Disaster</button>
-                <button class="chip-item" data-category="Animals" type="button">Animals</button>
-                <button class="chip-item" data-category="Community" type="button">Community</button>
-              </div>
-            </div>
+        <div class="form-row">
+          <div class="field-group">
+            <label for="firstNameInput">First Name</label>
+            <input id="firstNameInput" type="text" disabled />
           </div>
 
-          <div class="filter-right">
-            <span class="results-text">Results</span>
-            <button class="result-chip" type="button">30 ▼</button>
+          <div class="field-group">
+            <label for="lastNameInput">Last Name</label>
+            <input id="lastNameInput" type="text" disabled />
           </div>
         </div>
 
-        <div class="explore-text" id="favoriteCountText">
-          Explore favorite campaigns
+        <div class="form-row">
+          <div class="field-group">
+            <label for="dobInput">Date of Birth</label>
+            <input id="dobInput" type="date" disabled />
+          </div>
+
+          <div class="field-group">
+            <label for="phoneInput">Phone Number</label>
+            <input id="phoneInput" type="text" placeholder="e.g., +1234567890" disabled />
+          </div>
         </div>
 
-        <div class="empty-message" id="emptyBox">
-          No favorite campaigns yet
-        </div>
+        <p class="message" id="profileMessage"></p>
 
-        <div class="campaign-grid" id="favoriteGrid"></div>
-      </div>
+        <div class="button-row">
+          <button type="button" class="profile-btn-action edit-btn" id="editProfileBtn">
+            Edit
+          </button>
+
+          <button type="submit" class="profile-btn-action save-btn" id="saveProfileBtn" disabled>
+            Save
+          </button>
+        </div>
+      </form>
     </section>
-
   </main>
 
-  <!-- FOOTER SAME AS HOMEPAGE -->
-  <footer class="site-footer">
-    <div class="footer-col">
-      <h4>Donee</h4>
-      <a href="browseCampaign.html">Browse Campaigns</a>
-      <a href="myDonation.html">My Donations</a>
-    </div>
-
-    <div class="footer-col">
-      <h4>Fundraise</h4>
-      <a href="startCampaign.html">Start a Campaign</a>
-      <a href="myCampaign.html">My Campaigns</a>
-    </div>
-
-    <div class="footer-col">
-      <h4>About</h4>
-      <a href="aboutUs.html">About Us</a>
-    </div>
-  </footer>
-
-  <script src="/favoriteCampaignController.js"></script>
+  <script src="/profileController.js"></script>
 </body>
 </html>
