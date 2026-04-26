@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config({ path: "keys.env" });
 
 const open = require("open");
 const express = require("express");
@@ -8,7 +8,7 @@ const path = require("path");
 const { Server } = require("socket.io");
 const cookieParser = require("cookie-parser");
 const pool = require("./helper/db");
-const authRoutes = require("./boundary/controller/authRoutes");
+const authRoutes = require("./controller/authRoutes");
 
 const app = express();
 const server = http.createServer(app);
@@ -28,6 +28,7 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "boundary")));
+app.use("/controller", express.static(path.join(__dirname, "controller")));
 
 app.use("/auth", authRoutes);
 
