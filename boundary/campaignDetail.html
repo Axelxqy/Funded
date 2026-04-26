@@ -48,7 +48,7 @@
 
         <div class="nav-dropdown-menu">
           <a href="browseCampaign.html" class="nav-dropdown-item">Browse Campaigns</a>
-          <a href="myDonation.html" class="nav-dropdown-item">My Donations</a>
+          <a href="myDonation.html" class="nav-dropdown-item auth-required">My Donations</a>
         </div>
       </div>
 
@@ -77,8 +77,11 @@
 
       <div class="profile-divider"></div>
 
-      <!-- PROFILE DROPDOWN -->
-      <div class="nav-dropdown" id="profileDropdown">
+      <!-- SIGN IN BUTTON: show when user is not logged in -->
+      <a href="login.html" class="signin-header-btn" id="signinHeaderBtn">Sign in</a>
+
+      <!-- PROFILE DROPDOWN: show when user is logged in -->
+      <div class="nav-dropdown hidden" id="profileDropdown">
         <button class="nav-link nav-button profile-btn" id="profileMenuBtn" type="button">
           <div class="avatar small-avatar" id="headerAvatar">U</div>
           <span id="headerName">User</span>
@@ -87,7 +90,7 @@
 
         <div class="nav-dropdown-menu profile-menu">
           <a href="profile.html" class="nav-dropdown-item">Profile</a>
-          <a href="login.html" class="nav-dropdown-item" id="signOutBtn">Sign out</a>
+          <a href="homepage.html" class="nav-dropdown-item" id="signOutBtn">Sign out</a>
         </div>
       </div>
     </nav>
@@ -203,7 +206,7 @@
           </label>
 
           <label class="check-row">
-            <input type="checkbox" />
+            <input type="checkbox" id="anonymousCheckbox" />
             <span>Don't display my name publicly on the fundraiser.</span>
           </label>
 
@@ -225,7 +228,7 @@
     <div class="footer-col">
       <h4>Donee</h4>
       <a href="browseCampaign.html">Browse Campaigns</a>
-      <a href="myDonation.html">My Donations</a>
+      <a href="myDonation.html" class="auth-required">My Donations</a>
     </div>
 
     <div class="footer-col">

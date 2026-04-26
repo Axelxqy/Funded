@@ -70,8 +70,12 @@ function renderHeaderProfile() {
 }
 
 if (signOutBtn) {
-  signOutBtn.addEventListener("click", function () {
+  signOutBtn.addEventListener("click", function (event) {
+    event.preventDefault();
+
     localStorage.removeItem("loggedInUser");
+
+    window.location.href = "homepage.html";
   });
 }
 

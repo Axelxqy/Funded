@@ -28,8 +28,10 @@ setupDropdown("aboutMenuBtn", "aboutDropdown");
 setupDropdown("profileMenuBtn", "profileDropdown");
 
 /* =========================
-   HEADER PROFILE
+   LOGIN / PROFILE
 ========================= */
+const signinHeaderBtn = document.getElementById("signinHeaderBtn");
+const profileDropdown = document.getElementById("profileDropdown");
 const headerAvatar = document.getElementById("headerAvatar");
 const headerName = document.getElementById("headerName");
 const signOutBtn = document.getElementById("signOutBtn");
@@ -44,17 +46,60 @@ function getLoggedInUser() {
   try {
     return JSON.parse(saved);
   } catch (error) {
+    localStorage.removeItem("loggedInUser");
     return null;
   }
 }
 
-function renderHeaderProfile() {
+function isLoggedIn() {
+  const user = getLoggedInUser();
+  return user && user.user_id;
+}
+
+function requireLogin(event) {
+  if (isLoggedIn()) {
+    return;
+  }
+
+  event.preventDefault();
+
+  alert("Please sign in first to continue.");
+  window.location.href = "login.html";
+}
+
+document.querySelectorAll(".auth-required").forEach(function (link) {
+  link.addEventListener("click", requireLogin);
+});
+
+function renderHeaderAuth() {
   const user = getLoggedInUser();
 
   if (!user) {
-    if (headerAvatar) headerAvatar.textContent = "U";
-    if (headerName) headerName.textContent = "User";
+    if (signinHeaderBtn) {
+      signinHeaderBtn.classList.remove("hidden");
+    }
+
+    if (profileDropdown) {
+      profileDropdown.classList.add("hidden");
+    }
+
+    if (headerAvatar) {
+      headerAvatar.textContent = "U";
+    }
+
+    if (headerName) {
+      headerName.textContent = "User";
+    }
+
     return;
+  }
+
+  if (signinHeaderBtn) {
+    signinHeaderBtn.classList.add("hidden");
+  }
+
+  if (profileDropdown) {
+    profileDropdown.classList.remove("hidden");
   }
 
   const firstName = user.f_name || "";
@@ -71,12 +116,16 @@ function renderHeaderProfile() {
 }
 
 if (signOutBtn) {
-  signOutBtn.addEventListener("click", function () {
+  signOutBtn.addEventListener("click", function (event) {
+    event.preventDefault();
+
     localStorage.removeItem("loggedInUser");
+
+    window.location.href = "homepage.html";
   });
 }
 
-renderHeaderProfile();
+renderHeaderAuth();
 
 /* =========================
    CAMPAIGN DATA
@@ -145,6 +194,7 @@ let activeCategory = "all";
 const favoriteGrid = document.getElementById("favoriteGrid");
 const emptyBox = document.getElementById("emptyBox");
 const favoriteCountText = document.getElementById("favoriteCountText");
+const resultCountBtn = document.getElementById("resultCountBtn");
 
 const causesDropdown = document.getElementById("causesDropdown");
 const causesBtn = document.getElementById("causesBtn");
@@ -199,27 +249,44 @@ function getVisibleFavoriteCampaigns() {
 }
 
 /* =========================
+   RESULT COUNT
+========================= */
+function updateResultCount(count) {
+  if (resultCountBtn) {
+    resultCountBtn.textContent = count;
+  }
+}
+
+/* =========================
    RENDER FAVOURITES
 ========================= */
 function renderFavoriteCampaigns() {
   if (!favoriteGrid) return;
 
   const favoriteCampaigns = getVisibleFavoriteCampaigns();
+  const count = favoriteCampaigns.length;
 
   favoriteGrid.innerHTML = "";
+  updateResultCount(count);
 
   if (favoriteCountText) {
+    const categoryText = activeCategory === "all" ? "" : " in " + activeCategory;
+
     favoriteCountText.textContent =
       "Explore " +
-      favoriteCampaigns.length +
+      count +
       " favorite campaign" +
-      (favoriteCampaigns.length === 1 ? "" : "s");
+      (count === 1 ? "" : "s") +
+      categoryText;
   }
 
   if (favoriteCampaigns.length === 0) {
     if (emptyBox) {
       emptyBox.style.display = "block";
-      emptyBox.textContent = "No favorite campaigns yet";
+      emptyBox.textContent =
+        activeCategory === "all"
+          ? "No favorite campaigns yet"
+          : "No favorite campaigns found in " + activeCategory;
     }
 
     favoriteGrid.style.display = "none";

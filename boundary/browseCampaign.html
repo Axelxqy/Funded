@@ -18,7 +18,7 @@
         <svg class="brand-icon" viewBox="0 0 64 64" aria-hidden="true">
           <path d="M32 18C28 10 15 10 15 23C15 33 32 43 32 43C32 43 49 33 49 23C49 10 36 10 32 18Z" />
           <path d="M15 38C20 39 25 43 29 48" />
-          <path d="M49 38C44 39 43 35 35 48" />
+          <path d="M49 38C44 39 39 43 35 48" />
           <path d="M13 36C8 39 9 49 19 52C24 54 29 55 32 58" />
           <path d="M51 36C56 39 55 49 45 52C40 54 35 55 32 58" />
         </svg>
@@ -48,7 +48,7 @@
 
         <div class="nav-dropdown-menu">
           <a href="browseCampaign.html" class="nav-dropdown-item">Browse Campaigns</a>
-          <a href="myDonation.html" class="nav-dropdown-item">My Donations</a>
+          <a href="myDonation.html" class="nav-dropdown-item auth-required">My Donations</a>
         </div>
       </div>
 
@@ -77,8 +77,11 @@
 
       <div class="profile-divider"></div>
 
+      <!-- SIGN IN BUTTON -->
+      <a href="login.html" class="signin-header-btn" id="signinHeaderBtn">Sign in</a>
+
       <!-- PROFILE DROPDOWN -->
-      <div class="nav-dropdown" id="profileDropdown">
+      <div class="nav-dropdown hidden" id="profileDropdown">
         <button class="nav-link nav-button profile-btn" id="profileMenuBtn" type="button">
           <div class="avatar small-avatar" id="headerAvatar">U</div>
           <span id="headerName">User</span>
@@ -87,7 +90,7 @@
 
         <div class="nav-dropdown-menu profile-menu">
           <a href="profile.html" class="nav-dropdown-item">Profile</a>
-          <a href="login.html" class="nav-dropdown-item" id="signOutBtn">Sign out</a>
+          <a href="homepage.html" class="nav-dropdown-item" id="signOutBtn">Sign out</a>
         </div>
       </div>
     </nav>
@@ -152,7 +155,7 @@
 
           <div class="filter-right">
             <span class="results-text">Results</span>
-            <button class="result-chip" type="button">30 ▼</button>
+            <button class="result-chip" id="resultCountBtn" type="button">0 ▼</button>
           </div>
         </div>
 
@@ -164,12 +167,12 @@
 
   </main>
 
-  <!-- FOOTER SAME AS HOMEPAGE -->
+  <!-- FOOTER -->
   <footer class="site-footer">
     <div class="footer-col">
       <h4>Donee</h4>
       <a href="browseCampaign.html">Browse Campaigns</a>
-      <a href="myDonation.html">My Donations</a>
+      <a href="myDonation.html" class="auth-required">My Donations</a>
     </div>
 
     <div class="footer-col">

@@ -716,3 +716,28 @@ a {
     height: 180px;
   }
 }
+
+.hidden {
+  display: none !important;
+}
+
+.signin-header-btn {
+  min-width: 76px;
+  height: 42px;
+  padding: 0 18px;
+  border: 1px solid #bfd8bd;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #222;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s ease;
+}
+
+.signin-header-btn:hover {
+  background: #f5f8f3;
+  color: #4f8c52;
+}
