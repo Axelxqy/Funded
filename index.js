@@ -31,6 +31,9 @@ app.use(express.static(path.join(__dirname, "boundary")));
 app.use("/style", express.static(path.join(__dirname, "style")));
 app.use("/auth", authRoutes);
 
+const userManagementRoutes = require("./controller/usermanagementRoutes");
+app.use("/admin", userManagementRoutes);
+
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "boundary", "homepage.html"));
 });
