@@ -6,7 +6,7 @@
 
   <title>Start a Fundraising Campaign</title>
 
-  <link rel="stylesheet" href="startCampaign.css" />
+  <link rel="stylesheet" href="/style/startCampaign.css" />
 
   <!-- Font Awesome -->
   <link
@@ -26,14 +26,25 @@
   <!-- HEADER -->
   <header class="topbar">
     <div class="header-left">
-      <a href="homePage.html" class="brand-logo">
-        <img src="Logo.jpeg" alt="Helping Hands Logo" class="brand-logo-img" />
+      <a href="homepage.html" class="brand-logo">
+        <svg class="brand-icon" viewBox="0 0 64 64" aria-hidden="true">
+          <path d="M32 18C28 10 15 10 15 23C15 33 32 43 32 43C32 43 49 33 49 23C49 10 36 10 32 18Z" />
+          <path d="M15 38C20 39 25 43 29 48" />
+          <path d="M49 38C44 39 39 43 35 48" />
+          <path d="M13 36C8 39 9 49 19 52C24 54 29 55 32 58" />
+          <path d="M51 36C56 39 55 49 45 52C40 54 35 55 32 58" />
+        </svg>
+
+        <div class="brand-text">
+          <div class="brand-title">Helping Hands</div>
+          <div class="brand-subtitle">Fundraising Platform</div>
+        </div>
       </a>
     </div>
 
     <div class="header-center">
       <div class="header-search">
-        <i class="fa-solid fa-magnifying-glass"></i>
+        <span class="search-icon">🔍</span>
         <input type="text" placeholder="Search campaigns" />
       </div>
     </div>
@@ -43,7 +54,7 @@
 
       <div class="nav-dropdown">
         <button type="button" class="nav-link nav-button">
-          Donate <i class="fa-solid fa-chevron-down small-arrow"></i>
+          Donate <span class="small-arrow">▼</span>
         </button>
 
         <div class="nav-dropdown-menu">
@@ -54,7 +65,7 @@
 
       <div class="nav-dropdown">
         <button type="button" class="nav-link nav-button active">
-          Fundraise <i class="fa-solid fa-chevron-down small-arrow"></i>
+          Fundraise <span class="small-arrow">▼</span>
         </button>
 
         <div class="nav-dropdown-menu">
@@ -65,27 +76,26 @@
 
       <div class="nav-dropdown">
         <button type="button" class="nav-link nav-button">
-          About <i class="fa-solid fa-chevron-down small-arrow"></i>
+          About <span class="small-arrow">▼</span>
         </button>
 
         <div class="nav-dropdown-menu">
-          <a href="#" class="nav-dropdown-item">About Us</a>
+          <a href="aboutUs.html" class="nav-dropdown-item">About Us</a>
         </div>
       </div>
 
       <div class="nav-divider"></div>
 
-      <div class="profile-dropdown" id="profileDropdown">
-        <button type="button" class="profile-box" id="profileBtn">
-          <img src="https://i.pravatar.cc/80" alt="User Avatar" class="avatar" />
-          <span class="profile-name">
-            user <i class="fa-solid fa-chevron-down small-arrow"></i>
-          </span>
+      <div class="nav-dropdown" id="profileDropdown">
+        <button class="nav-link nav-button profile-btn" id="profileMenuBtn" type="button">
+          <div class="avatar small-avatar" id="headerAvatar">U</div>
+          <span id="headerName">User</span>
+          <span class="small-arrow">▼</span>
         </button>
 
-        <div class="profile-menu" id="profileMenu">
-          <a href="#">Profile</a>
-          <a href="#">Sign Out</a>
+        <div class="nav-dropdown-menu profile-menu">
+          <a href="profile.html" class="nav-dropdown-item">Profile</a>
+          <a href="login.html" class="nav-dropdown-item" id="signOutBtn">Sign out</a>
         </div>
       </div>
     </nav>

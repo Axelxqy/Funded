@@ -2,8 +2,6 @@
    HEADER NAV DROPDOWNS
 ========================= */
 const navDropdowns = document.querySelectorAll(".nav-dropdown");
-const profileDropdown = document.getElementById("profileDropdown");
-const profileBtn = document.getElementById("profileBtn");
 
 navDropdowns.forEach(function (dropdown) {
   const button = dropdown.querySelector(".nav-button");
@@ -11,6 +9,7 @@ navDropdowns.forEach(function (dropdown) {
   if (!button) return;
 
   button.addEventListener("click", function (event) {
+    event.preventDefault();
     event.stopPropagation();
 
     navDropdowns.forEach(function (item) {
@@ -19,26 +18,86 @@ navDropdowns.forEach(function (dropdown) {
       }
     });
 
-    if (profileDropdown) {
-      profileDropdown.classList.remove("open");
-    }
-
     dropdown.classList.toggle("open");
+  });
+
+  const menu = dropdown.querySelector(".nav-dropdown-menu");
+
+  if (menu) {
+    menu.addEventListener("click", function (event) {
+      event.stopPropagation();
+    });
+  }
+});
+
+/* =========================
+   CLOSE DROPDOWNS WHEN CLICK OUTSIDE
+========================= */
+document.addEventListener("click", function () {
+  navDropdowns.forEach(function (dropdown) {
+    dropdown.classList.remove("open");
   });
 });
 
 /* =========================
-   PROFILE DROPDOWN
+   LOGIN CHECK + HEADER USER
 ========================= */
-if (profileDropdown && profileBtn) {
-  profileBtn.addEventListener("click", function (event) {
-    event.stopPropagation();
+function getLoggedInUser() {
+  return JSON.parse(localStorage.getItem("loggedInUser"));
+}
 
-    navDropdowns.forEach(function (dropdown) {
-      dropdown.classList.remove("open");
-    });
+function protectFundraiserPage() {
+  const loggedInUser = getLoggedInUser();
 
-    profileDropdown.classList.toggle("open");
+  if (!loggedInUser) {
+    alert("Please login first before creating a campaign.");
+    window.location.href = "login.html";
+    return null;
+  }
+
+  return loggedInUser;
+}
+
+function updateHeaderUser() {
+  const loggedInUser = getLoggedInUser();
+
+  if (!loggedInUser) return;
+
+  const headerName = document.getElementById("headerName");
+  const headerAvatar = document.getElementById("headerAvatar");
+
+  const firstName = loggedInUser.f_name || "";
+  const email = loggedInUser.email || "";
+
+  // Same as homepage: show first name only
+  if (headerName) {
+    headerName.textContent = firstName || email || "User";
+  }
+
+  // Same as homepage: show first letter
+  if (headerAvatar) {
+    headerAvatar.textContent =
+      firstName.charAt(0).toUpperCase() ||
+      email.charAt(0).toUpperCase() ||
+      "U";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  protectFundraiserPage();
+  updateHeaderUser();
+});
+
+/* =========================
+   SIGN OUT
+========================= */
+const signOutBtn = document.getElementById("signOutBtn");
+
+if (signOutBtn) {
+  signOutBtn.addEventListener("click", function (event) {
+    event.preventDefault();
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "login.html";
   });
 }
 
@@ -191,7 +250,7 @@ if (startDateInput && endDateInput) {
     showMonths: 1,
     onChange: function () {
       checkDurationStar();
-    }
+    },
   });
 
   flatpickr("#startDate", {
@@ -206,7 +265,7 @@ if (startDateInput && endDateInput) {
       }
 
       checkDurationStar();
-    }
+    },
   });
 }
 
@@ -291,18 +350,96 @@ if (fundraisingGoal) {
 }
 
 /* =========================
-   CLOSE DROPDOWNS WHEN CLICK OUTSIDE
+   DATABASE SUBMIT
 ========================= */
-document.addEventListener("click", function (event) {
-  navDropdowns.forEach(function (dropdown) {
-    dropdown.classList.remove("open");
+const campaignForm = document.querySelector(".campaign-form");
+
+function convertDateToSql(dateText) {
+  if (!dateText) return null;
+
+  const date = new Date(dateText);
+  if (isNaN(date.getTime())) return null;
+
+  return date.toISOString().split("T")[0];
+}
+
+function getCategoryId(categoryName) {
+  const categoryMap = {
+    Medical: 1,
+    Education: 2,
+    Emergency: 3,
+    "Animal Welfare": 4,
+    Community: 5,
+    Environment: 6,
+  };
+
+  return categoryMap[categoryName] || null;
+}
+
+if (campaignForm) {
+  campaignForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const loggedInUser = getLoggedInUser();
+
+    if (!loggedInUser) {
+      alert("Please login first before creating a campaign.");
+      window.location.href = "login.html";
+      return;
+    }
+
+    const activity_name = campaignTitle.value.trim();
+    const categoryName = categoryValue.value.trim();
+    const category_id = getCategoryId(categoryName);
+    const fundraise_goal = fundraisingGoal.value.trim();
+    const start_date = convertDateToSql(startDateInput.value);
+    const end_date = convertDateToSql(endDateInput.value);
+    const description = campaignDescription.value.trim();
+
+    if (
+      !activity_name ||
+      !categoryName ||
+      !fundraise_goal ||
+      !start_date ||
+      !end_date ||
+      !description ||
+      !campaignImageInput.files ||
+      campaignImageInput.files.length === 0
+    ) {
+      alert("Please fill in all required fields and upload a campaign image.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:3000/activities", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          activity_name,
+          category_id,
+          category_name: categoryName,
+          fundraise_goal,
+          start_date,
+          end_date,
+          description,
+          created_by: loggedInUser.user_id,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || "Failed to create campaign.");
+        return;
+      }
+
+      alert("Campaign created successfully.");
+      window.location.href = "myCampaign.html";
+    } catch (error) {
+      console.error("Create campaign error:", error);
+      alert("Cannot connect to backend.");
+    }
   });
-
-  if (profileDropdown) {
-    profileDropdown.classList.remove("open");
-  }
-
-  if (categorySelect && !categorySelect.contains(event.target)) {
-    categorySelect.classList.remove("open");
-  }
-});
+}
