@@ -6,12 +6,12 @@
 
   <title>Helping Hands - Homepage</title>
 
-  <link rel="stylesheet" href="homepage.css" />
+  <link rel="stylesheet" href="../style/homepage.css" />
 </head>
 
 <body>
 
-  <!-- HEADER SAME AS BROWSE CAMPAIGN -->
+  <!-- HEADER -->
   <header class="topbar">
     <div class="header-left">
       <a href="homepage.html" class="brand-logo">
@@ -32,7 +32,11 @@
 
     <div class="header-center">
       <div class="header-search">
-        <span>🔍</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+
         <input type="text" placeholder="Search campaigns" />
       </div>
     </div>
@@ -48,7 +52,7 @@
 
         <div class="nav-dropdown-menu">
           <a href="browseCampaign.html" class="nav-dropdown-item">Browse Campaigns</a>
-          <a href="myDonation.html" class="nav-dropdown-item">My Donations</a>
+          <a href="myDonation.html" class="nav-dropdown-item auth-required">My Donations</a>
         </div>
       </div>
 
@@ -75,11 +79,22 @@
         </div>
       </div>
 
+      <!-- PROFILE / SIGN IN AREA -->
       <div class="profile-divider"></div>
 
-      <div class="profile-box">
-        <div class="avatar"></div>
-        <div class="profile-name">tc <span>▲</span></div>
+      <a href="login.html" class="signin-header-btn" id="signinHeaderBtn">Sign in</a>
+
+      <div class="nav-dropdown hidden" id="profileDropdown">
+        <button class="nav-link nav-button profile-btn" id="profileMenuBtn" type="button">
+          <div class="avatar small-avatar" id="headerAvatar">U</div>
+          <span id="headerName">User</span>
+          <span class="small-arrow">▼</span>
+        </button>
+
+        <div class="nav-dropdown-menu profile-menu">
+          <a href="profile.html" class="nav-dropdown-item">Profile</a>
+          <a href="login.html" class="nav-dropdown-item" id="signOutBtn">Sign out</a>
+        </div>
       </div>
     </nav>
   </header>
@@ -100,82 +115,129 @@
 
       <a href="browseCampaign.html" class="hero-btn">DONATE NOW</a>
     </div>
-
-    <div class="hero-right">
-      <img src="hero-heart.jpg" alt="Hands holding green heart" />
-    </div>
-
-    <div class="hero-wave"></div>
   </section>
 
   <!-- HOW IT WORKS -->
   <section class="how-it-works">
-    <h2>How It Works</h2>
-    <p class="section-subtitle">Making an impact is simple</p>
+    <h2 class="reveal">How It Works</h2>
+    <p class="section-subtitle reveal">Making an impact is simple</p>
 
-    <div class="steps-row">
-      <a href="browseCampaign.html" class="step-item step-link">
-        <div class="step-icon">⌕</div>
+    <div class="steps-row reveal-stagger">
+
+      <div class="step-item">
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#418349" stroke-width="2" stroke-linecap="round">
+            <circle cx="11" cy="11" r="7" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </div>
+
         <h3>1. Find a Campaign</h3>
         <p>Browse and discover causes that matter to you.</p>
-      </a>
+      </div>
 
       <div class="step-line"></div>
 
-      <a href="browseCampaign.html" class="step-item step-link">
-        <div class="step-icon">♡</div>
+      <div class="step-item">
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#418349" stroke-width="2" stroke-linecap="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+          </svg>
+        </div>
+
         <h3>2. Make a Donation</h3>
         <p>Your donation helps bring hope and support to those in need.</p>
-      </a>
+      </div>
 
       <div class="step-line"></div>
 
-      <a href="myDonation.html" class="step-item step-link">
-        <div class="step-icon">👥</div>
+      <div class="step-item">
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#418349" stroke-width="2" stroke-linecap="round">
+            <circle cx="9" cy="7" r="3" />
+            <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
+            <circle cx="17" cy="7" r="3" opacity=".5" />
+            <path d="M21 21v-2a4 4 0 0 0-3-3.87" opacity=".5" />
+          </svg>
+        </div>
+
         <h3>3. Create Change</h3>
         <p>Together, we build stronger communities.</p>
-      </a>
+      </div>
+
     </div>
   </section>
 
   <!-- EXPLORE CAUSES -->
   <section class="causes-section">
-    <h2>Explore Causes</h2>
-    <p class="section-subtitle">Choose a cause close to your heart</p>
+    <h2 class="reveal">Explore Causes</h2>
+    <p class="section-subtitle reveal">Choose a cause close to your heart</p>
 
-    <div class="causes-grid">
-      <a href="browseCampaign.html" class="cause-card cause-green cause-link">
-        <div class="cause-card-icon">♡</div>
+    <div class="causes-grid reveal-stagger">
+
+      <a href="browseCampaign.html?category=Health" class="cause-card cause-green cause-link">
+        <div class="cause-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#418349" stroke-width="2" stroke-linecap="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            <polyline points="3.5 12 7 9 10 15 13 11 15.5 13" />
+          </svg>
+        </div>
+
         <h3>Health</h3>
         <p>Support medical care and health initiatives</p>
       </a>
 
-      <a href="browseCampaign.html" class="cause-card cause-yellow cause-link">
-        <div class="cause-card-icon">🐾</div>
+      <a href="browseCampaign.html?category=Animals" class="cause-card cause-yellow cause-link">
+        <div class="cause-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#b58a2b" stroke-width="2" stroke-linecap="round">
+            <circle cx="7" cy="6" r="1.5" />
+            <circle cx="17" cy="6" r="1.5" />
+            <circle cx="4.5" cy="11" r="1.5" />
+            <circle cx="19.5" cy="11" r="1.5" />
+            <path d="M12 13c-3 0-6 2-6 5a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2c0-3-3-5-6-5z" />
+          </svg>
+        </div>
+
         <h3>Animals</h3>
         <p>Help protect and care for animals</p>
       </a>
 
-      <a href="browseCampaign.html" class="cause-card cause-blue cause-link">
-        <div class="cause-card-icon">🎓</div>
+      <a href="browseCampaign.html?category=Education" class="cause-card cause-blue cause-link">
+        <div class="cause-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#4d79a8" stroke-width="2" stroke-linecap="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z" />
+            <path d="M6 12v5c3 3 9 3 12 0v-5" />
+          </svg>
+        </div>
+
         <h3>Education</h3>
         <p>Empower learning and brighten futures</p>
       </a>
 
-      <a href="browseCampaign.html" class="cause-card cause-purple cause-link">
-        <div class="cause-card-icon">🤲</div>
+      <a href="browseCampaign.html?category=Community" class="cause-card cause-purple cause-link">
+        <div class="cause-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#7c5c9f" stroke-width="2" stroke-linecap="round">
+            <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0" />
+            <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2" />
+            <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8" />
+            <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
+          </svg>
+        </div>
+
         <h3>Community</h3>
         <p>Support people and strengthen communities</p>
       </a>
+
     </div>
   </section>
 
   <!-- FEATURED CAMPAIGNS -->
   <section class="featured-section">
-    <h2>Featured Campaigns</h2>
-    <p class="section-subtitle">Real stories. Real impact.</p>
+    <h2 class="reveal">Featured Campaigns</h2>
+    <p class="section-subtitle reveal">Real stories. Real impact.</p>
 
-    <div class="featured-grid">
+    <div class="featured-grid reveal-stagger">
+
       <a href="campaignDetail.html?id=1" class="campaign-card campaign-link">
         <img
           src="https://images.pexels.com/photos/6994982/pexels-photo-6994982.jpeg?auto=compress&cs=tinysrgb&w=900"
@@ -211,9 +273,10 @@
           <p>Provide learning resources and opportunities for kids.</p>
         </div>
       </a>
+
     </div>
 
-    <a href="browseCampaign.html" class="bottom-donate-btn">DONATE NOW</a>
+    <a href="browseCampaign.html" class="bottom-donate-btn reveal auth-required">DONATE NOW</a>
   </section>
 
   <!-- FOOTER -->
@@ -221,7 +284,7 @@
     <div class="footer-col">
       <h4>Donee</h4>
       <a href="browseCampaign.html">Browse Campaigns</a>
-      <a href="myDonation.html">My Donations</a>
+      <a href="myDonation.html" class="auth-required">My Donations</a>
     </div>
 
     <div class="footer-col">
@@ -236,6 +299,6 @@
     </div>
   </footer>
 
-  <script src="../controller/homepageController.js"></script>
+  <script src="/homepageController.js"></script>
 </body>
 </html>

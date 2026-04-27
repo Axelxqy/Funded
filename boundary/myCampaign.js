@@ -115,7 +115,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   updateHeaderUser();
 
   try {
-    const response = await fetch("http://localhost:3000/activities");
+    const response = await fetch(
+      `http://localhost:3000/activities/my/${loggedInUser.user_id}`
+    );
     const data = await response.json();
 
     if (!response.ok) {

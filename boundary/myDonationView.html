@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Browse Campaigns - Helping Hands</title>
+  <title>Donation View - Helping Hands</title>
 
-  <link rel="stylesheet" href="../style/browseCampaign.css" />
+  <link rel="stylesheet" href="../style/mydonationView.css" />
 </head>
 
 <body>
@@ -40,7 +40,6 @@
     <nav class="header-right">
       <a href="homepage.html" class="nav-link">Home</a>
 
-      <!-- DONEE DROPDOWN -->
       <div class="nav-dropdown" id="donateDropdown">
         <button class="nav-link nav-button active" id="donateMenuBtn" type="button">
           Donee <span class="small-arrow">▼</span>
@@ -48,11 +47,10 @@
 
         <div class="nav-dropdown-menu">
           <a href="browseCampaign.html" class="nav-dropdown-item">Browse Campaigns</a>
-          <a href="myDonation.html" class="nav-dropdown-item auth-required">My Donations</a>
+          <a href="myDonation.html" class="nav-dropdown-item">My Donations</a>
         </div>
       </div>
 
-      <!-- FUNDRAISE DROPDOWN -->
       <div class="nav-dropdown" id="fundraiseDropdown">
         <button class="nav-link nav-button" id="fundraiseMenuBtn" type="button">
           Fundraise <span class="small-arrow">▼</span>
@@ -64,7 +62,6 @@
         </div>
       </div>
 
-      <!-- ABOUT DROPDOWN -->
       <div class="nav-dropdown" id="aboutDropdown">
         <button class="nav-link nav-button" id="aboutMenuBtn" type="button">
           About <span class="small-arrow">▼</span>
@@ -77,11 +74,7 @@
 
       <div class="profile-divider"></div>
 
-      <!-- SIGN IN BUTTON -->
-      <a href="login.html" class="signin-header-btn" id="signinHeaderBtn">Sign in</a>
-
-      <!-- PROFILE DROPDOWN -->
-      <div class="nav-dropdown hidden" id="profileDropdown">
+      <div class="nav-dropdown" id="profileDropdown">
         <button class="nav-link nav-button profile-btn" id="profileMenuBtn" type="button">
           <div class="avatar small-avatar" id="headerAvatar">U</div>
           <span id="headerName">User</span>
@@ -90,81 +83,85 @@
 
         <div class="nav-dropdown-menu profile-menu">
           <a href="profile.html" class="nav-dropdown-item">Profile</a>
-          <a href="homepage.html" class="nav-dropdown-item" id="signOutBtn">Sign out</a>
+          <a href="login.html" class="nav-dropdown-item" id="signOutBtn">Sign out</a>
         </div>
       </div>
     </nav>
   </header>
 
-  <!-- MAIN CONTENT -->
+  <!-- MAIN -->
   <main class="page-wrap">
 
-    <!-- HERO -->
-    <section class="hero">
-      <h1>Donate today</h1>
+    <button type="button" class="back-top-btn" id="backTopBtn">
+      ‹ Back to My Donations
+    </button>
 
-      <p>
-        Transform lives and communities through giving.
-        Let your donations make meaningful differences today.
-      </p>
-
-      <label for="campaignSearch">Search charities or campaigns</label>
-
-      <div class="hero-search-row">
-        <input
-          id="campaignSearch"
-          type="text"
-          placeholder="Search for a charity or a cause close to your heart"
-        />
-        <button type="button" id="searchBtn">⌕</button>
-      </div>
-    </section>
-
-    <!-- CAMPAIGN LIST -->
-    <section>
-      <div class="campaign-tabs">
-        <button class="campaign-tab active" data-tab="all" type="button">
-          CAMPAIGNS
-        </button>
-
-        <a href="favoriteCampaign.html" class="campaign-tab favorite-tab-link">
-          FAVOURITE
-        </a>
+    <!-- UPPER CAMPAIGN DETAIL CARD -->
+    <section class="donation-hero-card">
+      <div class="donation-hero-image-wrap">
+        <img id="campaignImage" class="donation-hero-image" src="" alt="Campaign image" />
       </div>
 
-      <div class="campaign-area">
-        <div class="filter-row">
-          <div class="filter-left">
-            <span class="filter-text">Filter by</span>
+      <div class="donation-hero-main">
+        <h1 id="campaignTitle"></h1>
 
-            <div class="chip-dropdown" id="causesDropdown">
-              <button class="chip" id="causesBtn" type="button">
-                Causes ▼
-              </button>
-
-              <div class="chip-menu">
-                <button class="chip-item" data-category="all" type="button">All</button>
-                <button class="chip-item" data-category="Health" type="button">Health</button>
-                <button class="chip-item" data-category="Education" type="button">Education</button>
-                <button class="chip-item" data-category="Disaster" type="button">Disaster</button>
-                <button class="chip-item" data-category="Animals" type="button">Animals</button>
-                <button class="chip-item" data-category="Community" type="button">Community</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="filter-right">
-            <span class="results-text">Results</span>
-            <button class="result-chip" id="resultCountBtn" type="button">0 ▼</button>
-          </div>
+        <div class="campaign-meta-row">
+          <span class="category-pill" id="campaignCategory"></span>
+          <span id="campaignOrg"></span>
         </div>
 
-        <div class="explore-text" id="exploreText">Explore campaigns</div>
+        <p id="campaignShortDesc"></p>
 
-        <div class="campaign-grid" id="campaignGrid"></div>
+        <div class="support-message" id="supportMessage"></div>
       </div>
+
+      <aside class="campaign-side-info">
+        <div class="side-block">
+          <h4>Campaign Status</h4>
+          <span class="status-pill status-success">Active</span>
+        </div>
+
+        <div class="side-block">
+          <h4>Started On</h4>
+          <p id="campaignStartedOn"></p>
+        </div>
+
+        <div class="side-block">
+          <h4>Category</h4>
+          <p id="sideCategory"></p>
+        </div>
+      </aside>
     </section>
 
+    <!-- LOWER ABOUT + DONATION RECORD -->
+    <section class="detail-card">
+      <h2 class="section-title">About the Campaign</h2>
+      <p class="campaign-about" id="campaignAbout"></p>
+
+      <hr class="section-divider" />
+
+      <h2 class="section-title">Your Donation to This Campaign</h2>
+
+      <div class="table-wrap">
+        <table class="donation-table">
+          <thead>
+            <tr>
+              <th>Donation Date</th>
+              <th>Amount</th>
+              <th>Payment Method</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+
+          <tbody id="donationTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="button-row">
+        <button class="back-btn" id="backBtn" type="button">Back to My Donations</button>
+        <button class="view-btn" id="viewFullCampaignBtn" type="button">View Full Campaign</button>
+      </div>
+    </section>
   </main>
 
   <!-- FOOTER -->
@@ -172,7 +169,7 @@
     <div class="footer-col">
       <h4>Donee</h4>
       <a href="browseCampaign.html">Browse Campaigns</a>
-      <a href="myDonation.html" class="auth-required">My Donations</a>
+      <a href="myDonation.html">My Donations</a>
     </div>
 
     <div class="footer-col">
@@ -187,6 +184,6 @@
     </div>
   </footer>
 
-  <script src="/browseCampaignController.js"></script>
+  <script src="/myDonationViewController.js"></script>
 </body>
 </html>

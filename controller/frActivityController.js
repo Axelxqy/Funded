@@ -120,7 +120,46 @@ const getActivities = async (req, res) => {
   }
 };
 
+const getMyActivities = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `SELECT 
+         fa.activity_id,
+         fa.activity_name,
+         fa.category_id,
+         ac.name AS category_name,
+         fa.fundraise_goal,
+         fa.current_amount,
+         fa.start_date,
+         fa.end_date,
+         fa.status,
+         fa.description,
+         fa.created_by
+       FROM public.fr_activity fa
+       LEFT JOIN public.activity_category ac
+         ON fa.category_id = ac.category_id
+       WHERE fa.created_by = $1
+       ORDER BY fa.activity_id DESC`,
+      [userId]
+    );
+
+    res.status(200).json({
+      message: "My activities retrieved successfully.",
+      activities: result.rows,
+    });
+  } catch (error) {
+    console.error("Get my activities error:", error);
+    res.status(500).json({
+      message: "Server error while retrieving my campaigns.",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createActivity,
   getActivities,
+  getMyActivities,
 };

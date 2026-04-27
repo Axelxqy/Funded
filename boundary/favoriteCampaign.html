@@ -6,7 +6,7 @@
 
   <title>Favourite Campaigns - Helping Hands</title>
 
-  <link rel="stylesheet" href="favoriteCampaign.css" />
+  <link rel="stylesheet" href="../style/favoriteCampaign.css" />
 </head>
 
 <body>
@@ -48,7 +48,7 @@
 
         <div class="nav-dropdown-menu">
           <a href="browseCampaign.html" class="nav-dropdown-item">Browse Campaigns</a>
-          <a href="myDonation.html" class="nav-dropdown-item">My Donations</a>
+          <a href="myDonation.html" class="nav-dropdown-item auth-required">My Donations</a>
         </div>
       </div>
 
@@ -77,9 +77,21 @@
 
       <div class="profile-divider"></div>
 
-      <div class="profile-box">
-        <div class="avatar"></div>
-        <div class="profile-name">tc <span>▲</span></div>
+      <!-- SIGN IN BUTTON: show when user is not logged in -->
+      <a href="login.html" class="signin-header-btn" id="signinHeaderBtn">Sign in</a>
+
+      <!-- PROFILE DROPDOWN: show when user is logged in -->
+      <div class="nav-dropdown hidden" id="profileDropdown">
+        <button class="nav-link nav-button profile-btn" id="profileMenuBtn" type="button">
+          <div class="avatar small-avatar" id="headerAvatar">U</div>
+          <span id="headerName">User</span>
+          <span class="small-arrow">▼</span>
+        </button>
+
+        <div class="nav-dropdown-menu profile-menu">
+          <a href="profile.html" class="nav-dropdown-item">Profile</a>
+          <a href="homepage.html" class="nav-dropdown-item" id="signOutBtn">Sign out</a>
+        </div>
       </div>
     </nav>
   </header>
@@ -90,7 +102,7 @@
     <section>
       <div class="campaign-tabs">
         <a href="browseCampaign.html" class="campaign-tab">CAMPAIGNS</a>
-        <button class="campaign-tab active" type="button">FAVORITE</button>
+        <button class="campaign-tab active" type="button">FAVOURITE</button>
       </div>
 
       <div class="campaign-area">
@@ -104,20 +116,19 @@
               </button>
 
               <div class="chip-menu">
-                <button class="chip-item" data-category="Medical" type="button">Medical</button>
+                <button class="chip-item" data-category="all" type="button">All</button>
+                <button class="chip-item" data-category="Health" type="button">Health</button>
                 <button class="chip-item" data-category="Education" type="button">Education</button>
-                <button class="chip-item" data-category="Emergency" type="button">Emergency</button>
+                <button class="chip-item" data-category="Disaster" type="button">Disaster</button>
                 <button class="chip-item" data-category="Animals" type="button">Animals</button>
                 <button class="chip-item" data-category="Community" type="button">Community</button>
-                <button class="chip-item" data-category="Environment" type="button">Environment</button>
-                <button class="chip-item" data-category="Others" type="button">Others</button>
               </div>
             </div>
           </div>
 
           <div class="filter-right">
             <span class="results-text">Results</span>
-            <button class="result-chip" type="button">30 ▼</button>
+            <button class="result-chip" id="resultCountBtn" type="button">0 ▼</button>
           </div>
         </div>
 
@@ -140,7 +151,7 @@
     <div class="footer-col">
       <h4>Donee</h4>
       <a href="browseCampaign.html">Browse Campaigns</a>
-      <a href="myDonation.html">My Donations</a>
+      <a href="myDonation.html" class="auth-required">My Donations</a>
     </div>
 
     <div class="footer-col">
@@ -155,6 +166,6 @@
     </div>
   </footer>
 
-  <script src="../controller/favoriteCampaignController.js"></script>
+  <script src="/favoriteCampaignController.js"></script>
 </body>
 </html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Profile - Helping Hands</title>
+
+  <link rel="stylesheet" href="../style/profile.css" />
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="topbar">
+    <div class="header-left">
+      <a href="homepage.html" class="brand-logo">
+        <svg class="brand-icon" viewBox="0 0 64 64" aria-hidden="true">
+          <path d="M32 18C28 10 15 10 15 23C15 33 32 43 32 43C32 43 49 33 49 23C49 10 36 10 32 18Z" />
+          <path d="M15 38C20 39 25 43 29 48" />
+          <path d="M49 38C44 39 39 43 35 48" />
+          <path d="M13 36C8 39 9 49 19 52C24 54 29 55 32 58" />
+          <path d="M51 36C56 39 55 49 45 52C40 54 35 55 32 58" />
+        </svg>
+
+        <div class="brand-text">
+          <div class="brand-title">Helping Hands</div>
+          <div class="brand-subtitle">Fundraising Platform</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="header-center">
+      <div class="header-search">
+        <span>🔍</span>
+        <input type="text" placeholder="Search campaigns" />
+      </div>
+    </div>
+
+    <nav class="header-right">
+      <a href="homepage.html" class="nav-link">Home</a>
+
+      <div class="nav-dropdown" id="donateDropdown">
+        <button class="nav-link nav-button" id="donateMenuBtn" type="button">
+          Donee <span class="small-arrow">▼</span>
+        </button>
+
+        <div class="nav-dropdown-menu">
+          <a href="browseCampaign.html" class="nav-dropdown-item">Browse Campaigns</a>
+          <a href="myDonation.html" class="nav-dropdown-item">My Donations</a>
+        </div>
+      </div>
+
+      <div class="nav-dropdown" id="fundraiseDropdown">
+        <button class="nav-link nav-button" id="fundraiseMenuBtn" type="button">
+          Fundraise <span class="small-arrow">▼</span>
+        </button>
+
+        <div class="nav-dropdown-menu">
+          <a href="startCampaign.html" class="nav-dropdown-item">Start a Campaign</a>
+          <a href="myCampaign.html" class="nav-dropdown-item">My Campaigns</a>
+        </div>
+      </div>
+
+      <div class="nav-dropdown" id="aboutDropdown">
+        <button class="nav-link nav-button" id="aboutMenuBtn" type="button">
+          About <span class="small-arrow">▼</span>
+        </button>
+
+        <div class="nav-dropdown-menu">
+          <a href="aboutUs.html" class="nav-dropdown-item">About Us</a>
+        </div>
+      </div>
+
+      <div class="profile-divider"></div>
+
+      <div class="nav-dropdown" id="profileDropdown">
+        <button class="nav-link nav-button profile-btn" id="profileMenuBtn" type="button">
+          <div class="avatar small-avatar" id="headerAvatar">U</div>
+          <span id="headerName">User</span>
+          <span class="small-arrow">▼</span>
+        </button>
+
+        <div class="nav-dropdown-menu profile-menu">
+          <a href="profile.html" class="nav-dropdown-item">Profile</a>
+          <a href="login.html" class="nav-dropdown-item" id="signOutBtn">Sign out</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- MAIN -->
+  <main class="profile-page">
+    <aside class="profile-sidebar">
+      <div class="profile-avatar" id="profileAvatar">U</div>
+
+      <h2 id="profileFullName">User Name</h2>
+      <p id="profileEmail">user@email.com</p>
+    </aside>
+
+    <section class="profile-content">
+      <h1>Personal Information</h1>
+
+      <form class="profile-form" id="profileForm">
+        <input type="hidden" id="userIdInput" />
+
+        <div class="form-row">
+          <div class="field-group">
+            <label for="firstNameInput">First Name</label>
+            <input id="firstNameInput" type="text" disabled />
+          </div>
+
+          <div class="field-group">
+            <label for="lastNameInput">Last Name</label>
+            <input id="lastNameInput" type="text" disabled />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field-group">
+            <label for="dobInput">Date of Birth</label>
+            <input id="dobInput" type="date" disabled />
+          </div>
+
+          <div class="field-group">
+            <label for="phoneInput">Phone Number</label>
+            <input id="phoneInput" type="text" placeholder="e.g., +1234567890" disabled />
+          </div>
+        </div>
+
+        <p class="message" id="profileMessage"></p>
+
+        <div class="button-row">
+          <button type="button" class="profile-btn-action edit-btn" id="editProfileBtn">
+            Edit
+          </button>
+
+          <button type="submit" class="profile-btn-action save-btn" id="saveProfileBtn" disabled>
+            Save
+          </button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="/profileController.js"></script>
+</body>
+</html>

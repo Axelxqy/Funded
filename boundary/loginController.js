@@ -1,6 +1,7 @@
 const emailInput = document.getElementById("emailInput");
 const passwordInput = document.getElementById("passwordInput");
 const signInBtn = document.getElementById("signInBtn");
+
 const emailError = document.getElementById("emailError");
 const passwordError = document.getElementById("passwordError");
 const togglePassword = document.getElementById("togglePassword");
@@ -53,8 +54,10 @@ passwordInput.addEventListener("input", function () {
 togglePassword.addEventListener("click", function () {
   if (passwordInput.type === "password") {
     passwordInput.type = "text";
+    togglePassword.textContent = "🙈";
   } else {
     passwordInput.type = "password";
+    togglePassword.textContent = "👁";
   }
 });
 
@@ -83,7 +86,7 @@ signInBtn.addEventListener("click", async function () {
   if (hasError) return;
 
   try {
-    const response = await fetch("http://localhost:3000/auth/login", {
+    const response = await fetch("/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -104,8 +107,16 @@ signInBtn.addEventListener("click", async function () {
       } else {
         alert(data.message || "Login failed.");
       }
+
       return;
     }
+
+    if (!data.user || !data.user.user_id) {
+      alert("Login successful, but user profile data was not returned by the server.");
+      return;
+    }
+
+    localStorage.setItem("loggedInUser", JSON.stringify(data.user));
 
     alert("Login successful.");
     window.location.href = "homepage.html";

@@ -25,7 +25,111 @@ function setupDropdown(buttonId, dropdownId) {
 setupDropdown("donateMenuBtn", "donateDropdown");
 setupDropdown("fundraiseMenuBtn", "fundraiseDropdown");
 setupDropdown("aboutMenuBtn", "aboutDropdown");
+setupDropdown("profileMenuBtn", "profileDropdown");
 
+/* =========================
+   LOGIN / PROFILE
+========================= */
+const signinHeaderBtn = document.getElementById("signinHeaderBtn");
+const profileDropdown = document.getElementById("profileDropdown");
+const headerAvatar = document.getElementById("headerAvatar");
+const headerName = document.getElementById("headerName");
+const signOutBtn = document.getElementById("signOutBtn");
+
+function getLoggedInUser() {
+  const saved = localStorage.getItem("loggedInUser");
+
+  if (!saved) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(saved);
+  } catch (error) {
+    localStorage.removeItem("loggedInUser");
+    return null;
+  }
+}
+
+function isLoggedIn() {
+  const user = getLoggedInUser();
+  return user && user.user_id;
+}
+
+function requireLogin(event) {
+  if (isLoggedIn()) {
+    return;
+  }
+
+  event.preventDefault();
+
+  alert("Please sign in first to continue.");
+  window.location.href = "login.html";
+}
+
+document.querySelectorAll(".auth-required").forEach(function (link) {
+  link.addEventListener("click", requireLogin);
+});
+
+function renderHeaderAuth() {
+  const user = getLoggedInUser();
+
+  if (!user) {
+    if (signinHeaderBtn) {
+      signinHeaderBtn.classList.remove("hidden");
+    }
+
+    if (profileDropdown) {
+      profileDropdown.classList.add("hidden");
+    }
+
+    if (headerAvatar) {
+      headerAvatar.textContent = "U";
+    }
+
+    if (headerName) {
+      headerName.textContent = "User";
+    }
+
+    return;
+  }
+
+  if (signinHeaderBtn) {
+    signinHeaderBtn.classList.add("hidden");
+  }
+
+  if (profileDropdown) {
+    profileDropdown.classList.remove("hidden");
+  }
+
+  const firstName = user.f_name || "";
+  const email = user.email || "";
+  const initial = (firstName || email || "U").charAt(0).toUpperCase();
+
+  if (headerAvatar) {
+    headerAvatar.textContent = initial;
+  }
+
+  if (headerName) {
+    headerName.textContent = firstName || "User";
+  }
+}
+
+if (signOutBtn) {
+  signOutBtn.addEventListener("click", function (event) {
+    event.preventDefault();
+
+    localStorage.removeItem("loggedInUser");
+
+    window.location.href = "homepage.html";
+  });
+}
+
+renderHeaderAuth();
+
+/* =========================
+   CAMPAIGN DATA
+========================= */
 const campaigns = [
   {
     id: 1,
@@ -117,9 +221,56 @@ const searchBtn = document.getElementById("searchBtn");
 
 const causesDropdown = document.getElementById("causesDropdown");
 const causesBtn = document.getElementById("causesBtn");
+const resultCountBtn = document.getElementById("resultCountBtn");
 
 /* =========================
-   FAVOURITE LOCAL STORAGE
+   CATEGORY FROM URL
+========================= */
+function applyCategoryFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const selectedCategory = params.get("category");
+
+  const validCategories = [
+    "all",
+    "Health",
+    "Education",
+    "Disaster",
+    "Animals",
+    "Community"
+  ];
+
+  if (!selectedCategory || !validCategories.includes(selectedCategory)) {
+    activeCategory = "all";
+
+    if (causesBtn) {
+      causesBtn.textContent = "Causes ▼";
+    }
+
+    return;
+  }
+
+  activeCategory = selectedCategory;
+
+  if (causesBtn) {
+    causesBtn.textContent = selectedCategory + " ▼";
+  }
+}
+
+function updateCategoryUrl() {
+  if (activeCategory === "all") {
+    window.history.replaceState(null, "", "browseCampaign.html");
+    return;
+  }
+
+  window.history.replaceState(
+    null,
+    "",
+    "browseCampaign.html?category=" + encodeURIComponent(activeCategory)
+  );
+}
+
+/* =========================
+   FAVOURITES
 ========================= */
 function getFavoriteIds() {
   const saved = localStorage.getItem("fav_id");
@@ -159,7 +310,7 @@ function toggleFavorite(id) {
 }
 
 /* =========================
-   FILTER CAMPAIGNS
+   FILTERING
 ========================= */
 function getVisibleCampaigns() {
   let visibleCampaigns = campaigns.slice();
@@ -192,7 +343,16 @@ function getVisibleCampaigns() {
 }
 
 /* =========================
-   RENDER CAMPAIGN CARDS
+   RESULT COUNT
+========================= */
+function updateResultCount(count) {
+  if (resultCountBtn) {
+    resultCountBtn.textContent = count;
+  }
+}
+
+/* =========================
+   RENDER CAMPAIGNS
 ========================= */
 function renderCards() {
   if (!campaignGrid) return;
@@ -200,25 +360,23 @@ function renderCards() {
   campaignGrid.innerHTML = "";
 
   const visibleCampaigns = getVisibleCampaigns();
+  const count = visibleCampaigns.length;
+
+  updateResultCount(count);
 
   if (exploreText) {
-    if (activeCampaignTab === "favorite") {
-      exploreText.textContent =
-        "Explore favorite campaign" + (visibleCampaigns.length === 1 ? "" : "s");
-    } else {
-      exploreText.textContent =
-        "Explore " +
-        visibleCampaigns.length +
-        " campaign" +
-        (visibleCampaigns.length === 1 ? "" : "s");
-    }
+    const categoryText = activeCategory === "all" ? "" : " in " + activeCategory;
+
+    exploreText.textContent =
+      "Explore " +
+      count +
+      " campaign" +
+      (count === 1 ? "" : "s") +
+      categoryText;
   }
 
   if (visibleCampaigns.length === 0) {
-    campaignGrid.innerHTML =
-      activeCampaignTab === "favorite"
-        ? `<div class="empty-message">No favorite campaigns yet</div>`
-        : `<div class="empty-message">No campaign found.</div>`;
+    campaignGrid.innerHTML = `<div class="empty-message">No campaign found.</div>`;
     return;
   }
 
@@ -268,7 +426,7 @@ function renderCards() {
 }
 
 /* =========================
-   TAB EVENT
+   TABS
 ========================= */
 campaignTabs.forEach(function (tab) {
   tab.addEventListener("click", function () {
@@ -277,7 +435,7 @@ campaignTabs.forEach(function (tab) {
     });
 
     tab.classList.add("active");
-    activeCampaignTab = tab.dataset.tab;
+    activeCampaignTab = tab.dataset.tab || "all";
     renderCards();
   });
 });
@@ -288,6 +446,11 @@ campaignTabs.forEach(function (tab) {
 if (causesBtn && causesDropdown) {
   causesBtn.addEventListener("click", function (event) {
     event.stopPropagation();
+
+    document.querySelectorAll(".nav-dropdown").forEach(function (item) {
+      item.classList.remove("open");
+    });
+
     causesDropdown.classList.toggle("open");
   });
 }
@@ -300,6 +463,7 @@ document.querySelectorAll(".chip-item").forEach(function (item) {
     causesBtn.textContent = item.textContent + " ▼";
     causesDropdown.classList.remove("open");
 
+    updateCategoryUrl();
     renderCards();
   });
 });
@@ -332,4 +496,5 @@ document.addEventListener("click", function () {
   }
 });
 
+applyCategoryFromUrl();
 renderCards();
