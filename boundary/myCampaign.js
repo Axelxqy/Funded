@@ -100,7 +100,7 @@ if (signOutBtn) {
 ========================= */
 const myCampaignList = document.getElementById("myCampaignList");
 
-const campaignsPerPage = 5;
+const campaignsPerPage = 4;
 let currentPage = 1;
 let allCampaigns = [];
 
@@ -231,12 +231,21 @@ function displayCampaigns(activities) {
                 Edit
               </button>
 
-              <button 
-                class="more-btn" 
-                onclick="event.stopPropagation();"
-              >
-                <i class="fa-solid fa-ellipsis-vertical"></i>
-              </button>
+              <div class="more-wrapper" onclick="event.stopPropagation();">
+                <button 
+                  class="more-btn" 
+                  onclick="toggleCardMenu(event, ${activity.activity_id})"
+                >
+                  <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+
+                <div class="card-menu" id="cardMenu-${activity.activity_id}">
+                  <button onclick="deleteCampaign(event, ${activity.activity_id})">
+                    <i class="fa-regular fa-trash-can"></i>
+                    Delete Campaign
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -327,3 +336,83 @@ function editCampaign(activityId) {
   localStorage.setItem("editActivityId", activityId);
   window.location.href = "startCampaign.html";
 }
+
+function toggleCardMenu(event, activityId) {
+  event.stopPropagation();
+
+  const allMenus = document.querySelectorAll(".card-menu");
+
+  allMenus.forEach(function (menu) {
+    if (menu.id !== `cardMenu-${activityId}`) {
+      menu.classList.remove("show");
+    }
+  });
+
+  const menu = document.getElementById(`cardMenu-${activityId}`);
+
+  if (menu) {
+    menu.classList.toggle("show");
+  }
+}
+
+async function deleteCampaign(event, activityId) {
+  event.stopPropagation();
+
+  const loggedInUser = getLoggedInUser();
+
+  if (!loggedInUser) {
+    alert("Please login first.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  const confirmDelete = confirm("Are you sure you want to delete this campaign?");
+
+  if (!confirmDelete) return;
+
+  try {
+    const response = await fetch(`http://localhost:3000/activities/${activityId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: loggedInUser.user_id,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message || "Failed to delete campaign.");
+      return;
+    }
+
+    alert("Campaign deleted successfully.");
+
+    allCampaigns = allCampaigns.filter(function (campaign) {
+      return campaign.activity_id !== activityId;
+    });
+
+    const totalPages = Math.max(1, Math.ceil(allCampaigns.length / campaignsPerPage));
+
+    if (currentPage > totalPages) {
+      currentPage = totalPages;
+    }
+
+    updateCampaignStats(allCampaigns);
+    displayCampaignsByPage(currentPage);
+    renderPagination();
+  } catch (error) {
+    console.error("Delete campaign error:", error);
+    alert("Cannot connect to backend.");
+  }
+}
+
+document.addEventListener("click", function () {
+  const allMenus = document.querySelectorAll(".card-menu");
+
+  allMenus.forEach(function (menu) {
+    menu.classList.remove("show");
+  });
+});

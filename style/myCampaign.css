@@ -407,8 +407,8 @@ button {
 .campaign-grid {
   margin-top: 28px;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 26px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
 }
 
 .campaign-card {
@@ -424,7 +424,7 @@ button {
 .campaign-img {
   position: relative;
   width: 100%;
-  height: 150px;
+  height: 170px;
 }
 
 .campaign-img img {
@@ -564,7 +564,7 @@ button {
 }
 
 .more-btn {
-  margin-left: auto;
+  margin-left: 0;
   width: 38px;
   height: 38px;
   border: none;
@@ -853,4 +853,46 @@ button {
 .pagination button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+.more-wrapper {
+  position: relative;
+  margin-left: 0;
+}
+
+.card-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  min-width: 165px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+  display: none;
+  overflow: hidden;
+  z-index: 50;
+}
+
+.card-menu.show {
+  display: block;
+}
+
+.card-menu button {
+  width: 100%;
+  border: none;
+  background: #ffffff;
+  padding: 12px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #b91c1c;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.card-menu button:hover {
+  background: #fef2f2;
 }
