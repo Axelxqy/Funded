@@ -110,30 +110,6 @@ signupPasswordInput.addEventListener("input", function () {
   checkPasswordRules(value, signupRules);
 });
 
-signupFnameInput.addEventListener("input", function () {
-  if (signupFnameInput.value.trim() !== "") {
-    clearError(signupFnameInput, signupFnameError);
-  }
-});
-
-signupLnameInput.addEventListener("input", function () {
-  if (signupLnameInput.value.trim() !== "") {
-    clearError(signupLnameInput, signupLnameError);
-  }
-});
-
-signupDobInput.addEventListener("input", function () {
-  if (signupDobInput.value.trim() !== "") {
-    clearError(signupDobInput, signupDobError);
-  }
-});
-
-signupPhoneInput.addEventListener("input", function () {
-  if (signupPhoneInput.value.trim() !== "") {
-    clearError(signupPhoneInput, signupPhoneError);
-  }
-});
-
 signupBtn.addEventListener("click", async function () {
   const emailValue = signupEmailInput.value.trim();
   const passwordValue = signupPasswordInput.value;
@@ -200,7 +176,7 @@ signupBtn.addEventListener("click", async function () {
   if (hasError) return;
 
   try {
-    const response = await fetch("/auth/signup", {
+    const response = await fetch("http://localhost:3000/auth/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -218,12 +194,11 @@ signupBtn.addEventListener("click", async function () {
     const data = await response.json();
 
     if (!response.ok) {
-      if (data.message === "Email already exists.") {
+      if (data.message === "Email already registered.") {
         showError(signupEmailInput, signupEmailError, "This email is already registered.");
       } else {
         alert(data.message || "Signup failed.");
       }
-
       return;
     }
 
