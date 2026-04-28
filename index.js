@@ -7,8 +7,17 @@ const http = require("http");
 const path = require("path");
 const { Server } = require("socket.io");
 const cookieParser = require("cookie-parser");
-const pool = require("./helper/db");
-const authRoutes = require("./controller/authRoutes");
+const pool = require("./helper/db.js");
+
+//Routes
+const loginRoute = require("./routes/LoginRoute.js");
+const userRoutes = require("./routes/UserAccRoute.js");
+const profileRoutes = require("./routes/UserProfileRoute.js");
+const fraRoutes = require("./routes/FRActivityRoute.js");
+const favRoutes = require("./routes/FavFRActivityRoute.js");
+const donationRoutes = require("./routes/DonationRoute.js");
+const analyticsRoutes = require("./routes/AnalyticsRoute.js");
+const reportRoutes = require("./routes/ReportsRoute.js");
 
 const app = express();
 const server = http.createServer(app);
@@ -29,7 +38,14 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "boundary")));
 app.use("/style", express.static(path.join(__dirname, "style")));
-app.use("/auth", authRoutes);
+app.use("/auth", loginRoute);
+app.use("/users", userRoutes);
+app.use("/profiles", profileRoutes);
+app.use("/fra", fraRoutes);
+app.use("/fav", favRoutes);
+app.use("/donations", donationRoutes);
+app.use("/analytics", analyticsRoutes);
+app.use("/reports", reportRoutes);
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "boundary", "homepage.html"));
