@@ -128,67 +128,11 @@ if (signOutBtn) {
 renderHeaderAuth();
 
 /* =========================
-   CAMPAIGN DATA
+   API / CAMPAIGN DATA
 ========================= */
-const campaigns = [
-  {
-    id: 1,
-    title: "Provide Meals for Children",
-    category: "Health",
-    categoryClass: "health",
-    org: "Helping Hands Foundation",
-    email: "meals@helpinghands.org",
-    raised: "$350,604",
-    goal: "$1,000,000",
-    donors: 2608,
-    daysLeft: 50,
-    progress: 52,
-    image: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=900&q=80"
-  },
-  {
-    id: 2,
-    title: "Bringing Health, Joy and Connection to Our Seniors",
-    category: "Community",
-    categoryClass: "community",
-    org: "Sian Chay Medical Institution",
-    email: "sianchay@gmail.com",
-    raised: "$102,901",
-    goal: "$500,000",
-    donors: 1007,
-    daysLeft: 30,
-    progress: 21,
-    image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=900&q=80"
-  },
-  {
-    id: 3,
-    title: "Support for Relief Operations in Gaza",
-    category: "Disaster",
-    categoryClass: "disaster",
-    org: "Singapore Red Cross Society",
-    email: "redcross@gmail.com",
-    raised: "$390,815",
-    goal: "$500,000",
-    donors: 1561,
-    daysLeft: 18,
-    progress: 74,
-    image: "https://images.unsplash.com/photo-1618477462146-050d2767eac4?auto=format&fit=crop&w=900&q=80"
-  },
-  {
-    id: 4,
-    title: "SOSD Medical Fundraiser 2026/27",
-    category: "Animals",
-    categoryClass: "animals",
-    org: "SOSD",
-    email: "sosd@gmail.com",
-    raised: "$9,899",
-    goal: "$150,000",
-    donors: 55,
-    daysLeft: 42,
-    progress: 7,
-    image: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=900&q=80"
-  }
-];
+const API_BASE_URL = "http://localhost:3000";
 
+let campaigns = [];
 let activeCategory = "all";
 
 const favoriteGrid = document.getElementById("favoriteGrid");
@@ -198,6 +142,175 @@ const resultCountBtn = document.getElementById("resultCountBtn");
 
 const causesDropdown = document.getElementById("causesDropdown");
 const causesBtn = document.getElementById("causesBtn");
+
+/* =========================
+   LOAD ACTIVITIES FROM DATABASE
+========================= */
+async function loadActivitiesFromDatabase() {
+  if (favoriteGrid) {
+    favoriteGrid.innerHTML = "";
+  }
+
+  if (emptyBox) {
+    emptyBox.style.display = "block";
+    emptyBox.textContent = "Loading favorite campaigns...";
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/activities`);
+
+    if (!response.ok) {
+      throw new Error("Failed to load campaigns.");
+    }
+
+    const data = await response.json();
+
+    campaigns = data.activities.map(function (activity) {
+      const goal = Number(activity.fundraise_goal) || 0;
+      const currentAmount = Number(activity.current_amount) || 0;
+
+      const creatorName = `${activity.creator_f_name || ""} ${
+        activity.creator_l_name || ""
+      }`.trim();
+
+      let progress = 0;
+
+      if (goal > 0) {
+        progress = Math.round((currentAmount / goal) * 100);
+      }
+
+      if (progress > 100) {
+        progress = 100;
+      }
+
+      return {
+        id: activity.activity_id,
+        title: activity.activity_name || "Untitled Campaign",
+        category: formatCategoryName(activity.category_name),
+        categoryClass: getCategoryClass(activity.category_name),
+
+        org: creatorName || "Unknown Creator",
+        email: activity.creator_email || "No email available",
+
+        raised: "$" + currentAmount.toLocaleString(),
+        goal: "$" + goal.toLocaleString(),
+        donors: 0,
+        daysLeft: calculateDaysLeft(activity.end_date),
+        progress: progress,
+        image: getCategoryImage(activity.category_name),
+        shortDesc: activity.description || "",
+        about: activity.description || "",
+        status: activity.status || "Ongoing",
+        startDate: activity.start_date,
+        endDate: activity.end_date,
+        createdBy: activity.created_by,
+      };
+    });
+
+    renderFavoriteCampaigns();
+  } catch (error) {
+    console.error("Load favorite campaigns error:", error);
+
+    updateResultCount(0);
+
+    if (favoriteCountText) {
+      favoriteCountText.textContent = "Explore 0 favorite campaigns";
+    }
+
+    if (favoriteGrid) {
+      favoriteGrid.style.display = "none";
+    }
+
+    if (emptyBox) {
+      emptyBox.style.display = "block";
+      emptyBox.textContent = "Failed to load campaigns from server.";
+    }
+  }
+}
+
+/* =========================
+   HELPER FUNCTIONS
+========================= */
+function calculateDaysLeft(endDate) {
+  if (!endDate) return 0;
+
+  const today = new Date();
+  const end = new Date(endDate);
+
+  today.setHours(0, 0, 0, 0);
+  end.setHours(0, 0, 0, 0);
+
+  const difference = end - today;
+  const daysLeft = Math.ceil(difference / (1000 * 60 * 60 * 24));
+
+  return daysLeft > 0 ? daysLeft : 0;
+}
+
+function formatCategoryName(categoryName) {
+  if (!categoryName) return "Others";
+
+  const name = categoryName.toLowerCase();
+
+  if (name.includes("medical") || name.includes("health")) {
+    return "Health";
+  }
+
+  if (name.includes("education")) {
+    return "Education";
+  }
+
+  if (name.includes("animal")) {
+    return "Animals";
+  }
+
+  if (name.includes("disaster") || name.includes("relief")) {
+    return "Disaster";
+  }
+
+  if (name.includes("community")) {
+    return "Community";
+  }
+
+  return categoryName;
+}
+
+function getCategoryClass(categoryName) {
+  const category = formatCategoryName(categoryName).toLowerCase();
+
+  if (category === "health") return "health";
+  if (category === "education") return "education";
+  if (category === "animals") return "animals";
+  if (category === "disaster") return "disaster";
+  if (category === "community") return "community";
+
+  return "others";
+}
+
+function getCategoryImage(categoryName) {
+  const category = formatCategoryName(categoryName);
+
+  if (category === "Health") {
+    return "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=900&q=80";
+  }
+
+  if (category === "Education") {
+    return "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=900&q=80";
+  }
+
+  if (category === "Animals") {
+    return "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=900&q=80";
+  }
+
+  if (category === "Disaster") {
+    return "https://images.unsplash.com/photo-1593113598332-cd59a93c6132?auto=format&fit=crop&w=900&q=80";
+  }
+
+  if (category === "Community") {
+    return "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=900&q=80";
+  }
+
+  return "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=900&q=80";
+}
 
 /* =========================
    FAVOURITE LOCAL STORAGE
@@ -210,7 +323,9 @@ function getFavoriteIds() {
   }
 
   try {
-    return JSON.parse(saved);
+    return JSON.parse(saved).map(function (id) {
+      return Number(id);
+    });
   } catch (error) {
     return [];
   }
@@ -222,7 +337,7 @@ function saveFavoriteIds(ids) {
 
 function removeFavorite(id) {
   const favoriteIds = getFavoriteIds().filter(function (favoriteId) {
-    return favoriteId !== id;
+    return favoriteId !== Number(id);
   });
 
   saveFavoriteIds(favoriteIds);
@@ -236,7 +351,7 @@ function getVisibleFavoriteCampaigns() {
   const favoriteIds = getFavoriteIds();
 
   let favoriteCampaigns = campaigns.filter(function (campaign) {
-    return favoriteIds.includes(campaign.id);
+    return favoriteIds.includes(Number(campaign.id));
   });
 
   if (activeCategory !== "all") {
@@ -253,7 +368,7 @@ function getVisibleFavoriteCampaigns() {
 ========================= */
 function updateResultCount(count) {
   if (resultCountBtn) {
-    resultCountBtn.textContent = count;
+    resultCountBtn.textContent = count + " ▼";
   }
 }
 
@@ -330,10 +445,13 @@ function renderFavoriteCampaigns() {
 
     card.addEventListener("click", function (event) {
       if (event.target.classList.contains("heart-btn")) return;
+
       window.location.href = "campaignDetail.html?id=" + campaign.id;
     });
 
-    card.querySelector(".heart-btn").addEventListener("click", function (event) {
+    const heartBtn = card.querySelector(".heart-btn");
+
+    heartBtn.addEventListener("click", function (event) {
       event.stopPropagation();
       removeFavorite(campaign.id);
     });
@@ -362,8 +480,14 @@ document.querySelectorAll(".chip-item").forEach(function (item) {
     event.stopPropagation();
 
     activeCategory = item.dataset.category || "all";
-    causesBtn.textContent = item.textContent + " ▼";
-    causesDropdown.classList.remove("open");
+
+    if (causesBtn) {
+      causesBtn.textContent = item.textContent + " ▼";
+    }
+
+    if (causesDropdown) {
+      causesDropdown.classList.remove("open");
+    }
 
     renderFavoriteCampaigns();
   });
@@ -382,4 +506,7 @@ document.addEventListener("click", function () {
   }
 });
 
-renderFavoriteCampaigns();
+/* =========================
+   START PAGE
+========================= */
+loadActivitiesFromDatabase();

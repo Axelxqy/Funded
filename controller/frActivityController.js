@@ -100,10 +100,21 @@ const getActivities = async (req, res) => {
          fa.start_date,
          fa.end_date,
          fa.status,
-         fa.description
+         fa.description,
+         fa.created_by,
+
+         ua.f_name AS creator_f_name,
+         ua.l_name AS creator_l_name,
+         ua.email AS creator_email
+
        FROM public.fr_activity fa
+
        LEFT JOIN public.activity_category ac
          ON fa.category_id = ac.category_id
+
+       LEFT JOIN public.user_account ua
+         ON fa.created_by = ua.user_id
+
        ORDER BY fa.activity_id DESC`
     );
 
@@ -136,11 +147,22 @@ const getMyActivities = async (req, res) => {
          fa.end_date,
          fa.status,
          fa.description,
-         fa.created_by
+         fa.created_by,
+
+         ua.f_name AS creator_f_name,
+         ua.l_name AS creator_l_name,
+         ua.email AS creator_email
+
        FROM public.fr_activity fa
+
        LEFT JOIN public.activity_category ac
          ON fa.category_id = ac.category_id
+
+       LEFT JOIN public.user_account ua
+         ON fa.created_by = ua.user_id
+
        WHERE fa.created_by = $1
+
        ORDER BY fa.activity_id DESC`,
       [userId]
     );
@@ -158,8 +180,76 @@ const getMyActivities = async (req, res) => {
   }
 };
 
+const getActivityById = async (req, res) => {
+  const { activityId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `
+      SELECT 
+        fa.activity_id,
+        fa.activity_name,
+        fa.category_id,
+        ac.name AS category_name,
+        fa.fundraise_goal,
+        fa.current_amount,
+        fa.start_date,
+        fa.end_date,
+        fa.status,
+        fa.description,
+        fa.created_by,
+
+        ua.f_name AS creator_f_name,
+        ua.l_name AS creator_l_name,
+        ua.email AS creator_email,
+
+        COALESCE(dc.donor_count, 0) AS donor_count
+
+      FROM public.fr_activity fa
+
+      LEFT JOIN public.activity_category ac
+        ON fa.category_id = ac.category_id
+
+      LEFT JOIN public.user_account ua
+        ON fa.created_by = ua.user_id
+
+      LEFT JOIN (
+        SELECT activity_id, COUNT(*) AS donor_count
+        FROM public.donation
+        GROUP BY activity_id
+      ) dc
+        ON fa.activity_id = dc.activity_id
+
+      WHERE fa.activity_id = $1
+
+      LIMIT 1;
+      `,
+      [activityId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: "Campaign not found.",
+      });
+    }
+
+    res.status(200).json({
+      message: "Campaign retrieved successfully.",
+      activity: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Get activity by id error:", error);
+
+    res.status(500).json({
+      message: "Server error while retrieving campaign.",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createActivity,
   getActivities,
   getMyActivities,
+  getActivityById,
 };

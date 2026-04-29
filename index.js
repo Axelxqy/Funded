@@ -10,6 +10,7 @@ const cookieParser = require("cookie-parser");
 const pool = require("./helper/db");
 const authRoutes = require("./controller/authRoutes");
 const frActivityRoutes = require("./controller/frActivityRoutes");
+const donationRoutes = require("./controller/donationRoutes");
 
 const app = express();
 const server = http.createServer(app);
@@ -31,7 +32,7 @@ app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, "boundary")));
 app.use("/style", express.static(path.join(__dirname, "style")));
-
+app.use("/donations", donationRoutes);
 app.use("/auth", authRoutes);
 app.use("/activities", frActivityRoutes);
 app.get("/", (req, res) => {
