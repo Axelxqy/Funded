@@ -279,7 +279,11 @@ async function searchFavFRAFromDatabase() {
       return mapActivityToCampaign(activity);
     });
 
+    filteredCampaigns = campaigns;
+    currentPage = 1;
+
     renderFavoriteCampaigns();
+
   } catch (error) {
     console.error("Search favourite campaigns error:", error);
 
@@ -686,8 +690,12 @@ if (searchBtn && campaignSearch) {
   });
 
   campaignSearch.addEventListener("input", function () {
-    if (campaignSearch.value.trim() === "") {
+    const value = campaignSearch.value.trim();
+
+    if (value === "") {
       loadFavFRAFromDatabase();
+    } else {
+      searchFavFRAFromDatabase();
     }
   });
 }
