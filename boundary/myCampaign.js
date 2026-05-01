@@ -194,16 +194,15 @@ function displayCampaigns(activities) {
 
       return `
         <div class="campaign-card" onclick="viewCampaign(${activity.activity_id})">
-          <div class="campaign-img">
-            <img 
-              src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=800&q=80" 
-              alt="Campaign image" 
-            />
+          <div class="campaign-top">
+            <div>
+              <span class="campaign-category">${activity.category_name || "-"}</span>
+            </div>
+
             <span class="status ${statusClass}">${statusText}</span>
           </div>
 
           <div class="campaign-content">
-            <h3>${activity.activity_name || "Untitled Campaign"}</h3>
             <p>Category: ${activity.category_name || "-"}</p>
             <p>Goal: S$ ${goal.toFixed(2)}</p>
             <p>Raised: S$ ${current.toFixed(2)}</p>

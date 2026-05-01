@@ -106,7 +106,6 @@ const titleStar = document.getElementById("titleStar");
 const categoryStar = document.getElementById("categoryStar");
 const goalStar = document.getElementById("goalStar");
 const durationStar = document.getElementById("durationStar");
-const imageStar = document.getElementById("imageStar");
 const descriptionStar = document.getElementById("descriptionStar");
 
 const submitCampaignBtn =
@@ -156,21 +155,6 @@ function checkDurationStar() {
     durationStar.classList.add("hide");
   } else {
     durationStar.classList.remove("hide");
-  }
-}
-
-function checkImageStar() {
-  if (!campaignImageInput || !imageStar) return;
-
-  if (isEditMode) {
-    imageStar.classList.add("hide");
-    return;
-  }
-
-  if (campaignImageInput.files.length > 0) {
-    imageStar.classList.add("hide");
-  } else {
-    imageStar.classList.remove("hide");
   }
 }
 
@@ -285,54 +269,6 @@ if (startDateInput && endDateInput) {
 
       checkDurationStar();
     },
-  });
-}
-
-/* =========================
-   IMAGE UPLOAD PREVIEW
-========================= */
-const uploadBox = document.getElementById("uploadBox");
-const chooseFileBtn = document.getElementById("chooseFileBtn");
-const uploadAgainBtn = document.getElementById("uploadAgainBtn");
-const campaignImageInput = document.getElementById("campaignImageInput");
-const imagePreview = document.getElementById("imagePreview");
-
-function openImagePicker() {
-  if (campaignImageInput) {
-    campaignImageInput.click();
-  }
-}
-
-if (chooseFileBtn) {
-  chooseFileBtn.addEventListener("click", openImagePicker);
-}
-
-if (uploadAgainBtn) {
-  uploadAgainBtn.addEventListener("click", openImagePicker);
-}
-
-if (campaignImageInput && imagePreview && uploadBox) {
-  campaignImageInput.addEventListener("change", function () {
-    const file = campaignImageInput.files[0];
-
-    if (!file) {
-      checkImageStar();
-      return;
-    }
-
-    if (!file.type.startsWith("image/")) {
-      alert("Please upload an image file only.");
-      campaignImageInput.value = "";
-      checkImageStar();
-      return;
-    }
-
-    const imageURL = URL.createObjectURL(file);
-
-    imagePreview.src = imageURL;
-    uploadBox.classList.add("has-image");
-
-    checkImageStar();
   });
 }
 
@@ -483,10 +419,6 @@ async function loadEditCampaignData() {
     cancelCampaignBtn.textContent = "Cancel Edit";
   }
 
-  if (imageStar) {
-    imageStar.classList.add("hide");
-  }
-
   try {
     const response = await fetch(`http://localhost:3000/activities/${editActivityId}`);
     const data = await response.json();
@@ -577,7 +509,6 @@ if (campaignForm) {
     const start_date = convertDateToSql(startDateInput.value, startPicker);
     const end_date = convertDateToSql(endDateInput.value, endPicker);
     const description = campaignDescription.value.trim();
-    const imageFile = campaignImageInput ? campaignImageInput.files[0] : null;
 
     if (
       !activity_name ||
@@ -588,11 +519,6 @@ if (campaignForm) {
       !description
     ) {
       alert("Please fill in all required fields.");
-      return;
-    }
-
-    if (!isEditMode && !imageFile) {
-      alert("Please upload a campaign image before submitting.");
       return;
     }
 
