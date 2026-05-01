@@ -22,7 +22,7 @@
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
     </button>
     <div class="profile-menu" id="profileMenu">
-      <a href="#">My Profile</a>
+      <a href="adminProfile.html">My Profile</a>
       <a href="#" onclick="handleLogout(event)">Logout</a>
     </div>
   </div>
@@ -33,22 +33,14 @@
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <!-- UA only -->
-    <div class="sidebar-label ua-only">Admin Management</div>
-    <button class="sidebar-link ua-only active" onclick="navClick(this,'users')">
+    <div class="sidebar-label">Admin Management</div>
+    <button class="sidebar-link active" onclick="navClick(this,'users')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg>
       User Management
     </button>
-    <button class="sidebar-link ua-only" onclick="navClick(this,'activities')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-      Fundraising Activities
-    </button>
-
-    <!-- PM only -->
-    <div class="sidebar-label pm-only">Platform Manager Management</div>
-    <button class="sidebar-link pm-only" onclick="navClick(this,'categories')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      Category Management
+    <button class="sidebar-link" onclick="navClick(this,'activities')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Search Profile
     </button>
 
     <div class="sidebar-bottom">
@@ -63,93 +55,23 @@
   <!-- MAIN -->
   <main class="main">
 
-    <!-- ===== DASHBOARD (UA) ===== -->
-    <div id="section-dashboard" class="section ua-only">
-      <div class="main-card">
-        <div class="page-title">Dashboard</div>
-        <div class="page-desc">Welcome back, <span id="dashName">Admin</span>. Here's an overview of the platform.</div>
-
-        <!-- Stats Row -->
-        <div class="stats-row">
-          <div class="stat-card">
-            <div class="stat-icon" style="background:#dbeafe;color:#2563eb">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
-            </div>
-            <div class="stat-info">
-              <div class="stat-value" id="statTotalUsers">24</div>
-              <div class="stat-label">Total Users</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon" style="background:#dcfce7;color:#16a34a">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </div>
-            <div class="stat-info">
-              <div class="stat-value" id="statActiveUsers">0</div>
-              <div class="stat-label">Active Users</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon" style="background:#fee2e2;color:#dc2626">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7"/><line x1="18" y1="14" x2="18" y2="22"/><line x1="14" y1="18" x2="22" y2="18"/></svg>
-            </div>
-            <div class="stat-info">
-              <div class="stat-value" id="statSuspended">0</div>
-              <div class="stat-label">Suspended</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon" style="background:#fef9c3;color:#854d0e">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-            </div>
-            <div class="stat-info">
-              <div class="stat-value">20</div>
-              <div class="stat-label">Campaigns</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Two Column -->
-        <div class="dash-row">
-          <!-- Recent Users -->
-          <div class="dash-card">
-            <div class="dash-card-title">Recent Users</div>
-            <table style="width:100%;border-collapse:collapse">
-              <thead><tr><th style="text-align:left;font-size:11px;color:#888;padding:6px 8px;border-bottom:1px solid #f0f0f0">Name</th><th style="text-align:left;font-size:11px;color:#888;padding:6px 8px;border-bottom:1px solid #f0f0f0">Role</th><th style="text-align:left;font-size:11px;color:#888;padding:6px 8px;border-bottom:1px solid #f0f0f0">Status</th></tr></thead>
-              <tbody id="recentUsersBody"></tbody>
-            </table>
-          </div>
-
-          <!-- User Role Breakdown -->
-          <div class="dash-card">
-            <div class="dash-card-title">User Roles Breakdown</div>
-            <div id="roleBreakdown" class="role-breakdown"></div>
-
-            <div class="dash-card-title" style="margin-top:20px">Quick Actions</div>
-            <div class="quick-actions">
-              <button class="quick-btn" onclick="navClick(document.querySelector('.sidebar-link.ua-only:nth-child(3)'),'users')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
-                Manage Users
-              </button>
-              <button class="quick-btn" onclick="navClick(document.querySelector('.ua-only:nth-child(4)'),'activities')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-                View Campaigns
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- ===== USER MANAGEMENT (UA) ===== -->
-    <div id="section-users" class="section ua-only hidden">
+    <div id="section-users" class="section ua-only">
       <div class="main-card">
-        <div class="page-title">User Management</div>
-        <div class="page-desc">Manage all users in the fundraising platform. You can view, edit, suspend or activate user accounts.</div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px">
+          <div>
+            <div class="page-title">User Management</div>
+            <div class="page-desc" style="margin-bottom:0">Manage all users in the fundraising platform. You can view, edit, suspend or activate user accounts.</div>
+          </div>
+          <button class="add-user-btn" onclick="openAddUser()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add New User
+          </button>
+        </div>
         <div class="controls-bar">
           <div class="search-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input class="search-input" id="searchInput" type="text" placeholder="Search users by name, email or role..." oninput="filterUsers()" />
+            <input class="search-input" id="searchInput" type="search" placeholder="Search users by name, email or role..." oninput="filterUsers()" autocomplete="off" />
           </div>
           <select class="filter-select" id="roleFilter" onchange="filterUsers()">
             <option value="">All Roles</option>
@@ -162,7 +84,6 @@
             <option value="Active">Active</option>
             <option value="Suspended">Suspended</option>
           </select>
-
         </div>
         <div class="table-wrap">
           <table>
@@ -187,54 +108,34 @@
       </div>
     </div>
 
-    <!-- ===== FUNDRAISING ACTIVITIES (UA) ===== -->
+    <!-- ===== SEARCH PROFILE (UA) ===== -->
     <div id="section-activities" class="section ua-only hidden">
       <div class="main-card">
-        <div class="page-title">Fundraising Activities Management</div>
-        <div class="page-desc">Manage all fundraising campaigns created by fundraisers. You can view, update or delete campaigns.</div>
-        <div class="controls-bar">
-          <div class="search-wrap">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input class="search-input" id="actSearchInput" type="text" placeholder="Search campaigns by title or fundraiser..." oninput="filterActivities()" />
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px">
+          <div>
+            <div class="page-title">Search User Profile</div>
+            <div class="page-desc" style="margin-bottom:0">View and manage all user role profiles on the platform.</div>
           </div>
-          <select class="filter-select" id="actStatusFilter" onchange="filterActivities()">
-            <option value="">All Status</option>
-            <option value="Active">Active</option>
-            <option value="Pending">Pending</option>
-            <option value="Completed">Completed</option>
-          </select>
-          <select class="filter-select" id="actCategoryFilter" onchange="filterActivities()">
-            <option value="">All Category</option>
-            <option value="Health">Health</option>
-            <option value="Education">Education</option>
-            <option value="Animals">Animals</option>
-            <option value="Environment">Environment</option>
-            <option value="Disaster">Disaster</option>
-            <option value="Community">Community</option>
-          </select>
+          <button class="add-user-btn" onclick="openCreateProfile()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Create User Profile
+          </button>
+        </div>
 
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Title</th><th>Fundraiser</th><th>Category</th><th>Goal Amount</th><th>Status</th><th>Created On</th><th>Actions</th></tr></thead>
-            <tbody id="activitiesBody"></tbody>
-          </table>
-        </div>
-        <div class="pagination-row"><span id="actPaginationInfo"></span><div class="pager" id="actPager"></div></div>
-        <div class="legend-row">
-          <div class="legend-card">
-            <h4>Campaign Status</h4>
-            <div class="legend-item"><span class="status-badge status-pending">Pending</span><span>Campaign is pending admin approval.</span></div>
-            <div class="legend-item"><span class="status-badge status-active">Active</span><span>Campaign is approved and visible to users.</span></div>
-            <div class="legend-item"><span class="status-badge status-completed">Completed</span><span>Campaign has ended or reached its goal.</span></div>
+        <!-- Search bar -->
+        <div class="controls-bar">
+          <div class="search-wrap" style="flex:1">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="search-input" id="profileSearchInput" type="search" placeholder="Search by role..." oninput="filterProfiles()" autocomplete="off" />
           </div>
-          <div class="legend-card">
-            <h4>Actions Guide</h4>
-            <div class="legend-item"><svg viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="1.8" style="width:16px;height:16px;flex-shrink:0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span><strong>View</strong> — View campaign details</span></div>
-            <div class="legend-item"><svg viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="1.8" style="width:16px;height:16px;flex-shrink:0"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><span><strong>Edit</strong> — Edit campaign information</span></div>
-            <div class="legend-item"><svg viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="1.8" style="width:16px;height:16px;flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg><span><strong>Delete</strong> — Remove campaign from platform</span></div>
-          </div>
+          <button class="search-btn" onclick="filterProfiles()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Search
+          </button>
         </div>
+
+        <!-- Role profile cards -->
+        <div id="profileCardList" class="act-card-list"></div>
       </div>
     </div>
 
@@ -277,80 +178,10 @@
       </div>
     </div>
 
-    <!-- ===== REPORTS (PM) ===== -->
-    <div id="section-reports" class="section pm-only hidden">
-      <div class="main-card">
-        <div class="page-title">Reports</div>
-        <div class="page-desc">View daily, weekly and monthly reports to monitor platform activity.</div>
-
-        <!-- Report Tabs -->
-        <div class="report-tabs">
-          <button class="report-tab active" onclick="switchReport(this,'daily')">Daily</button>
-          <button class="report-tab" onclick="switchReport(this,'weekly')">Weekly</button>
-          <button class="report-tab" onclick="switchReport(this,'monthly')">Monthly</button>
-        </div>
-
-        <!-- Daily Report -->
-        <div id="report-daily" class="report-section">
-          <div class="stats-row" style="margin-top:18px">
-            <div class="stat-card"><div class="stat-icon" style="background:#dbeafe;color:#2563eb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg></div><div class="stat-info"><div class="stat-value">3</div><div class="stat-label">New Users Today</div></div></div>
-            <div class="stat-card"><div class="stat-icon" style="background:#dcfce7;color:#16a34a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><div class="stat-info"><div class="stat-value">5</div><div class="stat-label">Active Campaigns</div></div></div>
-            <div class="stat-card"><div class="stat-icon" style="background:#fef9c3;color:#854d0e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="stat-info"><div class="stat-value">RM 1,240</div><div class="stat-label">Donations Today</div></div></div>
-            <div class="stat-card"><div class="stat-icon" style="background:#ede9fe;color:#5b21b6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div class="stat-info"><div class="stat-value">87</div><div class="stat-label">Page Views</div></div></div>
-          </div>
-          <div class="report-table-title">Today's Activity Log</div>
-          <div class="table-wrap"><table><thead><tr><th>Time</th><th>User</th><th>Action</th><th>Status</th></tr></thead><tbody>
-            <tr><td>09:12</td><td>John Doe</td><td>Created campaign "Save Cancer Patients"</td><td><span class="status-badge status-active">Active</span></td></tr>
-            <tr><td>10:34</td><td>Sarah Johnson</td><td>Made donation RM 200</td><td><span class="status-badge status-active">Success</span></td></tr>
-            <tr><td>11:05</td><td>Mike Brown</td><td>Account suspended by admin</td><td><span class="status-badge status-suspended">Suspended</span></td></tr>
-            <tr><td>13:20</td><td>Emma Thompson</td><td>Registered new account</td><td><span class="status-badge status-active">Active</span></td></tr>
-            <tr><td>15:47</td><td>David Lee</td><td>Updated campaign details</td><td><span class="status-badge status-active">Active</span></td></tr>
-          </tbody></table></div>
-        </div>
-
-        <!-- Weekly Report -->
-        <div id="report-weekly" class="report-section hidden">
-          <div class="stats-row" style="margin-top:18px">
-            <div class="stat-card"><div class="stat-icon" style="background:#dbeafe;color:#2563eb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg></div><div class="stat-info"><div class="stat-value">18</div><div class="stat-label">New Users This Week</div></div></div>
-            <div class="stat-card"><div class="stat-icon" style="background:#dcfce7;color:#16a34a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></div><div class="stat-info"><div class="stat-value">12</div><div class="stat-label">Campaigns This Week</div></div></div>
-            <div class="stat-card"><div class="stat-icon" style="background:#fef9c3;color:#854d0e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="stat-info"><div class="stat-value">RM 8,650</div><div class="stat-label">Weekly Donations</div></div></div>
-            <div class="stat-card"><div class="stat-icon" style="background:#ede9fe;color:#5b21b6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div class="stat-info"><div class="stat-value">542</div><div class="stat-label">Total Page Views</div></div></div>
-          </div>
-          <div class="report-table-title">Weekly Summary (Mon – Sun)</div>
-          <div class="table-wrap"><table><thead><tr><th>Day</th><th>New Users</th><th>Donations (RM)</th><th>New Campaigns</th><th>Page Views</th></tr></thead><tbody>
-            <tr><td>Monday</td><td>3</td><td>1,240</td><td>2</td><td>87</td></tr>
-            <tr><td>Tuesday</td><td>2</td><td>980</td><td>1</td><td>102</td></tr>
-            <tr><td>Wednesday</td><td>4</td><td>1,560</td><td>3</td><td>95</td></tr>
-            <tr><td>Thursday</td><td>1</td><td>720</td><td>2</td><td>78</td></tr>
-            <tr><td>Friday</td><td>5</td><td>2,100</td><td>2</td><td>110</td></tr>
-            <tr><td>Saturday</td><td>2</td><td>1,280</td><td>1</td><td>45</td></tr>
-            <tr><td>Sunday</td><td>1</td><td>770</td><td>1</td><td>25</td></tr>
-          </tbody></table></div>
-        </div>
-
-        <!-- Monthly Report -->
-        <div id="report-monthly" class="report-section hidden">
-          <div class="stats-row" style="margin-top:18px">
-            <div class="stat-card"><div class="stat-icon" style="background:#dbeafe;color:#2563eb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg></div><div class="stat-info"><div class="stat-value">72</div><div class="stat-label">New Users This Month</div></div></div>
-            <div class="stat-card"><div class="stat-icon" style="background:#dcfce7;color:#16a34a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></div><div class="stat-info"><div class="stat-value">38</div><div class="stat-label">Campaigns This Month</div></div></div>
-            <div class="stat-card"><div class="stat-icon" style="background:#fef9c3;color:#854d0e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="stat-info"><div class="stat-value">RM 34,820</div><div class="stat-label">Monthly Donations</div></div></div>
-            <div class="stat-card"><div class="stat-icon" style="background:#ede9fe;color:#5b21b6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div class="stat-info"><div class="stat-value">2,148</div><div class="stat-label">Total Page Views</div></div></div>
-          </div>
-          <div class="report-table-title">Monthly Summary by Week</div>
-          <div class="table-wrap"><table><thead><tr><th>Week</th><th>New Users</th><th>Donations (RM)</th><th>New Campaigns</th><th>Page Views</th></tr></thead><tbody>
-            <tr><td>Week 1</td><td>18</td><td>8,650</td><td>10</td><td>542</td></tr>
-            <tr><td>Week 2</td><td>20</td><td>9,200</td><td>9</td><td>580</td></tr>
-            <tr><td>Week 3</td><td>16</td><td>8,100</td><td>11</td><td>510</td></tr>
-            <tr><td>Week 4</td><td>18</td><td>8,870</td><td>8</td><td>516</td></tr>
-          </tbody></table></div>
-        </div>
-      </div>
-    </div>
-
   </main>
 </div>
 
-<!-- ===== MODALS: USER ===== -->
+<!-- ===== MODALS: VIEW USER ===== -->
 <div class="modal-overlay" id="viewModal">
   <div class="modal">
     <div class="modal-header"><div class="modal-title">User Details</div><button class="modal-close" onclick="closeModal('viewModal')">×</button></div>
@@ -358,6 +189,8 @@
     <div class="modal-footer"><button class="btn-cancel" onclick="closeModal('viewModal')">Close</button></div>
   </div>
 </div>
+
+<!-- ===== MODALS: EDIT USER ===== -->
 <div class="modal-overlay" id="editModal">
   <div class="modal">
     <div class="modal-header"><div class="modal-title">Edit User</div><button class="modal-close" onclick="closeModal('editModal')">×</button></div>
@@ -380,6 +213,32 @@
     </div>
   </div>
 </div>
+
+<!-- ===== MODALS: ADD USER ===== -->
+<div class="modal-overlay" id="addUserModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Add New User</div><button class="modal-close" onclick="closeModal('addUserModal')">×</button></div>
+    <div class="modal-body">
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">First Name *</label><input class="field-input" id="addFName" type="text" placeholder="First name"/></div>
+        <div class="field-group"><label class="field-label">Last Name *</label><input class="field-input" id="addLName" type="text" placeholder="Last name"/></div>
+      </div>
+      <div class="field-group"><label class="field-label">Email *</label><input class="field-input" id="addEmail" type="email" placeholder="user@example.com"/></div>
+      <div class="field-group"><label class="field-label">Password *</label><input class="field-input" id="addPassword" type="password" placeholder="Minimum 8 characters"/></div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">Role</label><select class="field-select" id="addRole"><option>Admin</option><option>Fundraiser</option><option>Donee</option></select></div>
+        <div class="field-group"><label class="field-label">Phone</label><input class="field-input" id="addPhone" type="tel" placeholder="+60..."/></div>
+      </div>
+      <div class="field-group"><label class="field-label">Date of Birth</label><input class="field-input" id="addDob" type="date"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('addUserModal')">Cancel</button>
+      <button class="btn-save" onclick="saveAddUser()">Add User</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODALS: SUSPEND USER ===== -->
 <div class="modal-overlay" id="suspendModal">
   <div class="modal">
     <div class="modal-header"><div class="modal-title" id="suspendTitle">Suspend User</div><button class="modal-close" onclick="closeModal('suspendModal')">×</button></div>
@@ -394,103 +253,99 @@
     </div>
   </div>
 </div>
-<div class="modal-overlay" id="deleteModal">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-title">Delete User</div><button class="modal-close" onclick="closeModal('deleteModal')">×</button></div>
-    <div class="modal-body">
-      <input type="hidden" id="deleteUID"/>
-      <p class="confirm-msg">Are you sure you want to permanently delete this user?</p>
-      <p class="confirm-sub">This action cannot be undone.</p>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeModal('deleteModal')">Cancel</button>
-      <button class="btn-delete" onclick="confirmDelete()">Delete</button>
-    </div>
-  </div>
-</div>
 
-<!-- ===== MODALS: ACTIVITY ===== -->
-<div class="modal-overlay" id="actViewModal">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-title">Campaign Details</div><button class="modal-close" onclick="closeModal('actViewModal')">×</button></div>
-    <div class="modal-body" id="actViewBody"></div>
-    <div class="modal-footer"><button class="btn-cancel" onclick="closeModal('actViewModal')">Close</button></div>
-  </div>
-</div>
-
-<!-- Edit Campaign Modal -->
-<div class="modal-overlay" id="actEditModal">
-  <div class="modal" style="width:520px;max-width:96vw">
+<!-- ===== MODALS: PROFILE DETAILS ===== -->
+<div class="modal-overlay" id="profileDetailModal">
+  <div class="modal" style="width:480px;max-width:96vw">
     <div class="modal-header">
-      <div class="modal-title">Edit Campaign</div>
-      <button class="modal-close" onclick="closeModal('actEditModal')">×</button>
+      <div class="modal-title">Profile Details</div>
+      <button class="modal-close" onclick="closeModal('profileDetailModal')">×</button>
     </div>
     <div class="modal-body">
-      <p style="font-size:12px;color:#999;margin-bottom:14px">Update the campaign information. Fields marked with * are required.</p>
-      <input type="hidden" id="actEditID"/>
-      <div class="field-row">
-        <div class="field-group"><label class="field-label">Title *</label><input class="field-input" id="actEditTitle" type="text"/></div>
-        <div class="field-group"><label class="field-label">Category *</label>
-          <select class="field-select" id="actEditCategory">
-            <option>Health</option><option>Education</option><option>Animals</option>
-            <option>Environment</option><option>Disaster</option><option>Community</option>
-          </select>
-        </div>
-      </div>
-      <div class="field-row">
-        <div class="field-group"><label class="field-label">Fundraiser *</label><input class="field-input" id="actEditFundraiser" type="text"/></div>
-        <div class="field-group"><label class="field-label">Goal Amount (RM) *</label><input class="field-input" id="actEditGoal" type="number"/></div>
-      </div>
-      <div class="field-group">
-        <label class="field-label">Detailed Description</label>
-        <textarea class="field-input" id="actEditDesc" maxlength="2000" rows="4" style="height:auto;padding-top:8px;padding-bottom:8px;resize:vertical" oninput="updateActDescCount()"></textarea>
-        <div style="text-align:right;font-size:11px;color:#aaa;margin-top:2px"><span id="actDescCount">0</span>/2000</div>
-      </div>
-      <div class="field-group">
-        <label class="field-label">Campaign Image</label>
-        <div style="border:1.5px dashed #d0d0d0;border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:14px;background:#fafafa">
-          <div style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:#aaa">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:28px;height:28px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          </div>
-          <div style="flex:1">
-            <div style="font-size:12px;color:#555">Click to upload or drag and drop</div>
-            <div style="font-size:11px;color:#aaa">JPG, PNG up to 5MB</div>
-          </div>
-          <div id="actEditImgPreview" style="width:52px;height:52px;border-radius:6px;overflow:hidden;display:none">
-            <img id="actEditImgThumb" style="width:100%;height:100%;object-fit:cover"/>
-          </div>
-        </div>
-      </div>
-      <div class="field-group">
-        <label class="field-label">Status *</label>
-        <select class="field-select" id="actEditStatus" style="max-width:200px">
-          <option>Active</option><option>Pending</option><option>Completed</option>
-        </select>
-      </div>
+      <p style="font-size:12px;color:#999;margin-bottom:16px;font-weight:600">Profile Information</p>
+      <div id="profileDetailBody"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeModal('actEditModal')">Cancel</button>
-      <button class="btn-save" onclick="saveActEdit()">Save Changes</button>
+      <button class="btn-delete" onclick="openProfileDelete()">Delete</button>
+      <button class="btn-save" onclick="openProfileEdit()">Update</button>
     </div>
   </div>
 </div>
 
-<div class="modal-overlay" id="actDeleteModal">
+<!-- ===== MODALS: DELETE PROFILE CONFIRM ===== -->
+<div class="modal-overlay" id="profileDeleteModal">
   <div class="modal">
-    <div class="modal-header"><div class="modal-title">Delete Campaign</div><button class="modal-close" onclick="closeModal('actDeleteModal')">×</button></div>
+    <div class="modal-header">
+      <div class="modal-title">Delete Profile</div>
+      <button class="modal-close" onclick="closeModal('profileDeleteModal')">×</button>
+    </div>
     <div class="modal-body">
-      <input type="hidden" id="actDeleteID"/>
-      <p class="confirm-msg">Are you sure you want to permanently delete this campaign?</p>
+      <p class="confirm-msg">Are you sure you want to delete this profile?</p>
       <p class="confirm-sub">This action cannot be undone.</p>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeModal('actDeleteModal')">Cancel</button>
-      <button class="btn-delete" onclick="confirmActDelete()">Delete</button>
+      <button class="btn-cancel" onclick="closeModal('profileDeleteModal')">Cancel</button>
+      <button class="btn-delete" onclick="confirmProfileDelete()">Delete</button>
     </div>
   </div>
 </div>
 
-<!-- ===== MODALS: CATEGORY ===== -->
+<!-- ===== MODALS: EDIT PROFILE ===== -->
+<div class="modal-overlay" id="profileEditModal">
+  <div class="modal" style="width:480px;max-width:96vw">
+    <div class="modal-header">
+      <div class="modal-title">Edit Profile</div>
+      <button class="modal-close" onclick="closeModal('profileEditModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:12px;color:#999;margin-bottom:16px">Update the role profile information below.</p>
+      <input type="hidden" id="profileEditID"/>
+      <div class="field-group">
+        <label class="field-label">Role Name *</label>
+        <input class="field-input" id="profileEditName" type="text" placeholder="e.g. Donee"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Role Description *</label>
+        <textarea class="field-input" id="profileEditDesc" rows="4"
+          style="height:auto;padding-top:8px;padding-bottom:8px;resize:vertical"
+          placeholder="Describe the responsibilities of this role..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('profileEditModal')">Cancel</button>
+      <button class="btn-save" onclick="saveProfileEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODALS: CREATE USER PROFILE ===== -->
+<div class="modal-overlay" id="createProfileModal">
+  <div class="modal" style="width:480px;max-width:96vw">
+    <div class="modal-header">
+      <div class="modal-title">Create User Profile</div>
+      <button class="modal-close" onclick="closeModal('createProfileModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:12px;color:#999;margin-bottom:16px">Fill in the details to create a new user role profile.</p>
+      <div class="field-group">
+        <label class="field-label">Role Name *</label>
+        <input class="field-input" id="createProfileName" type="text" placeholder="e.g. Moderator"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Role Description *</label>
+        <textarea class="field-input" id="createProfileDesc" rows="4"
+          style="height:auto;padding-top:8px;padding-bottom:8px;resize:vertical"
+          placeholder="Describe the responsibilities of this role..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('createProfileModal')">Cancel</button>
+      <button class="btn-save" onclick="saveCreateProfile()">Create Profile</button>
+    </div>
+  </div>
+</div>
+
+
 <div class="modal-overlay" id="catEditModal">
   <div class="modal">
     <div class="modal-header"><div class="modal-title" id="catModalTitle">Edit Category</div><button class="modal-close" onclick="closeModal('catEditModal')">×</button></div>

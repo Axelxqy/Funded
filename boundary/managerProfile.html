@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile – Platform Manager</title>
+  <link rel="stylesheet" href="../style/Usermanagement.css" />
+  <link rel="stylesheet" href="../style/managerProfile.css" />
+</head>
+<body>
+
+<!-- ===================== NAVBAR ===================== -->
+<nav class="navbar">
+  <div class="nav-logo">
+    <img src="fundraising_logo.png" alt="Helping Hands" />
+  </div>
+  <div class="profile-wrap">
+    <button class="profile-btn" id="profileToggle">
+      <div class="profile-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      </div>
+      <span id="navUsername">Platform Manager</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="profile-menu" id="profileMenu">
+      <a href="managerProfile.html">My Profile</a>
+      <a href="#" onclick="handleLogout(event)">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ===================== BODY ===================== -->
+<div class="body-wrap">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-label">Platform Management</div>
+    <button class="sidebar-link" onclick="window.location.href='platformManager.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Category Management
+    </button>
+    <button class="sidebar-link" onclick="window.location.href='platformManager.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Reports
+    </button>
+
+    <div class="sidebar-bottom">
+      <hr class="sidebar-divider"/>
+      <button class="sidebar-link active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        My Profile
+      </button>
+      <button class="sidebar-link" onclick="handleLogout(event)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="main-card">
+      <div class="profile-page-wrap">
+
+        <a class="back-link" onclick="history.back()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </a>
+
+        <div class="page-title">My Profile</div>
+        <div class="page-desc">View and update your personal information and password.</div>
+
+        <!-- Avatar summary -->
+        <div class="profile-avatar-section">
+          <div class="profile-big-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          </div>
+          <div class="profile-avatar-info">
+            <div class="profile-full-name" id="displayName">—</div>
+            <div class="profile-role-badge">Platform Manager</div>
+            <div class="profile-email-sub" id="displayEmail">—</div>
+          </div>
+        </div>
+
+        <!-- Personal Info -->
+        <div class="profile-section">
+          <div class="profile-section-title">Personal Information</div>
+          <div class="profile-field-row">
+            <div class="profile-field-group">
+              <label class="profile-field-label">First Name</label>
+              <input class="profile-field-input" id="pFName" type="text" placeholder="First name" />
+            </div>
+            <div class="profile-field-group">
+              <label class="profile-field-label">Last Name</label>
+              <input class="profile-field-input" id="pLName" type="text" placeholder="Last name" />
+            </div>
+          </div>
+          <div class="profile-field-group">
+            <label class="profile-field-label">Email</label>
+            <input class="profile-field-input" id="pEmail" type="email" placeholder="Email address" />
+          </div>
+          <div class="profile-field-row">
+            <div class="profile-field-group">
+              <label class="profile-field-label">Phone</label>
+              <input class="profile-field-input" id="pPhone" type="tel" placeholder="Phone number" />
+            </div>
+            <div class="profile-field-group">
+              <label class="profile-field-label">Date of Birth</label>
+              <input class="profile-field-input" id="pDob" type="date" />
+            </div>
+          </div>
+          <div class="profile-field-group">
+            <label class="profile-field-label">Role</label>
+            <input class="profile-field-input" id="pRole" type="text" value="Platform Manager" disabled />
+          </div>
+          <div class="profile-actions">
+            <button class="btn-save-pm" onclick="saveProfile()">Save Changes</button>
+          </div>
+        </div>
+
+        <hr class="profile-divider"/>
+
+        <!-- Change Password -->
+        <div class="profile-section">
+          <div class="profile-section-title">Change Password</div>
+          <div class="profile-field-group">
+            <label class="profile-field-label">Current Password</label>
+            <input class="profile-field-input" id="pCurrentPw" type="password" placeholder="Enter current password" />
+          </div>
+          <div class="profile-field-group">
+            <label class="profile-field-label">New Password</label>
+            <input class="profile-field-input" id="pNewPw" type="password" placeholder="Minimum 8 characters" oninput="checkStrength(this.value)" />
+            <div class="password-strength"><div class="password-strength-bar" id="strengthBar"></div></div>
+            <div class="password-hint" id="strengthHint">Enter a new password</div>
+          </div>
+          <div class="profile-field-group">
+            <label class="profile-field-label">Confirm New Password</label>
+            <input class="profile-field-input" id="pConfirmPw" type="password" placeholder="Repeat new password" />
+          </div>
+          <div class="profile-actions">
+            <button class="btn-save-pm" onclick="changePassword()">Update Password</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '';
+let myUserId = null;
+
+window.addEventListener('DOMContentLoaded', async () => {
+  document.getElementById('profileToggle').addEventListener('click', e => {
+    e.stopPropagation();
+    document.getElementById('profileMenu').classList.toggle('show');
+  });
+  document.addEventListener('click', () => document.getElementById('profileMenu').classList.remove('show'));
+  await loadMyProfile();
+});
+
+async function loadMyProfile() {
+  try {
+    const session = JSON.parse(sessionStorage.getItem('hh_session') || '{}');
+    myUserId = session.user_id;
+
+    if (!myUserId) {
+      // fallback for demo
+      const res = await fetch(`${API}/admin/users`);
+      const data = await res.json();
+      const me = (data.users || []).find(u => u.role_name === 'Platform Management') || (data.users || [])[0];
+      if (me) populateProfile(me);
+      return;
+    }
+
+    const res = await fetch(`${API}/admin/users/${myUserId}`);
+    const data = await res.json();
+    if (data.user) populateProfile(data.user);
+  } catch (err) {
+    console.error('Failed to load profile:', err);
+    toast('Failed to load profile.', 'error');
+  }
+}
+
+function populateProfile(u) {
+  myUserId = u.user_id;
+  document.getElementById('displayName').textContent = `${u.f_name} ${u.l_name}`;
+  document.getElementById('displayEmail').textContent = u.email;
+  document.getElementById('navUsername').textContent = `${u.f_name} ${u.l_name}`;
+  document.getElementById('pFName').value  = u.f_name || '';
+  document.getElementById('pLName').value  = u.l_name || '';
+  document.getElementById('pEmail').value  = u.email  || '';
+  document.getElementById('pPhone').value  = u.phone  || '';
+  document.getElementById('pDob').value    = u.dob ? u.dob.split('T')[0] : '';
+}
+
+async function saveProfile() {
+  const f_name = document.getElementById('pFName').value.trim();
+  const l_name = document.getElementById('pLName').value.trim();
+  const email  = document.getElementById('pEmail').value.trim();
+  const phone  = document.getElementById('pPhone').value.trim();
+
+  if (!f_name || !email) { toast('Name and email are required.', 'error'); return; }
+
+  try {
+    const res = await fetch(`${API}/admin/users/${myUserId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ f_name, l_name, email, phone, profile_id: null })
+    });
+    if (!res.ok) { toast('Failed to save changes.', 'error'); return; }
+    document.getElementById('displayName').textContent = `${f_name} ${l_name}`;
+    document.getElementById('displayEmail').textContent = email;
+    document.getElementById('navUsername').textContent = `${f_name} ${l_name}`;
+    toast('Profile updated successfully.', 'success');
+  } catch (err) {
+    toast('Failed to save changes.', 'error');
+  }
+}
+
+async function changePassword() {
+  const current = document.getElementById('pCurrentPw').value;
+  const newPw   = document.getElementById('pNewPw').value;
+  const confirm = document.getElementById('pConfirmPw').value;
+
+  if (!current || !newPw || !confirm) { toast('Please fill in all password fields.', 'error'); return; }
+  if (newPw.length < 8) { toast('New password must be at least 8 characters.', 'error'); return; }
+  if (newPw !== confirm) { toast('Passwords do not match.', 'error'); return; }
+
+  try {
+    const res = await fetch(`${API}/admin/users/${myUserId}/password`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ current_password: current, new_password: newPw })
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      toast(err.message || 'Failed to update password.', 'error');
+      return;
+    }
+    document.getElementById('pCurrentPw').value = '';
+    document.getElementById('pNewPw').value = '';
+    document.getElementById('pConfirmPw').value = '';
+    document.getElementById('strengthBar').style.width = '0%';
+    document.getElementById('strengthHint').textContent = 'Enter a new password';
+    toast('Password updated successfully.', 'success');
+  } catch (err) {
+    toast('Failed to update password.', 'error');
+  }
+}
+
+function checkStrength(val) {
+  const bar  = document.getElementById('strengthBar');
+  const hint = document.getElementById('strengthHint');
+  if (!val) { bar.style.width = '0%'; hint.textContent = 'Enter a new password'; hint.style.color = '#aaa'; return; }
+  let score = 0;
+  if (val.length >= 8)           score++;
+  if (/[A-Z]/.test(val))         score++;
+  if (/[0-9]/.test(val))         score++;
+  if (/[^A-Za-z0-9]/.test(val))  score++;
+  const levels = [
+    { w: '25%', color: '#ef4444', text: 'Weak' },
+    { w: '50%', color: '#f97316', text: 'Fair' },
+    { w: '75%', color: '#eab308', text: 'Good' },
+    { w: '100%', color: '#22c55e', text: 'Strong' },
+  ];
+  const l = levels[score - 1] || levels[0];
+  bar.style.width = l.w;
+  bar.style.background = l.color;
+  hint.textContent = l.text;
+  hint.style.color = l.color;
+}
+
+function toast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type}`;
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function handleLogout(e) {
+  if (e) e.preventDefault();
+  sessionStorage.removeItem('hh_session');
+  toast('Logged out.', 'success');
+  setTimeout(() => window.location.href = 'login.html', 1200);
+}
+</script>
+</body>
+</html>

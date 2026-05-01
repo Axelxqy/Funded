@@ -1,3 +1,8 @@
+/* ============================================================
+   USER MANAGEMENT CSS — User Admin only
+   Shared base styles: navbar, sidebar, layout, table, modal, toast
+============================================================ */
+
 /* ===================== RESET ===================== */
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; }
 html, body { width: 100%; height: 100%; overflow-x: hidden; overflow-y: auto; }
@@ -32,12 +37,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .sidebar-divider { border: none; border-top: 1px solid #efefef; margin: 8px 0; }
 .sidebar-bottom { margin-top: auto; }
 
-/* ===================== ROLE VISIBILITY ===================== */
-.ua-only { display: block; }
-.sidebar-link.ua-only { display: flex; }
-.pm-only { display: block; }
-.sidebar-link.pm-only { display: flex; }
-
 /* ===================== SECTION ===================== */
 .section { display: block; }
 .section.hidden { display: none; }
@@ -48,40 +47,15 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .page-title { font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
 .page-desc { font-size: 13px; color: #777; margin-bottom: 22px; line-height: 1.5; }
 
-/* ===================== DASHBOARD ===================== */
-.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-.stat-card { background: #f9f9f9; border-radius: 10px; border: 1px solid #ebebeb; padding: 16px; display: flex; align-items: center; gap: 14px; }
-.stat-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.stat-icon svg { width: 22px; height: 22px; }
-.stat-value { font-size: 22px; font-weight: 700; color: #1a1a1a; line-height: 1; }
-.stat-label { font-size: 12px; color: #888; margin-top: 4px; }
-.dash-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.dash-card { background: #f9f9f9; border-radius: 10px; border: 1px solid #ebebeb; padding: 18px; }
-.dash-card-title { font-size: 13px; font-weight: 700; color: #333; margin-bottom: 12px; }
-.role-breakdown { display: flex; flex-direction: column; gap: 10px; }
-.role-bar-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
-.role-bar-label { width: 70px; color: #555; flex-shrink: 0; }
-.role-bar-track { flex: 1; height: 8px; background: #ebebeb; border-radius: 999px; overflow: hidden; }
-.role-bar-fill { height: 100%; border-radius: 999px; }
-.role-bar-count { width: 24px; text-align: right; color: #888; flex-shrink: 0; }
-.quick-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-.quick-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border: 1px solid #d0d0d0; border-radius: 8px; font-size: 13px; color: #444; background: #fff; cursor: pointer; }
-.quick-btn:hover { background: #f5f9f4; border-color: #a8c9a0; color: #2f5b37; }
-.quick-btn svg { width: 15px; height: 15px; }
-
-/* ===================== REPORT TABS ===================== */
-.report-tabs { display: flex; gap: 0; border-bottom: 2px solid #ebebeb; margin-bottom: 0; }
-.report-tab { padding: 10px 22px; font-size: 14px; font-weight: 500; color: #888; background: transparent; border: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
-.report-tab:hover { color: #2f5b37; }
-.report-tab.active { color: #2f5b37; border-bottom-color: #2f5b37; font-weight: 700; }
-.report-section { display: block; }
-.report-section.hidden { display: none; }
-.report-table-title { font-size: 13px; font-weight: 700; color: #333; margin: 20px 0 10px; }
-
-/* ===================== CATEGORY HEADER ===================== */
-.cat-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
-.add-cat-btn { display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 16px; border: 1.5px solid #7c5c9f; border-radius: 8px; color: #7c5c9f; font-size: 13px; font-weight: 600; background: #fff; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-.add-cat-btn:hover { background: #f5f0fb; }
+/* ===================== ADD USER BUTTON ===================== */
+.add-user-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 38px; padding: 0 16px;
+  border: 1.5px solid #2f5b37; border-radius: 8px;
+  color: #2f5b37; font-size: 13px; font-weight: 600;
+  background: #fff; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+}
+.add-user-btn:hover { background: #f0f5ef; }
 
 /* ===================== CONTROLS ===================== */
 .controls-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
@@ -110,17 +84,6 @@ td { padding: 12px; font-size: 13px; color: #333; vertical-align: middle; }
 .user-cell { display: flex; align-items: center; gap: 10px; }
 .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: #e8e8e8; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #777; }
 .user-avatar svg { width: 18px; height: 18px; }
-.campaign-cell { display: flex; align-items: center; gap: 10px; }
-.campaign-info .camp-title { font-size: 13px; font-weight: 600; color: #1a6b3f; }
-.campaign-info .camp-desc { font-size: 11px; color: #888; margin-top: 2px; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.fundraiser-cell { display: flex; align-items: center; gap: 8px; }
-.fundraiser-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
-.fundraiser-info .f-name { font-size: 12px; font-weight: 600; color: #222; }
-.fundraiser-info .f-email { font-size: 11px; color: #999; }
-
-/* ===================== CATEGORY ICON ===================== */
-.cat-icon-wrap { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.cat-icon-wrap svg { width: 18px; height: 18px; }
 
 /* ===================== BADGES ===================== */
 .badge { display: inline-block; padding: 3px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; }
@@ -132,14 +95,6 @@ td { padding: 12px; font-size: 13px; color: #333; vertical-align: middle; }
 .status-suspended { background: #fee2e2; color: #dc2626; }
 .status-pending   { background: #fef9c3; color: #854d0e; }
 .status-completed { background: #e0e7ff; color: #3730a3; }
-.cat-badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
-.cat-health      { background: #d1fae5; color: #065f46; }
-.cat-education   { background: #dbeafe; color: #1e40af; }
-.cat-animals     { background: #fef3c7; color: #92400e; }
-.cat-environment { background: #d1fae5; color: #065f46; }
-.cat-disaster    { background: #fee2e2; color: #991b1b; }
-.cat-community   { background: #ede9fe; color: #5b21b6; }
-.cat-default     { background: #f3f4f6; color: #374151; }
 
 /* ===================== ACTIONS ===================== */
 .actions { display: flex; align-items: center; gap: 5px; }
@@ -197,13 +152,20 @@ td { padding: 12px; font-size: 13px; color: #333; vertical-align: middle; }
 .toast.success { background: #2f5b37; }
 .toast.error   { background: #dc2626; }
 
+/* ===================== SEARCH PROFILE CARDS ===================== */
+.act-card-list { display: flex; flex-direction: column; border: 1px solid #ebebeb; border-radius: 10px; overflow: hidden; margin-bottom: 4px; }
+.act-profile-card { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: #fff; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background 0.15s; gap: 12px; }
+.act-profile-card:last-child { border-bottom: none; }
+.act-profile-card:hover { background: #f7faf7; }
+.act-card-left { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; }
+.act-card-avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+.act-card-info { flex: 1; min-width: 0; }
+.act-card-title { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.act-card-desc { font-size: 12px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.act-card-right { display: flex; align-items: center; flex-shrink: 0; gap: 4px; }
+
 /* ===================== RESPONSIVE ===================== */
-@media (max-width: 900px) {
-  .stats-row { grid-template-columns: repeat(2, 1fr); }
-  .dash-row { grid-template-columns: 1fr; }
-}
 @media (max-width: 600px) {
-  .stats-row { grid-template-columns: 1fr; }
   .body-wrap { padding: 12px; gap: 12px; }
   .sidebar { width: 160px; }
 }

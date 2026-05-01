@@ -1,0 +1,160 @@
+/* ============================================================
+   MANAGER PROFILE PAGE CSS
+   Place in: style/managerProfile.css
+   Requires: style/Usermanagement.css (base styles)
+============================================================ */
+
+.profile-page-wrap {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.profile-avatar-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 28px;
+  padding: 22px 24px;
+  background: #f7faf7;
+  border-radius: 12px;
+  border: 1px solid #e4ede4;
+}
+
+.profile-big-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #c8e0c2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #2f5b37;
+}
+.profile-big-avatar svg { width: 36px; height: 36px; }
+
+.profile-avatar-info .profile-full-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+.profile-avatar-info .profile-role-badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #ede9fe;
+  color: #7c3aed;
+}
+.profile-avatar-info .profile-email-sub {
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}
+
+.profile-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.profile-section { margin-bottom: 28px; }
+
+.profile-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.profile-field-group { margin-bottom: 14px; }
+
+.profile-field-label {
+  display: block;
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.profile-field-input {
+  width: 100%;
+  height: 40px;
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 13px;
+  color: #333;
+  outline: none;
+  background: #fff;
+  font-family: inherit;
+}
+.profile-field-input:focus { border-color: #c4b5fd; }
+.profile-field-input:disabled {
+  background: #f9f9f9;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.profile-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.profile-divider {
+  border: none;
+  border-top: 1px solid #f0f0f0;
+  margin: 24px 0;
+}
+
+.password-strength {
+  height: 4px;
+  border-radius: 999px;
+  background: #e8e8e8;
+  margin-top: 6px;
+  overflow: hidden;
+}
+.password-strength-bar {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s, background 0.3s;
+  width: 0%;
+}
+.password-hint {
+  font-size: 11px;
+  color: #aaa;
+  margin-top: 4px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 18px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.back-link:hover { color: #7c3aed; }
+.back-link svg { width: 15px; height: 15px; }
+
+/* Save button — purple for PM */
+.btn-save-pm {
+  height: 36px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 6px;
+  background: #7c3aed;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-save-pm:hover { background: #6d28d9; }

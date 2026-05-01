@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile – Helping Hands</title>
+  <link rel="stylesheet" href="../style/Usermanagement.css" />
+  <link rel="stylesheet" href="../style/adminProfile.css" />
+</head>
+<body>
+
+<!-- ===================== NAVBAR ===================== -->
+<nav class="navbar">
+  <div class="nav-logo">
+    <img src="fundraising_logo.png" alt="Helping Hands" />
+  </div>
+  <div class="profile-wrap">
+    <button class="profile-btn" id="profileToggle">
+      <div class="profile-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      </div>
+      <span id="navUsername">Admin User</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="profile-menu" id="profileMenu">
+      <a href="adminProfile.html">My Profile</a>
+      <a href="#" onclick="handleLogout(event)">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ===================== BODY ===================== -->
+<div class="body-wrap">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-label">Admin Management</div>
+    <button class="sidebar-link" onclick="window.location.href='Usermanagement.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg>
+      User Management
+    </button>
+    <button class="sidebar-link" onclick="window.location.href='Usermanagement.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Search Profile
+    </button>
+
+    <div class="sidebar-label">Platform Manager Management</div>
+    <button class="sidebar-link" onclick="window.location.href='Usermanagement.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Category Management
+    </button>
+
+    <div class="sidebar-bottom">
+      <hr class="sidebar-divider"/>
+      <button class="sidebar-link active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        My Profile
+      </button>
+      <button class="sidebar-link" onclick="handleLogout(event)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="main-card">
+      <div class="profile-page-wrap">
+
+        <!-- Back link -->
+        <a class="back-link" onclick="history.back()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </a>
+
+        <div class="page-title">My Profile</div>
+        <div class="page-desc">View and update your personal information and password.</div>
+
+        <!-- Avatar / summary row -->
+        <div class="profile-avatar-section">
+          <div class="profile-big-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          </div>
+          <div class="profile-avatar-info">
+            <div class="profile-full-name" id="displayName">—</div>
+            <div class="profile-role-badge" id="displayRole">—</div>
+            <div class="profile-email-sub" id="displayEmail">—</div>
+          </div>
+        </div>
+
+        <!-- ===== PERSONAL INFO ===== -->
+        <div class="profile-section">
+          <div class="profile-section-title">Personal Information</div>
+          <div class="profile-field-row">
+            <div class="profile-field-group">
+              <label class="profile-field-label">First Name</label>
+              <input class="profile-field-input" id="pFName" type="text" placeholder="First name" />
+            </div>
+            <div class="profile-field-group">
+              <label class="profile-field-label">Last Name</label>
+              <input class="profile-field-input" id="pLName" type="text" placeholder="Last name" />
+            </div>
+          </div>
+          <div class="profile-field-group">
+            <label class="profile-field-label">Email</label>
+            <input class="profile-field-input" id="pEmail" type="email" placeholder="Email address" />
+          </div>
+          <div class="profile-field-row">
+            <div class="profile-field-group">
+              <label class="profile-field-label">Phone</label>
+              <input class="profile-field-input" id="pPhone" type="tel" placeholder="Phone number" />
+            </div>
+            <div class="profile-field-group">
+              <label class="profile-field-label">Date of Birth</label>
+              <input class="profile-field-input" id="pDob" type="date" />
+            </div>
+          </div>
+          <div class="profile-field-group">
+            <label class="profile-field-label">Role</label>
+            <input class="profile-field-input" id="pRole" type="text" disabled />
+          </div>
+          <div class="profile-actions">
+            <button class="btn-save" onclick="saveProfile()">Save Changes</button>
+          </div>
+        </div>
+
+        <hr class="profile-divider"/>
+
+        <!-- ===== CHANGE PASSWORD ===== -->
+        <div class="profile-section">
+          <div class="profile-section-title">Change Password</div>
+          <div class="profile-field-group">
+            <label class="profile-field-label">Current Password</label>
+            <input class="profile-field-input" id="pCurrentPw" type="password" placeholder="Enter current password" />
+          </div>
+          <div class="profile-field-group">
+            <label class="profile-field-label">New Password</label>
+            <input class="profile-field-input" id="pNewPw" type="password" placeholder="Minimum 8 characters" oninput="checkStrength(this.value)" />
+            <div class="password-strength"><div class="password-strength-bar" id="strengthBar"></div></div>
+            <div class="password-hint" id="strengthHint">Enter a new password</div>
+          </div>
+          <div class="profile-field-group">
+            <label class="profile-field-label">Confirm New Password</label>
+            <input class="profile-field-input" id="pConfirmPw" type="password" placeholder="Repeat new password" />
+          </div>
+          <div class="profile-actions">
+            <button class="btn-save" onclick="changePassword()">Update Password</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '';
+
+/* ---- Load current user from session ---- */
+window.addEventListener('DOMContentLoaded', async () => {
+  // Profile menu toggle
+  document.getElementById('profileToggle').addEventListener('click', e => {
+    e.stopPropagation();
+    document.getElementById('profileMenu').classList.toggle('show');
+  });
+  document.addEventListener('click', () => document.getElementById('profileMenu').classList.remove('show'));
+
+  await loadMyProfile();
+});
+
+let myUserId = null;
+
+async function loadMyProfile() {
+  try {
+    // Get current user id from session
+    const session = JSON.parse(sessionStorage.getItem('hh_session') || '{}');
+    myUserId = session.user_id;
+
+    if (!myUserId) {
+      // fallback: load first admin user for demo
+      const res = await fetch(`${API}/admin/users`);
+      const data = await res.json();
+      const me = (data.users || [])[0];
+      if (me) populateProfile(me);
+      return;
+    }
+
+    const res = await fetch(`${API}/admin/users/${myUserId}`);
+    const data = await res.json();
+    if (data.user) populateProfile(data.user);
+  } catch (err) {
+    console.error('Failed to load profile:', err);
+    toast('Failed to load profile.', 'error');
+  }
+}
+
+function populateProfile(u) {
+  myUserId = u.user_id;
+  const role = u.role_name || 'Admin';
+
+  // Header summary
+  document.getElementById('displayName').textContent = `${u.f_name} ${u.l_name}`;
+  document.getElementById('displayRole').textContent = role;
+  document.getElementById('displayEmail').textContent = u.email;
+  document.getElementById('navUsername').textContent = `${u.f_name} ${u.l_name}`;
+
+  // Fields
+  document.getElementById('pFName').value  = u.f_name || '';
+  document.getElementById('pLName').value  = u.l_name || '';
+  document.getElementById('pEmail').value  = u.email  || '';
+  document.getElementById('pPhone').value  = u.phone  || '';
+  document.getElementById('pDob').value    = u.dob ? u.dob.split('T')[0] : '';
+  document.getElementById('pRole').value   = role;
+}
+
+/* ---- Save personal info ---- */
+async function saveProfile() {
+  const f_name = document.getElementById('pFName').value.trim();
+  const l_name = document.getElementById('pLName').value.trim();
+  const email  = document.getElementById('pEmail').value.trim();
+  const phone  = document.getElementById('pPhone').value.trim();
+
+  if (!f_name || !email) { toast('Name and email are required.', 'error'); return; }
+
+  try {
+    const res = await fetch(`${API}/admin/users/${myUserId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ f_name, l_name, email, phone, profile_id: null })
+    });
+    if (!res.ok) { toast('Failed to save changes.', 'error'); return; }
+
+    // Update header
+    document.getElementById('displayName').textContent = `${f_name} ${l_name}`;
+    document.getElementById('displayEmail').textContent = email;
+    document.getElementById('navUsername').textContent = `${f_name} ${l_name}`;
+    toast('Profile updated successfully.', 'success');
+  } catch (err) {
+    toast('Failed to save changes.', 'error');
+  }
+}
+
+/* ---- Change password ---- */
+async function changePassword() {
+  const current = document.getElementById('pCurrentPw').value;
+  const newPw   = document.getElementById('pNewPw').value;
+  const confirm = document.getElementById('pConfirmPw').value;
+
+  if (!current || !newPw || !confirm) { toast('Please fill in all password fields.', 'error'); return; }
+  if (newPw.length < 8) { toast('New password must be at least 8 characters.', 'error'); return; }
+  if (newPw !== confirm) { toast('Passwords do not match.', 'error'); return; }
+
+  try {
+    const res = await fetch(`${API}/admin/users/${myUserId}/password`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ current_password: current, new_password: newPw })
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      toast(err.message || 'Failed to update password.', 'error');
+      return;
+    }
+    document.getElementById('pCurrentPw').value = '';
+    document.getElementById('pNewPw').value = '';
+    document.getElementById('pConfirmPw').value = '';
+    document.getElementById('strengthBar').style.width = '0%';
+    document.getElementById('strengthHint').textContent = 'Enter a new password';
+    toast('Password updated successfully.', 'success');
+  } catch (err) {
+    toast('Failed to update password.', 'error');
+  }
+}
+
+/* ---- Password strength indicator ---- */
+function checkStrength(val) {
+  const bar  = document.getElementById('strengthBar');
+  const hint = document.getElementById('strengthHint');
+  if (!val) { bar.style.width = '0%'; hint.textContent = 'Enter a new password'; return; }
+  let score = 0;
+  if (val.length >= 8)  score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const levels = [
+    { w: '25%', color: '#ef4444', text: 'Weak' },
+    { w: '50%', color: '#f97316', text: 'Fair' },
+    { w: '75%', color: '#eab308', text: 'Good' },
+    { w: '100%', color: '#22c55e', text: 'Strong' },
+  ];
+  const l = levels[score - 1] || levels[0];
+  bar.style.width = l.w;
+  bar.style.background = l.color;
+  hint.textContent = l.text;
+  hint.style.color = l.color;
+}
+
+/* ---- Toast & Logout ---- */
+function toast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type}`;
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function handleLogout(e) {
+  if (e) e.preventDefault();
+  sessionStorage.removeItem('hh_session');
+  toast('Logged out.', 'success');
+  setTimeout(() => window.location.href = 'login.html', 1200);
+}
+</script>
+</body>
+</html>

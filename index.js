@@ -31,20 +31,20 @@ app.use(express.static(path.join(__dirname, "boundary")));
 app.use("/style", express.static(path.join(__dirname, "style")));
 app.use("/auth", authRoutes);
 
+// User Admin routes
 const userManagementRoutes = require("./controller/usermanagementRoutes");
 app.use("/admin", userManagementRoutes);
+
+// Platform Manager routes
+const platformManagerRoutes = require("./controller/platformManagerRoutes");
+app.use("/pm", platformManagerRoutes);
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "boundary", "homepage.html"));
 });
 
-// app.get("/", (req, res) => {
-//   res.send("Server is running");
-// });
-
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
-
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
   });
@@ -54,6 +54,5 @@ const PORT = 3000;
 
 server.listen(PORT, async () => {
   console.log(`Server running on http://localhost:${PORT}`);
-
   await open(`http://localhost:${PORT}`);
 });

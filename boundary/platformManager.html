@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Platform Manager – Helping Hands</title>
+  <link rel="stylesheet" href="../style/Usermanagement.css" />
+  <link rel="stylesheet" href="../style/platformManager.css" />
+</head>
+<body>
+
+<!-- ===================== NAVBAR ===================== -->
+<nav class="navbar">
+  <div class="nav-logo">
+    <img src="fundraising_logo.png" alt="Helping Hands" />
+  </div>
+  <div class="profile-wrap">
+    <button class="profile-btn" id="profileToggle">
+      <div class="profile-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      </div>
+      <span id="navUsername">Platform Manager</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="profile-menu" id="profileMenu">
+      <a href="managerProfile.html">My Profile</a>
+      <a href="#" onclick="handleLogout(event)">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ===================== BODY ===================== -->
+<div class="body-wrap">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-label">Platform Management</div>
+    <button class="sidebar-link active" onclick="navClick(this,'categories')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Category Management
+    </button>
+    <button class="sidebar-link" onclick="navClick(this,'reports')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Reports
+    </button>
+
+    <div class="sidebar-bottom">
+      <hr class="sidebar-divider"/>
+      <button class="sidebar-link" onclick="handleLogout(event)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ===== CATEGORY MANAGEMENT ===== -->
+    <div id="section-categories" class="section">
+      <div class="main-card">
+        <div class="cat-header">
+          <div>
+            <div class="page-title">Category Management</div>
+            <div class="page-desc">Manage all fundraising categories in the platform.<br>You can add, edit, delete or search categories.</div>
+          </div>
+          <button class="add-cat-btn" onclick="openAddCategory()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add New Category
+          </button>
+        </div>
+        <div class="controls-bar" style="margin-top:16px">
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="search-input" id="catSearchInput" type="search" placeholder="Search categories by name..." oninput="filterCategories()" autocomplete="off"/>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th></th><th>Category Name</th><th>Description</th><th>Created On</th><th>Actions</th></tr></thead>
+            <tbody id="categoriesBody"></tbody>
+          </table>
+        </div>
+        <div class="pagination-row"><span id="catPaginationInfo"></span><div class="pager" id="catPager"></div></div>
+        <div class="legend-row" style="margin-top:18px">
+          <div class="legend-card">
+            <h4>Actions Guide</h4>
+            <div class="legend-item"><svg viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="1.8" style="width:16px;height:16px;flex-shrink:0"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><span><strong>Edit</strong> — Update category name and description.</span></div>
+          </div>
+          <div class="legend-card">
+            <h4>&nbsp;</h4>
+            <div class="legend-item"><svg viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="1.8" style="width:16px;height:16px;flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg><span><strong>Delete</strong> — Remove category from the platform.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== REPORTS ===== -->
+    <div id="section-reports" class="section hidden">
+      <div class="main-card">
+        <div class="page-title">Reports</div>
+        <div class="page-desc">View daily, weekly and monthly reports to monitor platform activity.</div>
+
+        <!-- Tabs -->
+        <div class="report-tabs">
+          <button class="report-tab active" onclick="switchReport(this,'daily')">Daily</button>
+          <button class="report-tab" onclick="switchReport(this,'weekly')">Weekly</button>
+          <button class="report-tab" onclick="switchReport(this,'monthly')">Monthly</button>
+        </div>
+
+        <!-- Daily -->
+        <div id="report-daily" class="report-section">
+          <div class="stats-row" style="margin-top:18px">
+            <div class="stat-card"><div class="stat-icon" style="background:#dbeafe;color:#2563eb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg></div><div class="stat-info"><div class="stat-value">3</div><div class="stat-label">New Users Today</div></div></div>
+            <div class="stat-card"><div class="stat-icon" style="background:#dcfce7;color:#16a34a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><div class="stat-info"><div class="stat-value">5</div><div class="stat-label">Active Campaigns</div></div></div>
+            <div class="stat-card"><div class="stat-icon" style="background:#fef9c3;color:#854d0e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="stat-info"><div class="stat-value">SGD 1,240</div><div class="stat-label">Donations Today</div></div></div>
+            <div class="stat-card"><div class="stat-icon" style="background:#ede9fe;color:#5b21b6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div class="stat-info"><div class="stat-value">87</div><div class="stat-label">Page Views</div></div></div>
+          </div>
+          <div class="report-table-title">Today's Activity Log</div>
+          <div class="table-wrap"><table><thead><tr><th>Time</th><th>User</th><th>Action</th><th>Status</th></tr></thead><tbody>
+            <tr><td>09:12</td><td>John Doe</td><td>Created campaign "Save Cancer Patients"</td><td><span class="status-badge status-active">Active</span></td></tr>
+            <tr><td>10:34</td><td>Sarah Johnson</td><td>Made donation SGD 200</td><td><span class="status-badge status-active">Success</span></td></tr>
+            <tr><td>11:05</td><td>Mike Brown</td><td>Account suspended by admin</td><td><span class="status-badge status-suspended">Suspended</span></td></tr>
+            <tr><td>13:20</td><td>Emma Thompson</td><td>Registered new account</td><td><span class="status-badge status-active">Active</span></td></tr>
+            <tr><td>15:47</td><td>David Lee</td><td>Updated campaign details</td><td><span class="status-badge status-active">Active</span></td></tr>
+          </tbody></table></div>
+        </div>
+
+        <!-- Weekly -->
+        <div id="report-weekly" class="report-section hidden">
+          <div class="stats-row" style="margin-top:18px">
+            <div class="stat-card"><div class="stat-icon" style="background:#dbeafe;color:#2563eb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg></div><div class="stat-info"><div class="stat-value">18</div><div class="stat-label">New Users This Week</div></div></div>
+            <div class="stat-card"><div class="stat-icon" style="background:#dcfce7;color:#16a34a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></div><div class="stat-info"><div class="stat-value">12</div><div class="stat-label">Campaigns This Week</div></div></div>
+            <div class="stat-card"><div class="stat-icon" style="background:#fef9c3;color:#854d0e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="stat-info"><div class="stat-value">SGD 8,650</div><div class="stat-label">Weekly Donations</div></div></div>
+            <div class="stat-card"><div class="stat-icon" style="background:#ede9fe;color:#5b21b6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div class="stat-info"><div class="stat-value">542</div><div class="stat-label">Total Page Views</div></div></div>
+          </div>
+          <div class="report-table-title">Weekly Summary (Mon – Sun)</div>
+          <div class="table-wrap"><table><thead><tr><th>Day</th><th>New Users</th><th>Donations (SGD)</th><th>New Campaigns</th><th>Page Views</th></tr></thead><tbody>
+            <tr><td>Monday</td><td>3</td><td>1,240</td><td>2</td><td>87</td></tr>
+            <tr><td>Tuesday</td><td>2</td><td>980</td><td>1</td><td>102</td></tr>
+            <tr><td>Wednesday</td><td>4</td><td>1,560</td><td>3</td><td>95</td></tr>
+            <tr><td>Thursday</td><td>1</td><td>720</td><td>2</td><td>78</td></tr>
+            <tr><td>Friday</td><td>5</td><td>2,100</td><td>2</td><td>110</td></tr>
+            <tr><td>Saturday</td><td>2</td><td>1,280</td><td>1</td><td>45</td></tr>
+            <tr><td>Sunday</td><td>1</td><td>770</td><td>1</td><td>25</td></tr>
+          </tbody></table></div>
+        </div>
+
+        <!-- Monthly -->
+        <div id="report-monthly" class="report-section hidden">
+          <div class="stats-row" style="margin-top:18px">
+            <div class="stat-card"><div class="stat-icon" style="background:#dbeafe;color:#2563eb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg></div><div class="stat-info"><div class="stat-value">72</div><div class="stat-label">New Users This Month</div></div></div>
+            <div class="stat-card"><div class="stat-icon" style="background:#dcfce7;color:#16a34a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></div><div class="stat-info"><div class="stat-value">38</div><div class="stat-label">Campaigns This Month</div></div></div>
+            <div class="stat-card"><div class="stat-icon" style="background:#fef9c3;color:#854d0e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="stat-info"><div class="stat-value">SGD 34,820</div><div class="stat-label">Monthly Donations</div></div></div>
+            <div class="stat-card"><div class="stat-icon" style="background:#ede9fe;color:#5b21b6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div class="stat-info"><div class="stat-value">2,148</div><div class="stat-label">Total Page Views</div></div></div>
+          </div>
+          <div class="report-table-title">Monthly Summary by Week</div>
+          <div class="table-wrap"><table><thead><tr><th>Week</th><th>New Users</th><th>Donations (SGD)</th><th>New Campaigns</th><th>Page Views</th></tr></thead><tbody>
+            <tr><td>Week 1</td><td>18</td><td>8,650</td><td>10</td><td>542</td></tr>
+            <tr><td>Week 2</td><td>20</td><td>9,200</td><td>9</td><td>580</td></tr>
+            <tr><td>Week 3</td><td>16</td><td>8,100</td><td>11</td><td>510</td></tr>
+            <tr><td>Week 4</td><td>18</td><td>8,870</td><td>8</td><td>516</td></tr>
+          </tbody></table></div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ===== MODALS: CATEGORY ===== -->
+<div class="modal-overlay" id="catEditModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="catModalTitle">Edit Category</div><button class="modal-close" onclick="closeModal('catEditModal')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="catEditID"/>
+      <div class="field-group"><label class="field-label">Category Name *</label><input class="field-input" id="catEditName" type="text" placeholder="e.g. Health"/></div>
+      <div class="field-group"><label class="field-label">Description</label><input class="field-input" id="catEditDesc" type="text" placeholder="Brief description..."/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('catEditModal')">Cancel</button>
+      <button class="btn-save" onclick="saveCategoryEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="catDeleteModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Delete Category</div><button class="modal-close" onclick="closeModal('catDeleteModal')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="catDeleteID"/>
+      <p class="confirm-msg">Are you sure you want to delete this category?</p>
+      <p class="confirm-sub">This action cannot be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('catDeleteModal')">Cancel</button>
+      <button class="btn-delete" onclick="confirmCatDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="platformManagerController.js"></script>
+</body>
+</html>
