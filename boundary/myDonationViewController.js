@@ -48,6 +48,7 @@ function getLoggedInUser() {
   try {
     return JSON.parse(saved);
   } catch (error) {
+    localStorage.removeItem("loggedInUser");
     return null;
   }
 }
@@ -82,77 +83,17 @@ if (signOutBtn) {
 renderHeaderProfile();
 
 /* =========================
-   CAMPAIGN DATA
+   API / ELEMENTS
 ========================= */
-const campaigns = [
-  {
-    id: 1,
-    title: "Provide Meals for Children",
-    category: "Health",
-    categoryClass: "health",
-    org: "Helping Hands Foundation",
-    startedOn: "10 Apr 2026",
-    image:
-      "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=900&q=80",
-    shortDesc:
-      "Help us provide nutritious meals for children in need. Your support ensures that no child goes to bed hungry.",
-    about:
-      "We aim to provide healthy and balanced meals to children from underprivileged families and vulnerable communities. Proper nutrition is essential for their growth, learning, and overall well-being. Your donation will help us prepare and deliver meals, source essential ingredients, and support long-term food programs."
-  },
-  {
-    id: 2,
-    title: "Bringing Health, Joy and Connection to Our Seniors",
-    category: "Community",
-    categoryClass: "community",
-    org: "Sian Chay Medical Institution",
-    startedOn: "15 Apr 2026",
-    image:
-      "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=900&q=80",
-    shortDesc:
-      "Help us bring health, joy and connection to vulnerable seniors through our kindness initiative.",
-    about:
-      "This initiative supports elderly members of the community by funding check-ups, companionship activities, outreach services, and well-being programmes that reduce loneliness and improve quality of life."
-  },
-  {
-    id: 3,
-    title: "Support for Relief Operations in Gaza",
-    category: "Disaster",
-    categoryClass: "disaster",
-    org: "Singapore Red Cross Society",
-    startedOn: "18 Apr 2026",
-    image:
-      "https://images.unsplash.com/photo-1618477462146-050d2767eac4?auto=format&fit=crop&w=900&q=80",
-    shortDesc:
-      "Your support helps provide urgent relief aid and humanitarian assistance for affected communities.",
-    about:
-      "Funds raised will support emergency relief operations, humanitarian logistics, medical assistance, and essential supplies for affected families and communities."
-  },
-  {
-    id: 4,
-    title: "SOSD Medical Fundraiser 2026/27",
-    category: "Animals",
-    categoryClass: "animals",
-    org: "SOSD",
-    startedOn: "20 Apr 2026",
-    image:
-      "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=900&q=80",
-    shortDesc:
-      "Support medical treatment and care for rescued animals in need through this SOSD fundraiser.",
-    about:
-      "Donations help cover rescue, surgery, medicine, foster care, recovery treatment, and ongoing medical support for vulnerable animals."
-  }
-];
+const API_BASE_URL = "http://localhost:3000";
 
-/* =========================
-   ELEMENTS
-========================= */
-const campaignImage = document.getElementById("campaignImage");
 const campaignTitle = document.getElementById("campaignTitle");
 const campaignCategory = document.getElementById("campaignCategory");
 const campaignOrg = document.getElementById("campaignOrg");
 const campaignShortDesc = document.getElementById("campaignShortDesc");
 const supportMessage = document.getElementById("supportMessage");
 
+const campaignStatus = document.getElementById("campaignStatus");
 const campaignStartedOn = document.getElementById("campaignStartedOn");
 const sideCategory = document.getElementById("sideCategory");
 
@@ -163,68 +104,211 @@ const backBtn = document.getElementById("backBtn");
 const backTopBtn = document.getElementById("backTopBtn");
 const viewFullCampaignBtn = document.getElementById("viewFullCampaignBtn");
 
+let currentCampaignId = null;
 let currentCampaign = null;
+let campaignDonations = [];
 
 /* =========================
-   LOCAL STORAGE
+   HELPERS
 ========================= */
-function getDonationRecords() {
-  const saved = localStorage.getItem("donation_records");
+function getCampaignIdFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return Number(params.get("id"));
+}
 
-  if (!saved) {
-    return [];
+function formatDisplayDate(dateValue) {
+  if (!dateValue) return "-";
+
+  const dateObj = new Date(dateValue);
+
+  if (Number.isNaN(dateObj.getTime())) {
+    return "-";
+  }
+
+  const d = String(dateObj.getDate()).padStart(2, "0");
+
+  const months = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
+
+  const m = months[dateObj.getMonth()];
+  const y = dateObj.getFullYear();
+
+  return d + " " + m + " " + y;
+}
+
+function getCategoryClass(categoryName) {
+  if (!categoryName) return "others";
+
+  const category = categoryName.toLowerCase();
+
+  if (category.includes("health") || category.includes("medical")) return "health";
+  if (category.includes("education")) return "education";
+  if (category.includes("animal")) return "animals";
+  if (category.includes("disaster") || category.includes("relief")) return "disaster";
+  if (category.includes("community")) return "community";
+
+  return "others";
+}
+
+function getStatusClass(status) {
+  if (!status) return "status-active";
+
+  const value = status.toLowerCase();
+
+  if (value === "completed") {
+    return "status-completed";
+  }
+
+  return "status-active";
+}
+
+function getStatusText(status) {
+  if (!status) return "Active";
+
+  if (status.toLowerCase() === "completed") {
+    return "Completed";
+  }
+
+  return "Active";
+}
+
+/* =========================
+   LOAD FROM DATABASE
+========================= */
+async function loadDonationViewFromDatabase() {
+  const user = getLoggedInUser();
+
+  if (!user || !user.user_id) {
+    alert("Please sign in first to view your donation.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  currentCampaignId = getCampaignIdFromUrl();
+
+  if (!currentCampaignId) {
+    alert("Campaign ID is missing.");
+    window.location.href = "myDonation.html";
+    return;
+  }
+
+  if (donationTableBody) {
+    donationTableBody.innerHTML = `
+      <tr>
+        <td colspan="4">Loading donation details...</td>
+      </tr>
+    `;
   }
 
   try {
-    return JSON.parse(saved);
+    const response = await fetch(
+      `${API_BASE_URL}/donations/user/${user.user_id}/activity/${currentCampaignId}`
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to load donation view.");
+    }
+
+    campaignDonations = Array.isArray(data) ? data : data.donations || [];
+
+    if (campaignDonations.length === 0) {
+      alert("No donation record found for this campaign.");
+      window.location.href = "myDonation.html";
+      return;
+    }
+
+    currentCampaign = campaignDonations[0];
+
+    renderDonationView();
   } catch (error) {
-    return [];
+    console.error("Load donation view error:", error);
+    alert("Failed to load donation details.");
+    window.location.href = "myDonation.html";
   }
-}
-
-function getCampaignIdFromUrl() {
-  const params = new URLSearchParams(window.location.search);
-  return Number(params.get("id")) || 1;
-}
-
-function getDonationsForCampaign(campaignId) {
-  return getDonationRecords().filter(function (record) {
-    return Number(record.campaign_id) === Number(campaignId);
-  });
 }
 
 /* =========================
    RENDER PAGE
 ========================= */
 function renderDonationView() {
-  const campaignId = getCampaignIdFromUrl();
+  if (!currentCampaign) return;
 
-  currentCampaign =
-    campaigns.find(function (campaign) {
-      return campaign.id === campaignId;
-    }) || campaigns[0];
+  const categoryName = currentCampaign.category_name || "Others";
+  const categoryClass = getCategoryClass(categoryName);
+  const statusText = getStatusText(currentCampaign.status);
+  const statusClass = getStatusClass(currentCampaign.status);
 
-  const donations = getDonationsForCampaign(currentCampaign.id);
+  if (campaignTitle) {
+    campaignTitle.textContent =
+      currentCampaign.activity_name || "Untitled Campaign";
+  }
 
-  campaignImage.src = currentCampaign.image;
-  campaignTitle.textContent = currentCampaign.title;
+  if (campaignCategory) {
+    campaignCategory.textContent = categoryName;
+    campaignCategory.className = "category-pill " + categoryClass;
+  }
 
-  campaignCategory.textContent = currentCampaign.category;
-  campaignCategory.className = "category-pill " + currentCampaign.categoryClass;
+  if (campaignOrg) {
+    campaignOrg.textContent = "Supported campaign";
+  }
 
-  campaignOrg.textContent = "Organized by " + currentCampaign.org + " ✅";
-  campaignShortDesc.textContent = currentCampaign.shortDesc;
-  campaignStartedOn.textContent = currentCampaign.startedOn;
-  sideCategory.textContent = currentCampaign.category;
-  campaignAbout.textContent = currentCampaign.about;
+  if (campaignShortDesc) {
+    campaignShortDesc.textContent = currentCampaign.description || "";
+  }
 
-  if (donations.length === 0) {
+  if (campaignStatus) {
+    campaignStatus.textContent = statusText;
+    campaignStatus.className = "status-pill " + statusClass;
+  }
+
+  if (campaignStartedOn) {
+    campaignStartedOn.textContent = formatDisplayDate(currentCampaign.start_date);
+  }
+
+  if (sideCategory) {
+    sideCategory.textContent = categoryName;
+  }
+
+  if (campaignAbout) {
+    campaignAbout.textContent = currentCampaign.description || "";
+  }
+
+  renderSupportMessage();
+  renderDonationTable();
+}
+
+function renderSupportMessage() {
+  if (!supportMessage) return;
+
+  if (!campaignDonations || campaignDonations.length === 0) {
     supportMessage.className = "support-message no-support-message";
     supportMessage.innerHTML = `
       <span class="support-title">No donation yet</span>
       You have not donated to this campaign yet.
     `;
 
+    return;
+  }
+
+  const latestDonation = campaignDonations[0];
+  const latestAmount = Number(latestDonation.amount) || 0;
+
+  supportMessage.className = "support-message";
+  supportMessage.innerHTML = `
+    <span class="support-title">♡ Thank you for your support!</span>
+    You recently donated <strong>SGD ${latestAmount.toFixed(2)}</strong>
+    to this campaign on ${formatDisplayDate(latestDonation.date)}.
+  `;
+}
+
+function renderDonationTable() {
+  if (!donationTableBody) return;
+
+  if (!campaignDonations || campaignDonations.length === 0) {
     donationTableBody.innerHTML = `
       <tr>
         <td colspan="4">No donation record found.</td>
@@ -234,24 +318,19 @@ function renderDonationView() {
     return;
   }
 
-  const latestDonation = donations[0];
-
-  supportMessage.className = "support-message";
-  supportMessage.innerHTML = `
-    <span class="support-title">♡ Thank you for your support!</span>
-    You recently donated <strong>SGD ${latestDonation.amount}</strong>
-    to this campaign on ${latestDonation.date}. Every contribution makes a real difference.
-  `;
-
-  donationTableBody.innerHTML = donations
+  donationTableBody.innerHTML = campaignDonations
     .map(function (donation) {
+      const amount = Number(donation.amount) || 0;
+
       return `
         <tr>
-          <td>${donation.date}</td>
-          <td>SGD ${donation.amount}</td>
-          <td>${donation.payment_method}</td>
+          <td>${formatDisplayDate(donation.date)}</td>
+          <td>SGD ${amount.toFixed(2)}</td>
+          <td>${donation.payment_method || "Credit or debit"}</td>
           <td>
-            <span class="status-pill status-success">${donation.status}</span>
+            <span class="status-pill status-success">
+              ${donation.donation_status || "Successful"}
+            </span>
           </td>
         </tr>
       `;
@@ -276,9 +355,11 @@ if (backTopBtn) {
 
 if (viewFullCampaignBtn) {
   viewFullCampaignBtn.addEventListener("click", function () {
-    if (!currentCampaign) return;
-    window.location.href = "campaignDetail.html?id=" + currentCampaign.id;
+    window.location.href = "myDonation.html";
   });
 }
 
-renderDonationView();
+/* =========================
+   START PAGE
+========================= */
+loadDonationViewFromDatabase();

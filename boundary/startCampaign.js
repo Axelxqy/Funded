@@ -2,6 +2,7 @@
    HEADER NAV DROPDOWNS
 ========================= */
 const navDropdowns = document.querySelectorAll(".nav-dropdown");
+const profileDropdown = document.getElementById("profileDropdown");
 
 navDropdowns.forEach(function (dropdown) {
   const button = dropdown.querySelector(".nav-button");
@@ -69,12 +70,10 @@ function updateHeaderUser() {
   const firstName = loggedInUser.f_name || "";
   const email = loggedInUser.email || "";
 
-  // Same as homepage: show first name only
   if (headerName) {
     headerName.textContent = firstName || email || "User";
   }
 
-  // Same as homepage: show first letter
   if (headerAvatar) {
     headerAvatar.textContent =
       firstName.charAt(0).toUpperCase() ||
@@ -82,11 +81,6 @@ function updateHeaderUser() {
       "U";
   }
 }
-
-document.addEventListener("DOMContentLoaded", function () {
-  protectFundraiserPage();
-  updateHeaderUser();
-});
 
 /* =========================
    SIGN OUT
@@ -97,6 +91,7 @@ if (signOutBtn) {
   signOutBtn.addEventListener("click", function (event) {
     event.preventDefault();
     localStorage.removeItem("loggedInUser");
+    localStorage.removeItem("editActivityId");
     window.location.href = "login.html";
   });
 }
@@ -111,8 +106,21 @@ const titleStar = document.getElementById("titleStar");
 const categoryStar = document.getElementById("categoryStar");
 const goalStar = document.getElementById("goalStar");
 const durationStar = document.getElementById("durationStar");
-const imageStar = document.getElementById("imageStar");
 const descriptionStar = document.getElementById("descriptionStar");
+
+const submitCampaignBtn =
+  document.getElementById("submitCampaignBtn") ||
+  document.querySelector(".submit-btn");
+
+const cancelCampaignBtn =
+  document.getElementById("cancelCampaignBtn") ||
+  document.querySelector(".cancel-btn");
+
+/* =========================
+   EDIT MODE STATE
+========================= */
+let isEditMode = false;
+let editActivityId = localStorage.getItem("editActivityId");
 
 /* =========================
    REQUIRED STAR CONTROL
@@ -150,16 +158,6 @@ function checkDurationStar() {
   }
 }
 
-function checkImageStar() {
-  if (!campaignImageInput || !imageStar) return;
-
-  if (campaignImageInput.files.length > 0) {
-    imageStar.classList.add("hide");
-  } else {
-    imageStar.classList.remove("hide");
-  }
-}
-
 /* =========================
    CATEGORY DROPDOWN
 ========================= */
@@ -173,6 +171,7 @@ const categoryOptions = document.querySelectorAll(".select-option");
 
 if (categorySelect && categoryBtn) {
   categoryBtn.addEventListener("click", function (event) {
+    event.preventDefault();
     event.stopPropagation();
 
     navDropdowns.forEach(function (dropdown) {
@@ -189,6 +188,7 @@ if (categorySelect && categoryBtn) {
 
 if (otherCategoryArrow && categorySelect) {
   otherCategoryArrow.addEventListener("click", function (event) {
+    event.preventDefault();
     event.stopPropagation();
     categorySelect.classList.toggle("open");
   });
@@ -241,8 +241,11 @@ if (otherCategoryInput) {
 const startDateInput = document.getElementById("startDate");
 const endDateInput = document.getElementById("endDate");
 
+let startPicker = null;
+let endPicker = null;
+
 if (startDateInput && endDateInput) {
-  const endPicker = flatpickr("#endDate", {
+  endPicker = flatpickr("#endDate", {
     dateFormat: "F j, Y",
     minDate: "today",
     disableMobile: true,
@@ -253,14 +256,14 @@ if (startDateInput && endDateInput) {
     },
   });
 
-  flatpickr("#startDate", {
+  startPicker = flatpickr("#startDate", {
     dateFormat: "F j, Y",
     minDate: "today",
     disableMobile: true,
     monthSelectorType: "static",
     showMonths: 1,
     onChange: function (selectedDates) {
-      if (selectedDates.length > 0) {
+      if (selectedDates.length > 0 && endPicker) {
         endPicker.set("minDate", selectedDates[0]);
       }
 
@@ -270,66 +273,23 @@ if (startDateInput && endDateInput) {
 }
 
 /* =========================
-   IMAGE UPLOAD PREVIEW
-========================= */
-const uploadBox = document.getElementById("uploadBox");
-const chooseFileBtn = document.getElementById("chooseFileBtn");
-const uploadAgainBtn = document.getElementById("uploadAgainBtn");
-const campaignImageInput = document.getElementById("campaignImageInput");
-const imagePreview = document.getElementById("imagePreview");
-
-function openImagePicker() {
-  if (campaignImageInput) {
-    campaignImageInput.click();
-  }
-}
-
-if (chooseFileBtn) {
-  chooseFileBtn.addEventListener("click", openImagePicker);
-}
-
-if (uploadAgainBtn) {
-  uploadAgainBtn.addEventListener("click", openImagePicker);
-}
-
-if (campaignImageInput && imagePreview && uploadBox) {
-  campaignImageInput.addEventListener("change", function () {
-    const file = campaignImageInput.files[0];
-
-    if (!file) {
-      checkImageStar();
-      return;
-    }
-
-    if (!file.type.startsWith("image/")) {
-      alert("Please upload an image file only.");
-      campaignImageInput.value = "";
-      checkImageStar();
-      return;
-    }
-
-    const imageURL = URL.createObjectURL(file);
-
-    imagePreview.src = imageURL;
-    uploadBox.classList.add("has-image");
-
-    checkImageStar();
-  });
-}
-
-/* =========================
    DESCRIPTION WORD COUNT
 ========================= */
 const campaignDescription = document.getElementById("campaignDescription");
 const descriptionCount = document.getElementById("descriptionCount");
 
+function updateDescriptionCount() {
+  if (!campaignDescription || !descriptionCount) return;
+
+  const text = campaignDescription.value.trim();
+  const wordCount = text === "" ? 0 : text.split(/\s+/).length;
+
+  descriptionCount.textContent = wordCount + " / 1000 Words";
+}
+
 if (campaignDescription && descriptionCount) {
   campaignDescription.addEventListener("input", function () {
-    const text = campaignDescription.value.trim();
-    const wordCount = text === "" ? 0 : text.split(/\s+/).length;
-
-    descriptionCount.textContent = wordCount + " / 1000 Words";
-
+    updateDescriptionCount();
     toggleStar(campaignDescription, descriptionStar);
   });
 }
@@ -350,17 +310,88 @@ if (fundraisingGoal) {
 }
 
 /* =========================
-   DATABASE SUBMIT
+   DATABASE HELPERS
 ========================= */
 const campaignForm = document.querySelector(".campaign-form");
+const API_BASE_URL = "http://localhost:3000";
 
-function convertDateToSql(dateText) {
+function formatDateLocal(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function makeLocalDateFromSql(dateValue) {
+  if (!dateValue) return null;
+
+  const dateOnly = String(dateValue).split("T")[0];
+  const parts = dateOnly.split("-");
+
+  if (parts.length !== 3) return null;
+
+  const year = Number(parts[0]);
+  const month = Number(parts[1]) - 1;
+  const day = Number(parts[2]);
+
+  const localDate = new Date(year, month, day);
+
+  if (isNaN(localDate.getTime())) return null;
+
+  return localDate;
+}
+
+function convertDateToSql(dateText, picker) {
+  if (picker && picker.selectedDates && picker.selectedDates.length > 0) {
+    return formatDateLocal(picker.selectedDates[0]);
+  }
+
+  if (!dateText) return null;
+
+  const date = makeLocalDateFromDisplay(dateText);
+
+  if (!date) return null;
+
+  return formatDateLocal(date);
+}
+
+function makeLocalDateFromDisplay(dateText) {
   if (!dateText) return null;
 
   const date = new Date(dateText);
+
   if (isNaN(date.getTime())) return null;
 
-  return date.toISOString().split("T")[0];
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function formatDateForFlatpickr(dateValue) {
+  const date = makeLocalDateFromSql(dateValue);
+
+  if (!date) return "";
+
+  return date.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+async function readJsonResponse(response) {
+  const text = await response.text();
+
+  if (!text) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    return {
+      message: text,
+    };
+  }
 }
 
 function getCategoryId(categoryName) {
@@ -376,6 +407,125 @@ function getCategoryId(categoryName) {
   return categoryMap[categoryName] || null;
 }
 
+function applyKnownOrOtherCategory(categoryName) {
+  if (!categoryName || !categorySelect || !categoryText || !categoryValue) return;
+
+  const knownCategoryId = getCategoryId(categoryName);
+
+  categoryOptions.forEach(function (option) {
+    const optionValue = option.getAttribute("data-value");
+
+    if (optionValue === categoryName) {
+      option.classList.add("selected");
+    } else {
+      option.classList.remove("selected");
+    }
+  });
+
+  if (knownCategoryId) {
+    categorySelect.classList.remove("typing-mode");
+    categoryText.textContent = categoryName;
+    categoryValue.value = categoryName;
+
+    if (otherCategoryInput) {
+      otherCategoryInput.value = "";
+    }
+  } else {
+    categorySelect.classList.add("typing-mode");
+    categoryText.textContent = "Others:";
+    categoryValue.value = categoryName;
+
+    if (otherCategoryInput) {
+      otherCategoryInput.value = categoryName;
+    }
+  }
+
+  checkCategoryStar();
+}
+
+async function loadEditCampaignData() {
+  if (!editActivityId) return;
+
+  isEditMode = true;
+
+  if (submitCampaignBtn) {
+    submitCampaignBtn.textContent = "Save Changes";
+  }
+
+  if (cancelCampaignBtn) {
+    cancelCampaignBtn.textContent = "Cancel Edit";
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/fra/${editActivityId}`);
+    const data = await readJsonResponse(response);
+
+    if (!response.ok) {
+      alert(data.message || "Failed to load campaign data.");
+      localStorage.removeItem("editActivityId");
+      window.location.href = "myCampaign.html";
+      return;
+    }
+
+    const activity = data.activity || data;
+
+    if (campaignTitle) {
+      campaignTitle.value = activity.activity_name || "";
+      toggleStar(campaignTitle, titleStar);
+    }
+
+    if (fundraisingGoal) {
+      fundraisingGoal.value = activity.fundraise_goal || "";
+      toggleStar(fundraisingGoal, goalStar);
+    }
+
+    if (campaignDescription) {
+      campaignDescription.value = activity.description || "";
+      toggleStar(campaignDescription, descriptionStar);
+      updateDescriptionCount();
+    }
+
+    const startDateObj = makeLocalDateFromSql(activity.start_date);
+    const endDateObj = makeLocalDateFromSql(activity.end_date);
+
+    if (startPicker && startDateObj) {
+      startPicker.set("minDate", null);
+      startPicker.setDate(startDateObj, false);
+    } else if (startDateInput && startDateObj) {
+      startDateInput.value = formatDateForFlatpickr(activity.start_date);
+    }
+
+    if (endPicker && endDateObj) {
+      if (startDateObj) {
+        endPicker.set("minDate", startDateObj);
+      }
+
+      endPicker.setDate(endDateObj, false);
+    } else if (endDateInput && endDateObj) {
+      endDateInput.value = formatDateForFlatpickr(activity.end_date);
+    }
+
+    checkDurationStar();
+    applyKnownOrOtherCategory(activity.category_name);
+  } catch (error) {
+    console.error("Load edit campaign error:", error);
+    alert("Cannot load campaign data.");
+  }
+}
+
+/* =========================
+   CANCEL / CANCEL EDIT
+========================= */
+if (cancelCampaignBtn) {
+  cancelCampaignBtn.addEventListener("click", function () {
+    localStorage.removeItem("editActivityId");
+    window.location.href = "myCampaign.html";
+  });
+}
+
+/* =========================
+   SUBMIT CREATE / EDIT
+========================= */
 if (campaignForm) {
   campaignForm.addEventListener("submit", async function (event) {
     event.preventDefault();
@@ -392,8 +542,8 @@ if (campaignForm) {
     const categoryName = categoryValue.value.trim();
     const category_id = getCategoryId(categoryName);
     const fundraise_goal = fundraisingGoal.value.trim();
-    const start_date = convertDateToSql(startDateInput.value);
-    const end_date = convertDateToSql(endDateInput.value);
+    const start_date = convertDateToSql(startDateInput.value, startPicker);
+    const end_date = convertDateToSql(endDateInput.value, endPicker);
     const description = campaignDescription.value.trim();
 
     if (
@@ -402,44 +552,79 @@ if (campaignForm) {
       !fundraise_goal ||
       !start_date ||
       !end_date ||
-      !description ||
-      !campaignImageInput.files ||
-      campaignImageInput.files.length === 0
+      !description
     ) {
-      alert("Please fill in all required fields and upload a campaign image.");
+      alert("Please fill in all required fields.");
       return;
     }
 
+    const requestUrl = isEditMode
+      ? `${API_BASE_URL}/fra/${editActivityId}`
+      : `${API_BASE_URL}/fra`;
+
+    const requestMethod = isEditMode ? "PUT" : "POST";
+
     try {
-      const response = await fetch("http://localhost:3000/activities", {
-        method: "POST",
+      console.log("Date before save:", {
+        start_date: start_date,
+        end_date: end_date,
+      });
+
+      const requestBody = {
+        activity_name,
+        category_id,
+        category_name: categoryName,
+        fundraise_goal,
+        start_date,
+        end_date,
+        description,
+      };
+
+      if (!isEditMode) {
+        requestBody.created_by = loggedInUser.user_id;
+        requestBody.current_amount = 0;
+        requestBody.status = "Ongoing";
+      }
+
+      if (isEditMode) {
+        requestBody.status = "Ongoing";
+      }
+
+      const response = await fetch(requestUrl, {
+        method: requestMethod,
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          activity_name,
-          category_id,
-          category_name: categoryName,
-          fundraise_goal,
-          start_date,
-          end_date,
-          description,
-          created_by: loggedInUser.user_id,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
-      const data = await response.json();
+      const data = await readJsonResponse(response);
 
       if (!response.ok) {
-        alert(data.message || "Failed to create campaign.");
+        alert(data.message || "Failed to save campaign.");
         return;
       }
 
-      alert("Campaign created successfully.");
+      alert(
+        isEditMode
+          ? "Campaign updated successfully."
+          : "Campaign created successfully."
+      );
+
+      localStorage.removeItem("editActivityId");
       window.location.href = "myCampaign.html";
     } catch (error) {
-      console.error("Create campaign error:", error);
+      console.error("Save campaign error:", error);
       alert("Cannot connect to backend.");
     }
   });
 }
+
+/* =========================
+   PAGE INIT
+========================= */
+document.addEventListener("DOMContentLoaded", function () {
+  protectFundraiserPage();
+  updateHeaderUser();
+  loadEditCampaignData();
+});

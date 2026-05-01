@@ -39,7 +39,9 @@ const signOutBtn = document.getElementById("signOutBtn");
 function getLoggedInUser() {
   const saved = localStorage.getItem("loggedInUser");
 
-  if (!saved) return null;
+  if (!saved) {
+    return null;
+  }
 
   try {
     return JSON.parse(saved);
@@ -55,7 +57,9 @@ function isLoggedIn() {
 }
 
 function requireLogin(event) {
-  if (isLoggedIn()) return;
+  if (isLoggedIn()) {
+    return;
+  }
 
   event.preventDefault();
   alert("Please sign in first to continue.");
@@ -70,24 +74,44 @@ function renderHeaderAuth() {
   const user = getLoggedInUser();
 
   if (!user) {
-    if (signinHeaderBtn) signinHeaderBtn.classList.remove("hidden");
-    if (profileDropdown) profileDropdown.classList.add("hidden");
+    if (signinHeaderBtn) {
+      signinHeaderBtn.classList.remove("hidden");
+    }
 
-    if (headerAvatar) headerAvatar.textContent = "U";
-    if (headerName) headerName.textContent = "User";
+    if (profileDropdown) {
+      profileDropdown.classList.add("hidden");
+    }
+
+    if (headerAvatar) {
+      headerAvatar.textContent = "U";
+    }
+
+    if (headerName) {
+      headerName.textContent = "User";
+    }
 
     return;
   }
 
-  if (signinHeaderBtn) signinHeaderBtn.classList.add("hidden");
-  if (profileDropdown) profileDropdown.classList.remove("hidden");
+  if (signinHeaderBtn) {
+    signinHeaderBtn.classList.add("hidden");
+  }
+
+  if (profileDropdown) {
+    profileDropdown.classList.remove("hidden");
+  }
 
   const firstName = user.f_name || "";
   const email = user.email || "";
   const initial = (firstName || email || "U").charAt(0).toUpperCase();
 
-  if (headerAvatar) headerAvatar.textContent = initial;
-  if (headerName) headerName.textContent = firstName || "User";
+  if (headerAvatar) {
+    headerAvatar.textContent = initial;
+  }
+
+  if (headerName) {
+    headerName.textContent = firstName || "User";
+  }
 }
 
 if (signOutBtn) {
@@ -110,12 +134,10 @@ let currentCampaign = null;
 let activityDonations = [];
 
 const backBtn = document.getElementById("backBtn");
+
 const detailTitle = document.getElementById("detailTitle");
 const detailOrg = document.getElementById("detailOrg");
 const detailEmail = document.getElementById("detailEmail");
-const detailMainImg = document.getElementById("detailMainImg");
-const detailSideImg = document.getElementById("detailSideImg");
-const detailDesc = document.getElementById("detailDesc");
 const detailHeart = document.getElementById("detailHeart");
 const detailRaised = document.getElementById("detailRaised");
 const detailGoal = document.getElementById("detailGoal");
@@ -140,7 +162,13 @@ const detailPanels = document.querySelectorAll(".detail-panel");
 ========================= */
 function getCampaignIdFromUrl() {
   const params = new URLSearchParams(window.location.search);
-  return Number(params.get("id"));
+  const idFromUrl = Number(params.get("id"));
+
+  if (idFromUrl) {
+    return idFromUrl;
+  }
+
+  return Number(localStorage.getItem("selectedActivityId"));
 }
 
 function formatMoney(amount) {
@@ -156,7 +184,9 @@ function calculateProgress(currentAmount, goalAmount) {
   const current = Number(currentAmount) || 0;
   const goal = Number(goalAmount) || 0;
 
-  if (goal <= 0) return 0;
+  if (goal <= 0) {
+    return 0;
+  }
 
   const progress = Math.round((current / goal) * 100);
 
@@ -164,7 +194,9 @@ function calculateProgress(currentAmount, goalAmount) {
 }
 
 function calculateDaysLeft(endDate) {
-  if (!endDate) return 0;
+  if (!endDate) {
+    return 0;
+  }
 
   const today = new Date();
   const end = new Date(endDate);
@@ -176,6 +208,73 @@ function calculateDaysLeft(endDate) {
   const daysLeft = Math.ceil(difference / (1000 * 60 * 60 * 24));
 
   return daysLeft > 0 ? daysLeft : 0;
+}
+
+function isCampaignDateEnded(endDate) {
+  if (!endDate) {
+    return false;
+  }
+
+  const today = new Date();
+  const end = new Date(endDate);
+
+  today.setHours(0, 0, 0, 0);
+  end.setHours(0, 0, 0, 0);
+
+  return end <= today;
+}
+
+function isCampaignStatusEnded(status) {
+  if (!status) {
+    return false;
+  }
+
+  const value = String(status).trim().toLowerCase();
+
+  return (
+    value === "completed" ||
+    value === "complete" ||
+    value === "ended" ||
+    value === "end"
+  );
+}
+
+function isCampaignDonationClosed() {
+  if (!currentCampaign) {
+    return true;
+  }
+
+  const currentAmount = Number(currentCampaign.current_amount) || 0;
+  const goalAmount = Number(currentCampaign.fundraise_goal) || 0;
+
+  const goalReached = goalAmount > 0 && currentAmount >= goalAmount;
+  const dateEnded = isCampaignDateEnded(currentCampaign.end_date);
+  const statusEnded = isCampaignStatusEnded(currentCampaign.status);
+
+  return goalReached || dateEnded || statusEnded;
+}
+
+function getClosedReasonMessage() {
+  if (!currentCampaign) {
+    return "This campaign cannot receive donations.";
+  }
+
+  const currentAmount = Number(currentCampaign.current_amount) || 0;
+  const goalAmount = Number(currentCampaign.fundraise_goal) || 0;
+
+  if (isCampaignStatusEnded(currentCampaign.status)) {
+    return "This campaign has ended and cannot receive donations.";
+  }
+
+  if (goalAmount > 0 && currentAmount >= goalAmount) {
+    return "This campaign has reached its target amount and cannot receive more donations.";
+  }
+
+  if (isCampaignDateEnded(currentCampaign.end_date)) {
+    return "This campaign has ended and cannot receive donations.";
+  }
+
+  return "This campaign cannot receive donations.";
 }
 
 function formatDateTime(dateValue) {
@@ -194,69 +293,15 @@ function formatDateTime(dateValue) {
   return d + "/" + m + "/" + y + " " + h + ":" + min + " " + ap;
 }
 
-function formatCategoryName(categoryName) {
-  if (!categoryName) return "Others";
-
-  const name = categoryName.toLowerCase();
-
-  if (name.includes("medical") || name.includes("health")) return "Health";
-  if (name.includes("education")) return "Education";
-  if (name.includes("animal")) return "Animals";
-  if (name.includes("disaster") || name.includes("relief")) return "Disaster";
-  if (name.includes("community")) return "Community";
-
-  return categoryName;
-}
-
-function getCategoryImage(categoryName) {
-  const category = formatCategoryName(categoryName);
-
-  if (category === "Health") {
-    return "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=900&q=80";
-  }
-
-  if (category === "Education") {
-    return "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=900&q=80";
-  }
-
-  if (category === "Animals") {
-    return "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=900&q=80";
-  }
-
-  if (category === "Disaster") {
-    return "https://images.unsplash.com/photo-1593113598332-cd59a93c6132?auto=format&fit=crop&w=900&q=80";
-  }
-
-  if (category === "Community") {
-    return "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=900&q=80";
-  }
-
-  return "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=900&q=80";
-}
-
-function getDonorDisplayName() {
-  const user = getLoggedInUser();
-
-  if (!user) return "Anonymous";
-
-  if (anonymousCheckbox && anonymousCheckbox.checked) {
-    return "Anonymous";
-  }
-
-  const firstName = user.f_name || "";
-  const lastName = user.l_name || "";
-  const fullName = `${firstName} ${lastName}`.trim();
-
-  return fullName || "Anonymous";
-}
-
 /* =========================
    FAVOURITE LOCAL STORAGE
 ========================= */
 function getFavoriteIds() {
   const saved = localStorage.getItem("fav_id");
 
-  if (!saved) return [];
+  if (!saved) {
+    return [];
+  }
 
   try {
     return JSON.parse(saved).map(function (id) {
@@ -275,6 +320,13 @@ function isFavorite(id) {
   return getFavoriteIds().includes(Number(id));
 }
 
+function updateHeart() {
+  if (!detailHeart) return;
+
+  detailHeart.textContent = isFavorite(currentCampaignId) ? "❤" : "♡";
+  detailHeart.classList.toggle("active", isFavorite(currentCampaignId));
+}
+
 function toggleFavorite(id) {
   let favoriteIds = getFavoriteIds();
 
@@ -288,13 +340,6 @@ function toggleFavorite(id) {
 
   saveFavoriteIds(favoriteIds);
   updateHeart();
-}
-
-function updateHeart() {
-  if (!detailHeart) return;
-
-  detailHeart.textContent = isFavorite(currentCampaignId) ? "❤" : "♡";
-  detailHeart.classList.toggle("active", isFavorite(currentCampaignId));
 }
 
 /* =========================
@@ -323,20 +368,21 @@ async function loadCampaignDetail() {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/activities/${currentCampaignId}`);
-
-    if (!response.ok) {
-      throw new Error("Failed to load campaign detail.");
-    }
-
+    const response = await fetch(`${API_BASE_URL}/fra/${currentCampaignId}`);
     const data = await response.json();
 
-    currentCampaign = data.activity;
+    if (!response.ok) {
+      alert(data.message || "Failed to load campaign detail.");
+      window.location.href = "browseCampaign.html";
+      return;
+    }
 
-    await loadActivityDonations();
+    currentCampaign = data.activity || data;
 
     renderCampaignDetail();
     updateHeart();
+
+    await loadActivityDonations();
     renderDonors();
   } catch (error) {
     console.error("Load campaign detail error:", error);
@@ -346,16 +392,23 @@ async function loadCampaignDetail() {
 }
 
 async function loadActivityDonations() {
-  const response = await fetch(`${API_BASE_URL}/donations/activity/${currentCampaignId}`);
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/donations/activity/${currentCampaignId}`
+    );
 
-  if (!response.ok) {
+    if (!response.ok) {
+      activityDonations = [];
+      return;
+    }
+
+    const data = await response.json();
+
+    activityDonations = Array.isArray(data) ? data : data.donations || [];
+  } catch (error) {
+    console.error("Load donors error:", error);
     activityDonations = [];
-    return;
   }
-
-  const data = await response.json();
-
-  activityDonations = data.donations || [];
 }
 
 function renderCampaignDetail() {
@@ -370,30 +423,61 @@ function renderCampaignDetail() {
   const donorCount = Number(currentCampaign.donor_count) || 0;
   const progress = calculateProgress(currentAmount, goalAmount);
   const daysLeft = calculateDaysLeft(currentCampaign.end_date);
-
-  const image = getCategoryImage(currentCampaign.category_name);
-
-  detailTitle.textContent = currentCampaign.activity_name || "Untitled Campaign";
-  detailOrg.textContent = "👤 " + (creatorName || "Unknown Creator");
-  detailEmail.textContent =
-    "✉️ " + (currentCampaign.creator_email || "No email available");
-
-  detailMainImg.src = image;
-  detailSideImg.src = image;
-
-  detailDesc.textContent = currentCampaign.description || "";
-  detailRaised.textContent = formatMoney(currentAmount);
-  detailGoal.textContent = "raised of " + formatMoney(goalAmount);
-  detailProgressBar.style.width = progress + "%";
-  detailDonors.textContent = donorCount;
-  detailDays.textContent = daysLeft;
-  detailAbout.textContent = currentCampaign.description || "";
-
   const remainingAmount = goalAmount - currentAmount;
+
+  if (detailTitle) {
+    detailTitle.textContent =
+      currentCampaign.activity_name || "Untitled Campaign";
+  }
+
+  if (detailOrg) {
+    detailOrg.textContent = "👤 " + (creatorName || "Unknown Creator");
+  }
+
+  if (detailEmail) {
+    detailEmail.textContent =
+      "✉️ " + (currentCampaign.creator_email || "No email available");
+  }
+
+  if (detailRaised) {
+    detailRaised.textContent = formatMoney(currentAmount);
+  }
+
+  if (detailGoal) {
+    detailGoal.textContent = "raised of " + formatMoney(goalAmount);
+  }
+
+  if (detailProgressBar) {
+    detailProgressBar.style.width = progress + "%";
+  }
+
+  if (detailDonors) {
+    detailDonors.textContent = donorCount;
+  }
+
+  if (detailDays) {
+    if (isCampaignDonationClosed()) {
+      detailDays.textContent = "Ended";
+    } else {
+      detailDays.textContent = daysLeft;
+    }
+  }
+
+  if (detailAbout) {
+    detailAbout.textContent = currentCampaign.description || "";
+  }
 
   if (donationInput) {
     donationInput.max = Math.max(remainingAmount, 0);
   }
+
+  /*
+    Keep your original donation section design.
+    Do not disable input.
+    Do not change placeholder.
+    Do not change button style.
+    Only block donation when user clicks Donate Now.
+  */
 
   if (donateNowBtn) {
     if (remainingAmount <= 0) {
@@ -409,15 +493,19 @@ function renderCampaignDetail() {
 function renderDonors() {
   if (!donorsPanel) return;
 
-  if (activityDonations.length === 0) {
+  if (!activityDonations || activityDonations.length === 0) {
     donorsPanel.innerHTML = `<div class="no-donors">No donor donate yet</div>`;
     return;
   }
 
   donorsPanel.innerHTML = activityDonations
     .map(function (donation) {
-      const fullName = `${donation.f_name || ""} ${donation.l_name || ""}`.trim();
+      const fullName = `${donation.f_name || ""} ${
+        donation.l_name || ""
+      }`.trim();
+
       const donorName = fullName || "Anonymous";
+      const amount = Number(donation.amount) || 0;
 
       return `
         <div class="donor-card">
@@ -425,7 +513,7 @@ function renderDonors() {
 
           <div>
             <div class="donor-main">
-              ${donorName} - donated $${Number(donation.amount).toFixed(2)}
+              ${donorName} - donated $${amount.toFixed(2)}
             </div>
 
             <div class="donor-time">${formatDateTime(donation.date)}</div>
@@ -465,6 +553,11 @@ if (scrollDonateBtn) {
       return;
     }
 
+    if (isCampaignDonationClosed()) {
+      alert(getClosedReasonMessage());
+      return;
+    }
+
     activateDetailTab("donatePanel");
 
     if (donatePanel) {
@@ -479,6 +572,13 @@ if (scrollDonateBtn) {
 if (donationInput) {
   donationInput.addEventListener("input", function () {
     const value = Number(donationInput.value) || 0;
+
+    if (isCampaignDonationClosed()) {
+      if (donationSummary) {
+        donationSummary.textContent = "SGD " + value.toFixed(2);
+      }
+      return;
+    }
 
     if (currentCampaign) {
       const currentAmount = Number(currentCampaign.current_amount) || 0;
@@ -496,7 +596,9 @@ if (donationInput) {
       }
     }
 
-    donationSummary.textContent = "SGD " + value.toFixed(2);
+    if (donationSummary) {
+      donationSummary.textContent = "SGD " + value.toFixed(2);
+    }
   });
 }
 
@@ -505,6 +607,11 @@ if (donateNowBtn) {
     if (!isLoggedIn()) {
       alert("Please sign in first before making a donation.");
       window.location.href = "login.html";
+      return;
+    }
+
+    if (isCampaignDonationClosed()) {
+      alert(getClosedReasonMessage());
       return;
     }
 
@@ -549,7 +656,10 @@ if (donateNowBtn) {
       }
 
       donationInput.value = "";
-      donationSummary.textContent = "SGD 0";
+
+      if (donationSummary) {
+        donationSummary.textContent = "SGD 0";
+      }
 
       if (anonymousCheckbox) {
         anonymousCheckbox.checked = false;
@@ -560,8 +670,6 @@ if (donateNowBtn) {
       activateDetailTab("donorsPanel");
 
       alert("Donation successful. Thank you for your support!");
-
-      window.location.href = "myDonation.html";
     } catch (error) {
       console.error("Donation error:", error);
       alert("Server error while donating.");

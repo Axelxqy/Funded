@@ -103,61 +103,16 @@ if (signOutBtn) {
 
 renderHeaderAuth();
 
-/* If user opens My Donations without login */
 if (!isLoggedIn()) {
   alert("Please sign in first to view your donations.");
   window.location.href = "login.html";
 }
 
 /* =========================
-   CAMPAIGN DATA
+   API / ELEMENTS
 ========================= */
-const campaigns = [
-  {
-    id: 1,
-    title: "Provide Meals for Children",
-    category: "Health",
-    categoryClass: "health",
-    image:
-      "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=900&q=80",
-    shortDesc:
-      "Help us provide nutritious meals for children in need. Your support ensures that no child goes to bed hungry."
-  },
-  {
-    id: 2,
-    title: "Bringing Health, Joy and Connection to Our Seniors",
-    category: "Community",
-    categoryClass: "community",
-    image:
-      "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=900&q=80",
-    shortDesc:
-      "Help us bring health, joy and connection to vulnerable seniors through our kindness initiative."
-  },
-  {
-    id: 3,
-    title: "Support for Relief Operations in Gaza",
-    category: "Disaster",
-    categoryClass: "disaster",
-    image:
-      "https://images.unsplash.com/photo-1618477462146-050d2767eac4?auto=format&fit=crop&w=900&q=80",
-    shortDesc:
-      "Your support helps provide urgent relief aid and humanitarian assistance for affected communities."
-  },
-  {
-    id: 4,
-    title: "SOSD Medical Fundraiser 2026/27",
-    category: "Animals",
-    categoryClass: "animals",
-    image:
-      "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=900&q=80",
-    shortDesc:
-      "Support medical treatment and care for rescued animals in need through this SOSD fundraiser."
-  }
-];
+const API_BASE_URL = "http://localhost:3000";
 
-/* =========================
-   ELEMENTS
-========================= */
 const donationTableBody = document.getElementById("donationTableBody");
 const donationSearch = document.getElementById("donationSearch");
 
@@ -173,81 +128,33 @@ const clearDateFilterBtn = document.getElementById("clearDateFilterBtn");
 const paginationBox = document.getElementById("paginationBox");
 
 /* =========================
-   PAGINATION STATE
+   STATE
 ========================= */
 const RECORDS_PER_PAGE = 5;
+
 let currentPage = 1;
+
+// This stores data from backend view/search controller
+let backendDonationRecords = [];
+
+// This stores data after local date filter
+let donationRecords = [];
+
 let activeStartDate = "";
 let activeEndDate = "";
 
 /* =========================
    HELPERS
 ========================= */
-function getCampaignById(id) {
-  return campaigns.find(function (campaign) {
-    return Number(campaign.id) === Number(id);
-  });
-}
+function formatDisplayDate(dateValue) {
+  if (!dateValue) return "-";
 
-function getDonationRecords() {
-  const saved = localStorage.getItem("donation_records");
+  const dateObj = new Date(dateValue);
 
-  if (!saved) {
-    return [];
+  if (Number.isNaN(dateObj.getTime())) {
+    return "-";
   }
 
-  try {
-    return JSON.parse(saved);
-  } catch (error) {
-    return [];
-  }
-}
-
-function getCurrentUserDonationRecords() {
-  const user = getLoggedInUser();
-
-  if (!user) {
-    return [];
-  }
-
-  return getDonationRecords().filter(function (record) {
-    if (!record.user_id) {
-      return true;
-    }
-
-    return Number(record.user_id) === Number(user.user_id);
-  });
-}
-
-function getDonationDateObject(record) {
-  if (record.date_iso) {
-    const dateFromIso = new Date(record.date_iso);
-
-    if (!Number.isNaN(dateFromIso.getTime())) {
-      return dateFromIso;
-    }
-  }
-
-  if (record.donation_id) {
-    const dateFromId = new Date(Number(record.donation_id));
-
-    if (!Number.isNaN(dateFromId.getTime())) {
-      return dateFromId;
-    }
-  }
-
-  if (record.date) {
-    const dateFromText = new Date(record.date);
-
-    if (!Number.isNaN(dateFromText.getTime())) {
-      return dateFromText;
-    }
-  }
-
-  return new Date();
-}
-
-function formatDisplayDate(dateObj) {
   const d = String(dateObj.getDate()).padStart(2, "0");
 
   const months = [
@@ -261,15 +168,13 @@ function formatDisplayDate(dateObj) {
   return d + " " + m + " " + y;
 }
 
-function formatInputDate(dateObj) {
-  const y = dateObj.getFullYear();
-  const m = String(dateObj.getMonth() + 1).padStart(2, "0");
-  const d = String(dateObj.getDate()).padStart(2, "0");
+function getDateOnlyTime(dateValue) {
+  const dateObj = new Date(dateValue);
 
-  return y + "-" + m + "-" + d;
-}
+  if (Number.isNaN(dateObj.getTime())) {
+    return 0;
+  }
 
-function getDateOnlyTime(dateObj) {
   return new Date(
     dateObj.getFullYear(),
     dateObj.getMonth(),
@@ -277,57 +182,179 @@ function getDateOnlyTime(dateObj) {
   ).getTime();
 }
 
-/* =========================
-   FILTER RECORDS
-========================= */
-function getFilteredDonationRecords() {
-  const keyword = donationSearch ? donationSearch.value.toLowerCase().trim() : "";
+function getDateTime(dateValue) {
+  const dateObj = new Date(dateValue);
 
-  let records = getCurrentUserDonationRecords().map(function (record) {
-    const campaign = getCampaignById(record.campaign_id);
-
-    return {
-      ...record,
-      campaign: campaign,
-      dateObj: getDonationDateObject(record)
-    };
-  });
-
-  records = records.filter(function (record) {
-    return record.campaign;
-  });
-
-  if (keyword !== "") {
-    records = records.filter(function (record) {
-      return (
-        record.campaign.title.toLowerCase().includes(keyword) ||
-        record.campaign.category.toLowerCase().includes(keyword) ||
-        formatDisplayDate(record.dateObj).toLowerCase().includes(keyword)
-      );
-    });
+  if (Number.isNaN(dateObj.getTime())) {
+    return 0;
   }
+
+  return dateObj.getTime();
+}
+
+function getCategoryClass(categoryName) {
+  if (!categoryName) {
+    return "others";
+  }
+
+  const category = categoryName.toLowerCase();
+
+  if (category.includes("health") || category.includes("medical")) {
+    return "health";
+  }
+
+  if (category.includes("education")) {
+    return "education";
+  }
+
+  if (category.includes("animal")) {
+    return "animals";
+  }
+
+  if (category.includes("disaster") || category.includes("relief")) {
+    return "disaster";
+  }
+
+  if (category.includes("community")) {
+    return "community";
+  }
+
+  return "others";
+}
+
+/* =========================
+   LOCAL DATE RANGE FILTER
+========================= */
+function applyDateRangeFilter(records) {
+  let filteredRecords = records.slice();
 
   if (activeStartDate) {
     const startTime = new Date(activeStartDate + "T00:00:00").getTime();
 
-    records = records.filter(function (record) {
-      return getDateOnlyTime(record.dateObj) >= startTime;
+    filteredRecords = filteredRecords.filter(function (record) {
+      return getDateOnlyTime(record.date) >= startTime;
     });
   }
 
   if (activeEndDate) {
     const endTime = new Date(activeEndDate + "T00:00:00").getTime();
 
-    records = records.filter(function (record) {
-      return getDateOnlyTime(record.dateObj) <= endTime;
+    filteredRecords = filteredRecords.filter(function (record) {
+      return getDateOnlyTime(record.date) <= endTime;
     });
   }
 
-  records.sort(function (a, b) {
-    return b.dateObj.getTime() - a.dateObj.getTime();
-  });
+  return filteredRecords;
+}
 
-  return records;
+/* =========================
+   VIEW DONATION HISTORY
+   GET /donations/:user_id
+========================= */
+async function loadDonationHistoryFromDatabase() {
+  const user = getLoggedInUser();
+
+  if (!user || !user.user_id) {
+    return;
+  }
+
+  if (donationTableBody) {
+    donationTableBody.innerHTML = `
+      <tr>
+        <td colspan="6" class="empty-row">Loading donations...</td>
+      </tr>
+    `;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/donations/${user.user_id}`);
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to load donations.");
+    }
+
+    backendDonationRecords = Array.isArray(data) ? data : data.donations || [];
+
+    currentPage = 1;
+    renderDonations();
+  } catch (error) {
+    console.error("Load donation history error:", error);
+
+    backendDonationRecords = [];
+    donationRecords = [];
+
+    if (donationTableBody) {
+      donationTableBody.innerHTML = `
+        <tr>
+          <td colspan="6" class="empty-row">Failed to load donations.</td>
+        </tr>
+      `;
+    }
+
+    renderStats([]);
+    renderPagination([]);
+  }
+}
+
+/* =========================
+   SEARCH DONATION HISTORY
+   GET /donations/:user_id/search/:keyword
+========================= */
+async function searchDonationHistoryFromDatabase() {
+  const user = getLoggedInUser();
+
+  if (!user || !user.user_id) {
+    return;
+  }
+
+  const keyword = donationSearch ? donationSearch.value.trim() : "";
+
+  if (keyword === "") {
+    await loadDonationHistoryFromDatabase();
+    return;
+  }
+
+  if (donationTableBody) {
+    donationTableBody.innerHTML = `
+      <tr>
+        <td colspan="6" class="empty-row">Searching donations...</td>
+      </tr>
+    `;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/donations/${user.user_id}/search/${encodeURIComponent(keyword)}`
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to search donations.");
+    }
+
+    backendDonationRecords = Array.isArray(data) ? data : data.donations || [];
+
+    currentPage = 1;
+    renderDonations();
+  } catch (error) {
+    console.error("Search donation history error:", error);
+
+    backendDonationRecords = [];
+    donationRecords = [];
+
+    if (donationTableBody) {
+      donationTableBody.innerHTML = `
+        <tr>
+          <td colspan="6" class="empty-row">Failed to search donations.</td>
+        </tr>
+      `;
+    }
+
+    renderStats([]);
+    renderPagination([]);
+  }
 }
 
 /* =========================
@@ -336,34 +363,46 @@ function getFilteredDonationRecords() {
 function renderStats(records) {
   const uniqueCampaignIds = new Set(
     records.map(function (record) {
-      return record.campaign_id;
+      return record.activity_id;
     })
   );
 
-  totalCampaigns.textContent = uniqueCampaignIds.size;
-  totalDonations.textContent = records.length;
+  if (totalCampaigns) {
+    totalCampaigns.textContent = uniqueCampaignIds.size;
+  }
+
+  if (totalDonations) {
+    totalDonations.textContent = records.length;
+  }
 
   if (records.length === 0) {
-    firstDonation.textContent = "-";
-    latestDonation.textContent = "-";
+    if (firstDonation) firstDonation.textContent = "-";
+    if (latestDonation) latestDonation.textContent = "-";
     return;
   }
 
   const sortedOldestFirst = records.slice().sort(function (a, b) {
-    return a.dateObj.getTime() - b.dateObj.getTime();
+    return getDateTime(a.date) - getDateTime(b.date);
   });
 
   const firstRecord = sortedOldestFirst[0];
   const latestRecord = sortedOldestFirst[sortedOldestFirst.length - 1];
 
-  firstDonation.textContent = formatDisplayDate(firstRecord.dateObj);
-  latestDonation.textContent = formatDisplayDate(latestRecord.dateObj);
+  if (firstDonation) {
+    firstDonation.textContent = formatDisplayDate(firstRecord.date);
+  }
+
+  if (latestDonation) {
+    latestDonation.textContent = formatDisplayDate(latestRecord.date);
+  }
 }
 
 /* =========================
    TABLE
 ========================= */
 function renderTable(records) {
+  if (!donationTableBody) return;
+
   donationTableBody.innerHTML = "";
 
   if (records.length === 0) {
@@ -380,37 +419,40 @@ function renderTable(records) {
   const pageRecords = records.slice(startIndex, endIndex);
 
   pageRecords.forEach(function (record) {
-    const campaign = record.campaign;
-
     const row = document.createElement("tr");
+
+    const campaignTitle = record.activity_name || "Untitled Campaign";
+    const campaignDesc = record.description || "";
+    const categoryName = record.category_name || "Others";
+    const categoryClass = getCategoryClass(categoryName);
+    const amount = Number(record.amount) || 0;
 
     row.innerHTML = `
       <td>
-        <div class="campaign-cell">
-          <img src="${campaign.image}" alt="${campaign.title}" class="campaign-thumb" />
+        <div class="campaign-cell no-image-campaign-cell">
           <div>
-            <div class="campaign-cell-title">${campaign.title}</div>
-            <div class="campaign-cell-desc">${campaign.shortDesc}</div>
+            <div class="campaign-cell-title">${campaignTitle}</div>
+            <div class="campaign-cell-desc">${campaignDesc}</div>
           </div>
         </div>
       </td>
 
       <td>
-        <span class="category-pill ${campaign.categoryClass}">
-          ${campaign.category}
+        <span class="category-pill ${categoryClass}">
+          ${categoryName}
         </span>
       </td>
 
-      <td>${formatDisplayDate(record.dateObj)}</td>
+      <td>${formatDisplayDate(record.date)}</td>
 
-      <td>SGD ${Number(record.amount).toFixed(2)}</td>
+      <td>SGD ${amount.toFixed(2)}</td>
 
       <td>
-        <span class="status-pill">${record.status || "Successful"}</span>
+        <span class="status-pill">Successful</span>
       </td>
 
       <td>
-        <button class="view-campaign-btn" data-id="${campaign.id}" type="button">
+        <button class="view-campaign-btn" data-id="${record.activity_id}" type="button">
           👁 View Campaign
         </button>
       </td>
@@ -430,6 +472,8 @@ function renderTable(records) {
    PAGINATION
 ========================= */
 function renderPagination(records) {
+  if (!paginationBox) return;
+
   paginationBox.innerHTML = "";
 
   const totalPages = Math.ceil(records.length / RECORDS_PER_PAGE);
@@ -487,16 +531,17 @@ function renderPagination(records) {
    MAIN RENDER
 ========================= */
 function renderDonations() {
-  const records = getFilteredDonationRecords();
-  const totalPages = Math.ceil(records.length / RECORDS_PER_PAGE) || 1;
+  donationRecords = applyDateRangeFilter(backendDonationRecords);
+
+  const totalPages = Math.ceil(donationRecords.length / RECORDS_PER_PAGE) || 1;
 
   if (currentPage > totalPages) {
     currentPage = totalPages;
   }
 
-  renderStats(records);
-  renderTable(records);
-  renderPagination(records);
+  renderStats(donationRecords);
+  renderTable(donationRecords);
+  renderPagination(donationRecords);
 }
 
 /* =========================
@@ -505,14 +550,14 @@ function renderDonations() {
 if (donationSearch) {
   donationSearch.addEventListener("input", function () {
     currentPage = 1;
-    renderDonations();
+    searchDonationHistoryFromDatabase();
   });
 }
 
 if (applyDateFilterBtn) {
   applyDateFilterBtn.addEventListener("click", function () {
-    activeStartDate = startDateInput.value;
-    activeEndDate = endDateInput.value;
+    activeStartDate = startDateInput ? startDateInput.value : "";
+    activeEndDate = endDateInput ? endDateInput.value : "";
 
     if (activeStartDate && activeEndDate && activeStartDate > activeEndDate) {
       alert("Start date cannot be later than end date.");
@@ -526,11 +571,13 @@ if (applyDateFilterBtn) {
 
 if (clearDateFilterBtn) {
   clearDateFilterBtn.addEventListener("click", function () {
-    startDateInput.value = "";
-    endDateInput.value = "";
+    if (startDateInput) startDateInput.value = "";
+    if (endDateInput) endDateInput.value = "";
+
     activeStartDate = "";
     activeEndDate = "";
     currentPage = 1;
+
     renderDonations();
   });
 }
@@ -544,4 +591,7 @@ document.addEventListener("click", function () {
   });
 });
 
-renderDonations();
+/* =========================
+   START PAGE
+========================= */
+loadDonationHistoryFromDatabase();

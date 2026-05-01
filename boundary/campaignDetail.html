@@ -30,17 +30,9 @@
       </a>
     </div>
 
-    <div class="header-center">
-      <div class="header-search">
-        <span>🔍</span>
-        <input type="text" placeholder="Search campaigns" />
-      </div>
-    </div>
-
     <nav class="header-right">
       <a href="homepage.html" class="nav-link">Home</a>
 
-      <!-- DONEE DROPDOWN -->
       <div class="nav-dropdown" id="donateDropdown">
         <button class="nav-link nav-button active" id="donateMenuBtn" type="button">
           Donee <span class="small-arrow">▼</span>
@@ -52,7 +44,6 @@
         </div>
       </div>
 
-      <!-- FUNDRAISE DROPDOWN -->
       <div class="nav-dropdown" id="fundraiseDropdown">
         <button class="nav-link nav-button" id="fundraiseMenuBtn" type="button">
           Fundraise <span class="small-arrow">▼</span>
@@ -64,7 +55,6 @@
         </div>
       </div>
 
-      <!-- ABOUT DROPDOWN -->
       <div class="nav-dropdown" id="aboutDropdown">
         <button class="nav-link nav-button" id="aboutMenuBtn" type="button">
           About <span class="small-arrow">▼</span>
@@ -77,10 +67,8 @@
 
       <div class="profile-divider"></div>
 
-      <!-- SIGN IN BUTTON: show when user is not logged in -->
       <a href="login.html" class="signin-header-btn" id="signinHeaderBtn">Sign in</a>
 
-      <!-- PROFILE DROPDOWN: show when user is logged in -->
       <div class="nav-dropdown hidden" id="profileDropdown">
         <button class="nav-link nav-button profile-btn" id="profileMenuBtn" type="button">
           <div class="avatar small-avatar" id="headerAvatar">U</div>
@@ -106,14 +94,8 @@
         <div class="detail-line" id="detailOrg"></div>
         <div class="detail-line" id="detailEmail"></div>
 
-        <div class="detail-media">
-          <img id="detailMainImg" class="detail-main-img" src="" alt="Campaign image" />
-
-          <div>
-            <img id="detailSideImg" class="detail-side-img" src="" alt="Campaign poster" />
-            <p class="detail-desc" id="detailDesc"></p>
-          </div>
-        </div>
+        <h2 class="about-title">About</h2>
+        <p class="about-text" id="detailAbout"></p>
       </div>
 
       <aside class="summary-card">
@@ -138,11 +120,6 @@
 
         <button class="donate-main-btn" type="button" id="scrollDonateBtn">Donate</button>
       </aside>
-    </section>
-
-    <section>
-      <h2 class="about-title">About</h2>
-      <p class="about-text" id="detailAbout"></p>
     </section>
 
     <section class="detail-bottom">
@@ -223,7 +200,6 @@
     </section>
   </main>
 
-  <!-- FOOTER SAME AS HOMEPAGE -->
   <footer class="site-footer">
     <div class="footer-col">
       <h4>Donee</h4>

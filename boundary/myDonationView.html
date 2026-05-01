@@ -30,13 +30,6 @@
       </a>
     </div>
 
-    <div class="header-center">
-      <div class="header-search">
-        <span>🔍</span>
-        <input type="text" placeholder="Search campaigns" />
-      </div>
-    </div>
-
     <nav class="header-right">
       <a href="homepage.html" class="nav-link">Home</a>
 
@@ -92,16 +85,15 @@
   <!-- MAIN -->
   <main class="page-wrap">
 
-    <button type="button" class="back-top-btn" id="backTopBtn">
-      ‹ Back to My Donations
-    </button>
+    <div class="back-nav-wrap">
+      <button type="button" class="back-pretty-btn" id="backTopBtn">
+        <span class="back-arrow">←</span>
+        <span>Back to My Donations</span>
+      </button>
+    </div>
 
-    <!-- UPPER CAMPAIGN DETAIL CARD -->
-    <section class="donation-hero-card">
-      <div class="donation-hero-image-wrap">
-        <img id="campaignImage" class="donation-hero-image" src="" alt="Campaign image" />
-      </div>
-
+    <!-- UPPER CAMPAIGN DETAIL CARD - NO IMAGE -->
+    <section class="donation-hero-card no-image-hero-card">
       <div class="donation-hero-main">
         <h1 id="campaignTitle"></h1>
 
@@ -118,7 +110,7 @@
       <aside class="campaign-side-info">
         <div class="side-block">
           <h4>Campaign Status</h4>
-          <span class="status-pill status-success">Active</span>
+          <span class="status-pill" id="campaignStatus"></span>
         </div>
 
         <div class="side-block">

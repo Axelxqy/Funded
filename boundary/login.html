@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Login</title>
+
   <link rel="stylesheet" href="/style/login.css" />
 </head>
+
 <body>
   <div class="app-bg">
     <div class="bg-shape shape-1"></div>
@@ -16,10 +19,14 @@
     <section class="screen active">
       <div class="card signin-card">
         <h1 class="title center">Welcome</h1>
-        <p class="subtitle center">Sign in to GoFundMe or sign up to continue.</p>
+
+        <p class="subtitle center">
+          Sign in to Helping Hands or sign up to continue.
+        </p>
 
         <div class="field-group">
           <label for="emailInput" class="field-label">Email Address</label>
+
           <input
             id="emailInput"
             class="input"
@@ -27,6 +34,7 @@
             placeholder="example@email.com"
             autocomplete="email"
           />
+
           <p id="emailError" class="error-text hidden"></p>
         </div>
 
@@ -39,6 +47,7 @@
               placeholder="Password"
               autocomplete="current-password"
             />
+
             <button id="togglePassword" class="eye-btn" type="button">👁</button>
           </div>
 
@@ -47,7 +56,9 @@
 
         <a href="#" class="forgot-link">Forgot your password?</a>
 
-        <button id="signInBtn" class="primary-btn" type="button">Sign in</button>
+        <button id="signInBtn" class="primary-btn" type="button">
+          Sign in
+        </button>
 
         <p class="bottom-text bigger-bottom-text">
           DON'T HAVE AN ACCOUNT?
@@ -57,6 +68,6 @@
     </section>
   </div>
 
-  <script src="loginController.js"></script>
+  <script src="/LoginPage.js"></script>
 </body>
 </html>

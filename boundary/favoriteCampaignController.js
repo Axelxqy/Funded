@@ -44,16 +44,31 @@ function getLoggedInUser() {
   }
 
   try {
-    return JSON.parse(saved);
+    const parsed = JSON.parse(saved);
+
+    if (parsed && parsed.user && parsed.user.user_id) {
+      return parsed.user;
+    }
+
+    return parsed;
   } catch (error) {
     localStorage.removeItem("loggedInUser");
     return null;
   }
 }
 
-function isLoggedIn() {
+function getLoggedInUserId() {
   const user = getLoggedInUser();
-  return user && user.user_id;
+
+  if (!user) {
+    return null;
+  }
+
+  return user.user_id || user.userId || user.id || null;
+}
+
+function isLoggedIn() {
+  return getLoggedInUserId() !== null;
 }
 
 function requireLogin(event) {
@@ -62,7 +77,6 @@ function requireLogin(event) {
   }
 
   event.preventDefault();
-
   alert("Please sign in first to continue.");
   window.location.href = "login.html";
 }
@@ -118,9 +132,7 @@ function renderHeaderAuth() {
 if (signOutBtn) {
   signOutBtn.addEventListener("click", function (event) {
     event.preventDefault();
-
     localStorage.removeItem("loggedInUser");
-
     window.location.href = "homepage.html";
   });
 }
@@ -128,7 +140,7 @@ if (signOutBtn) {
 renderHeaderAuth();
 
 /* =========================
-   API / CAMPAIGN DATA
+   API / STATE
 ========================= */
 const API_BASE_URL = "http://localhost:3000";
 
@@ -143,10 +155,40 @@ const resultCountBtn = document.getElementById("resultCountBtn");
 const causesDropdown = document.getElementById("causesDropdown");
 const causesBtn = document.getElementById("causesBtn");
 
+const campaignSearch = document.getElementById("campaignSearch");
+const searchBtn = document.getElementById("searchBtn");
+
 /* =========================
-   LOAD ACTIVITIES FROM DATABASE
+   SAFE JSON
 ========================= */
-async function loadActivitiesFromDatabase() {
+async function readJsonResponse(response) {
+  const text = await response.text();
+
+  if (!text) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    return {
+      message: text,
+    };
+  }
+}
+
+/* =========================
+   LOAD FAVOURITE FRA FROM DATABASE
+========================= */
+async function loadFavFRAFromDatabase() {
+  const userId = getLoggedInUserId();
+
+  if (!userId) {
+    alert("Please sign in first to view favourite campaigns.");
+    window.location.href = "login.html";
+    return;
+  }
+
   if (favoriteGrid) {
     favoriteGrid.innerHTML = "";
   }
@@ -157,60 +199,24 @@ async function loadActivitiesFromDatabase() {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/activities`);
+    const response = await fetch(`${API_BASE_URL}/fav/${userId}`);
+    const data = await readJsonResponse(response);
 
     if (!response.ok) {
-      throw new Error("Failed to load campaigns.");
+      throw new Error(data.message || "Failed to load favourite campaigns.");
     }
 
-    const data = await response.json();
+    const favActivities = Array.isArray(data) ? data : data.favourites || [];
 
-    campaigns = data.activities.map(function (activity) {
-      const goal = Number(activity.fundraise_goal) || 0;
-      const currentAmount = Number(activity.current_amount) || 0;
-
-      const creatorName = `${activity.creator_f_name || ""} ${
-        activity.creator_l_name || ""
-      }`.trim();
-
-      let progress = 0;
-
-      if (goal > 0) {
-        progress = Math.round((currentAmount / goal) * 100);
-      }
-
-      if (progress > 100) {
-        progress = 100;
-      }
-
-      return {
-        id: activity.activity_id,
-        title: activity.activity_name || "Untitled Campaign",
-        category: formatCategoryName(activity.category_name),
-        categoryClass: getCategoryClass(activity.category_name),
-
-        org: creatorName || "Unknown Creator",
-        email: activity.creator_email || "No email available",
-
-        raised: "$" + currentAmount.toLocaleString(),
-        goal: "$" + goal.toLocaleString(),
-        donors: 0,
-        daysLeft: calculateDaysLeft(activity.end_date),
-        progress: progress,
-        image: getCategoryImage(activity.category_name),
-        shortDesc: activity.description || "",
-        about: activity.description || "",
-        status: activity.status || "Ongoing",
-        startDate: activity.start_date,
-        endDate: activity.end_date,
-        createdBy: activity.created_by,
-      };
+    campaigns = favActivities.map(function (activity) {
+      return mapActivityToCampaign(activity);
     });
 
     renderFavoriteCampaigns();
   } catch (error) {
-    console.error("Load favorite campaigns error:", error);
+    console.error("Load favourite campaigns error:", error);
 
+    campaigns = [];
     updateResultCount(0);
 
     if (favoriteCountText) {
@@ -223,13 +229,193 @@ async function loadActivitiesFromDatabase() {
 
     if (emptyBox) {
       emptyBox.style.display = "block";
-      emptyBox.textContent = "Failed to load campaigns from server.";
+      emptyBox.textContent = "Failed to load favorite campaigns from server.";
     }
   }
 }
 
 /* =========================
-   HELPER FUNCTIONS
+   SEARCH SAVED FAVOURITE FRA
+   GET /fav/:user_id/search/:name
+========================= */
+async function searchFavFRAFromDatabase() {
+  const userId = getLoggedInUserId();
+  const activity_name = campaignSearch ? campaignSearch.value.trim() : "";
+
+  if (!userId) {
+    alert("Please sign in first to search favourite campaigns.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  if (activity_name === "") {
+    await loadFavFRAFromDatabase();
+    return;
+  }
+
+  if (favoriteGrid) {
+    favoriteGrid.innerHTML = "";
+  }
+
+  if (emptyBox) {
+    emptyBox.style.display = "block";
+    emptyBox.textContent = "Searching favorite campaigns...";
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/fav/${userId}/search/${encodeURIComponent(activity_name)}`
+    );
+
+    const data = await readJsonResponse(response);
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to search favourite campaigns.");
+    }
+
+    const favActivities = Array.isArray(data) ? data : data.favourites || [];
+
+    campaigns = favActivities.map(function (activity) {
+      return mapActivityToCampaign(activity);
+    });
+
+    renderFavoriteCampaigns();
+  } catch (error) {
+    console.error("Search favourite campaigns error:", error);
+
+    campaigns = [];
+    updateResultCount(0);
+
+    if (favoriteCountText) {
+      favoriteCountText.textContent = "Explore 0 favorite campaigns";
+    }
+
+    if (favoriteGrid) {
+      favoriteGrid.style.display = "none";
+    }
+
+    if (emptyBox) {
+      emptyBox.style.display = "block";
+      emptyBox.textContent = "Failed to search favorite campaigns.";
+    }
+  }
+}
+
+/* =========================
+   REMOVE FROM FAVOURITES
+   DELETE /fav/user/:user_id/activity/:activity_id
+========================= */
+async function removeFavourite(activity_id) {
+  const userId = getLoggedInUserId();
+
+  if (!userId) {
+    alert("Please sign in first.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  const activityId = Number(activity_id);
+
+  if (!activityId) {
+    alert("Invalid campaign selected.");
+    return;
+  }
+
+  const confirmRemove = confirm("Remove this campaign from your favourites?");
+
+  if (!confirmRemove) {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/fav/user/${userId}/activity/${activityId}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    const data = await readJsonResponse(response);
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to remove favourite campaign.");
+    }
+
+    campaigns = campaigns.filter(function (campaign) {
+      return Number(campaign.id) !== activityId;
+    });
+
+    renderFavoriteCampaigns();
+
+    alert("Campaign removed from favourites.");
+  } catch (error) {
+    console.error("Remove favourite error:", error);
+    alert("Failed to remove favourite campaign.");
+  }
+}
+
+/* =========================
+   MAP DATA
+========================= */
+function mapActivityToCampaign(activity) {
+  const goal = Number(activity.fundraise_goal) || 0;
+  const currentAmount = Number(activity.current_amount) || 0;
+
+  const creatorName = `${activity.creator_f_name || ""} ${
+    activity.creator_l_name || ""
+  }`.trim();
+
+  const daysLeft = calculateDaysLeft(activity.end_date);
+  const endedByAmount = goal > 0 && currentAmount >= goal;
+  const endedByDate = isCampaignDateEnded(activity.end_date);
+  const endedByStatus = isCampaignStatusEnded(activity.status);
+  const isEnded = endedByAmount || endedByDate || endedByStatus;
+
+  let progress = 0;
+
+  if (goal > 0) {
+    progress = Math.round((currentAmount / goal) * 100);
+  }
+
+  if (progress > 100) {
+    progress = 100;
+  }
+
+  return {
+    favId: activity.fav_id,
+    id: Number(activity.activity_id),
+    title: activity.activity_name || "Untitled Campaign",
+    category: formatCategoryName(activity.category_name),
+    categoryClass: getCategoryClass(activity.category_name),
+
+    org: creatorName || "Unknown Creator",
+    email: activity.creator_email || "No email available",
+
+    raisedAmount: currentAmount,
+    goalAmount: goal,
+    raised: "$" + currentAmount.toLocaleString(),
+    goal: "$" + goal.toLocaleString(),
+
+    donors: Number(activity.donor_count) || 0,
+    daysLeft: daysLeft,
+    durationText: isEnded ? "Ended" : daysLeft + " days left",
+
+    progress: progress,
+    shortDesc: activity.description || "",
+    about: activity.description || "",
+
+    status: isEnded ? "Ended" : "Active",
+    statusClass: isEnded ? "ended" : "active",
+
+    isEnded: isEnded,
+    startDate: activity.start_date,
+    endDate: activity.end_date,
+    createdBy: activity.created_by,
+  };
+}
+
+/* =========================
+   HELPERS
 ========================= */
 function calculateDaysLeft(endDate) {
   if (!endDate) return 0;
@@ -246,30 +432,43 @@ function calculateDaysLeft(endDate) {
   return daysLeft > 0 ? daysLeft : 0;
 }
 
+function isCampaignDateEnded(endDate) {
+  if (!endDate) return false;
+
+  const today = new Date();
+  const end = new Date(endDate);
+
+  today.setHours(0, 0, 0, 0);
+  end.setHours(0, 0, 0, 0);
+
+  return end <= today;
+}
+
+function isCampaignStatusEnded(status) {
+  if (!status) return false;
+
+  const value = String(status).trim().toLowerCase();
+
+  return (
+    value === "completed" ||
+    value === "complete" ||
+    value === "ended" ||
+    value === "end"
+  );
+}
+
 function formatCategoryName(categoryName) {
   if (!categoryName) return "Others";
 
   const name = categoryName.toLowerCase();
 
-  if (name.includes("medical") || name.includes("health")) {
-    return "Health";
-  }
-
-  if (name.includes("education")) {
-    return "Education";
-  }
-
-  if (name.includes("animal")) {
-    return "Animals";
-  }
-
-  if (name.includes("disaster") || name.includes("relief")) {
-    return "Disaster";
-  }
-
-  if (name.includes("community")) {
-    return "Community";
-  }
+  if (name.includes("medical") || name.includes("health")) return "Health";
+  if (name.includes("education")) return "Education";
+  if (name.includes("animal")) return "Animals";
+  if (name.includes("emergency")) return "Disaster";
+  if (name.includes("disaster") || name.includes("relief")) return "Disaster";
+  if (name.includes("community")) return "Community";
+  if (name.includes("environment")) return "Community";
 
   return categoryName;
 }
@@ -286,73 +485,11 @@ function getCategoryClass(categoryName) {
   return "others";
 }
 
-function getCategoryImage(categoryName) {
-  const category = formatCategoryName(categoryName);
-
-  if (category === "Health") {
-    return "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=900&q=80";
-  }
-
-  if (category === "Education") {
-    return "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=900&q=80";
-  }
-
-  if (category === "Animals") {
-    return "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=900&q=80";
-  }
-
-  if (category === "Disaster") {
-    return "https://images.unsplash.com/photo-1593113598332-cd59a93c6132?auto=format&fit=crop&w=900&q=80";
-  }
-
-  if (category === "Community") {
-    return "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=900&q=80";
-  }
-
-  return "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=900&q=80";
-}
-
-/* =========================
-   FAVOURITE LOCAL STORAGE
-========================= */
-function getFavoriteIds() {
-  const saved = localStorage.getItem("fav_id");
-
-  if (!saved) {
-    return [];
-  }
-
-  try {
-    return JSON.parse(saved).map(function (id) {
-      return Number(id);
-    });
-  } catch (error) {
-    return [];
-  }
-}
-
-function saveFavoriteIds(ids) {
-  localStorage.setItem("fav_id", JSON.stringify(ids));
-}
-
-function removeFavorite(id) {
-  const favoriteIds = getFavoriteIds().filter(function (favoriteId) {
-    return favoriteId !== Number(id);
-  });
-
-  saveFavoriteIds(favoriteIds);
-  renderFavoriteCampaigns();
-}
-
 /* =========================
    FILTER FAVOURITES
 ========================= */
 function getVisibleFavoriteCampaigns() {
-  const favoriteIds = getFavoriteIds();
-
-  let favoriteCampaigns = campaigns.filter(function (campaign) {
-    return favoriteIds.includes(Number(campaign.id));
-  });
+  let favoriteCampaigns = campaigns.slice();
 
   if (activeCategory !== "all") {
     favoriteCampaigns = favoriteCampaigns.filter(function (campaign) {
@@ -368,7 +505,7 @@ function getVisibleFavoriteCampaigns() {
 ========================= */
 function updateResultCount(count) {
   if (resultCountBtn) {
-    resultCountBtn.textContent = count + " ▼";
+    resultCountBtn.textContent = count;
   }
 }
 
@@ -416,20 +553,58 @@ function renderFavoriteCampaigns() {
 
   favoriteCampaigns.forEach(function (campaign) {
     const card = document.createElement("article");
-    card.className = "campaign-card";
+
+    card.className =
+      "campaign-card no-image-campaign-card category-" + campaign.categoryClass;
 
     card.innerHTML = `
-      <div class="card-image" style="background-image:url('${campaign.image}')">
-        <button class="heart-btn active" data-id="${campaign.id}" type="button">❤</button>
-      </div>
+      <div class="card-accent"></div>
 
-      <div class="card-body">
+      <div class="card-body no-image-card-body">
+        <div class="card-top-row">
+          <span class="category-pill ${campaign.categoryClass}">
+            ${campaign.category}
+          </span>
+
+          <button class="heart-btn active" data-id="${campaign.id}" type="button">
+            ❤
+          </button>
+        </div>
+
         <div class="card-title">${campaign.title}</div>
-        <div class="card-line">👤 ${campaign.org}</div>
-        <div class="card-line">✉️ ${campaign.email}</div>
 
-        <div class="card-amount">
-          <strong>${campaign.raised}</strong> raised of ${campaign.goal}
+        <p class="card-desc">
+          ${campaign.shortDesc || "No campaign description provided."}
+        </p>
+
+        <div class="creator-box">
+          <div class="creator-avatar">
+            ${(campaign.org || "U").charAt(0).toUpperCase()}
+          </div>
+
+          <div class="creator-info">
+            <div class="creator-name">${campaign.org}</div>
+            <div class="creator-email">${campaign.email}</div>
+          </div>
+        </div>
+
+        <div class="amount-row">
+          <div>
+            <div class="amount-label">Raised</div>
+            <div class="amount-value">${campaign.raised}</div>
+          </div>
+
+          <div class="goal-box">
+            <div class="amount-label">Goal</div>
+            <div class="goal-value">${campaign.goal}</div>
+          </div>
+        </div>
+
+        <div class="progress-info-row">
+          <span>${campaign.progress}% funded</span>
+          <span class="status-pill ${campaign.statusClass}">
+            ${campaign.status}
+          </span>
         </div>
 
         <div class="progress-track">
@@ -437,8 +612,8 @@ function renderFavoriteCampaigns() {
         </div>
 
         <div class="card-footer">
-          <span>${campaign.donors} donors</span>
-          <span>${campaign.daysLeft} days left</span>
+          <span>👥 ${campaign.donors} donors</span>
+          <span>⏳ ${campaign.durationText}</span>
         </div>
       </div>
     `;
@@ -451,10 +626,12 @@ function renderFavoriteCampaigns() {
 
     const heartBtn = card.querySelector(".heart-btn");
 
-    heartBtn.addEventListener("click", function (event) {
-      event.stopPropagation();
-      removeFavorite(campaign.id);
-    });
+    if (heartBtn) {
+      heartBtn.addEventListener("click", function (event) {
+        event.stopPropagation();
+        removeFavourite(campaign.id);
+      });
+    }
 
     favoriteGrid.appendChild(card);
   });
@@ -494,6 +671,28 @@ document.querySelectorAll(".chip-item").forEach(function (item) {
 });
 
 /* =========================
+   SEARCH FAVOURITES
+========================= */
+if (searchBtn && campaignSearch) {
+  searchBtn.addEventListener("click", function () {
+    searchFavFRAFromDatabase();
+  });
+
+  campaignSearch.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      searchFavFRAFromDatabase();
+    }
+  });
+
+  campaignSearch.addEventListener("input", function () {
+    if (campaignSearch.value.trim() === "") {
+      loadFavFRAFromDatabase();
+    }
+  });
+}
+
+/* =========================
    CLOSE DROPDOWNS
 ========================= */
 document.addEventListener("click", function () {
@@ -509,4 +708,4 @@ document.addEventListener("click", function () {
 /* =========================
    START PAGE
 ========================= */
-loadActivitiesFromDatabase();
+loadFavFRAFromDatabase();

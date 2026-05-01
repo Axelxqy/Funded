@@ -1,9 +1,7 @@
 const Donation = require("../entity/donation.js");
 
 class CreateDonationController {
-
   static async createDonation(data) {
-
     const { user_id, activity_id, amount } = data;
 
     if (!user_id || !activity_id || !amount) {
@@ -17,7 +15,7 @@ class CreateDonationController {
     return await Donation.create({
       user_id,
       activity_id,
-      amount
+      amount,
     });
   }
 }

@@ -44,16 +44,31 @@ function getLoggedInUser() {
   }
 
   try {
-    return JSON.parse(saved);
+    const parsed = JSON.parse(saved);
+
+    if (parsed && parsed.user && parsed.user.user_id) {
+      return parsed.user;
+    }
+
+    return parsed;
   } catch (error) {
     localStorage.removeItem("loggedInUser");
     return null;
   }
 }
 
-function isLoggedIn() {
+function getLoggedInUserId() {
   const user = getLoggedInUser();
-  return user && user.user_id;
+
+  if (!user) {
+    return null;
+  }
+
+  return user.user_id || user.userId || user.id || null;
+}
+
+function isLoggedIn() {
+  return getLoggedInUserId() !== null;
 }
 
 function requireLogin(event) {
@@ -62,7 +77,6 @@ function requireLogin(event) {
   }
 
   event.preventDefault();
-
   alert("Please sign in first to continue.");
   window.location.href = "login.html";
 }
@@ -118,9 +132,7 @@ function renderHeaderAuth() {
 if (signOutBtn) {
   signOutBtn.addEventListener("click", function (event) {
     event.preventDefault();
-
     localStorage.removeItem("loggedInUser");
-
     window.location.href = "homepage.html";
   });
 }
@@ -133,6 +145,7 @@ renderHeaderAuth();
 const API_BASE_URL = "http://localhost:3000";
 
 let campaigns = [];
+let favoriteIds = [];
 let activeCampaignTab = "all";
 let activeCategory = "all";
 let searchKeyword = "";
@@ -148,7 +161,58 @@ const causesBtn = document.getElementById("causesBtn");
 const resultCountBtn = document.getElementById("resultCountBtn");
 
 /* =========================
-   LOAD ACTIVITIES FROM DATABASE
+   SAFE JSON
+========================= */
+async function readJsonResponse(response) {
+  const text = await response.text();
+
+  if (!text) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    return {
+      message: text,
+    };
+  }
+}
+
+/* =========================
+   LOAD FAV IDS FROM DATABASE
+========================= */
+async function loadFavoriteIdsFromDatabase() {
+  const userId = getLoggedInUserId();
+
+  if (!userId) {
+    favoriteIds = [];
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/fav/${userId}`);
+    const data = await readJsonResponse(response);
+
+    if (!response.ok) {
+      console.error("Load favourite ids failed:", data);
+      favoriteIds = [];
+      return;
+    }
+
+    const favourites = Array.isArray(data) ? data : data.favourites || [];
+
+    favoriteIds = favourites.map(function (fav) {
+      return Number(fav.activity_id);
+    });
+  } catch (error) {
+    console.error("Load favourite ids error:", error);
+    favoriteIds = [];
+  }
+}
+
+/* =========================
+   LOAD ALL FRA FROM DATABASE
 ========================= */
 async function loadActivitiesFromDatabase() {
   if (campaignGrid) {
@@ -156,54 +220,21 @@ async function loadActivitiesFromDatabase() {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/activities`);
+    await loadFavoriteIdsFromDatabase();
+
+    const response = await fetch(`${API_BASE_URL}/fra`);
+    const data = await readJsonResponse(response);
 
     if (!response.ok) {
-      throw new Error("Failed to load campaigns.");
+      throw new Error(data.message || "Failed to load campaigns.");
     }
 
-    const data = await response.json();
+    console.log("Browse campaigns from backend:", data);
 
-    campaigns = data.activities.map(function (activity) {
-      const goal = Number(activity.fundraise_goal) || 0;
-      const currentAmount = Number(activity.current_amount) || 0;
+    const activities = Array.isArray(data) ? data : data.activities || [];
 
-      const creatorName = `${activity.creator_f_name || ""} ${
-        activity.creator_l_name || ""
-      }`.trim();
-
-      let progress = 0;
-
-      if (goal > 0) {
-        progress = Math.round((currentAmount / goal) * 100);
-      }
-
-      if (progress > 100) {
-        progress = 100;
-      }
-
-      return {
-        id: activity.activity_id,
-        title: activity.activity_name || "Untitled Campaign",
-        category: formatCategoryName(activity.category_name),
-        categoryClass: getCategoryClass(activity.category_name),
-
-        org: creatorName || "Unknown Creator",
-        email: activity.creator_email || "No email available",
-
-        raised: "$" + currentAmount.toLocaleString(),
-        goal: "$" + goal.toLocaleString(),
-        donors: 0,
-        daysLeft: calculateDaysLeft(activity.end_date),
-        progress: progress,
-        image: getCategoryImage(activity.category_name),
-        shortDesc: activity.description || "",
-        about: activity.description || "",
-        status: activity.status || "Ongoing",
-        startDate: activity.start_date,
-        endDate: activity.end_date,
-        createdBy: activity.created_by,
-      };
+    campaigns = activities.map(function (activity) {
+      return mapActivityToCampaign(activity);
     });
 
     renderCards();
@@ -227,6 +258,125 @@ async function loadActivitiesFromDatabase() {
 }
 
 /* =========================
+   SEARCH FRA FROM DATABASE
+========================= */
+async function searchActivitiesFromDatabase() {
+  const activity_name = campaignSearch ? campaignSearch.value.trim() : "";
+
+  searchKeyword = activity_name;
+
+  if (activity_name === "") {
+    await loadActivitiesFromDatabase();
+    return;
+  }
+
+  if (campaignGrid) {
+    campaignGrid.innerHTML = `<div class="empty-message">Searching campaigns...</div>`;
+  }
+
+  try {
+    await loadFavoriteIdsFromDatabase();
+
+    const response = await fetch(
+      `${API_BASE_URL}/fra/search/${encodeURIComponent(activity_name)}`
+    );
+
+    const data = await readJsonResponse(response);
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to search campaigns.");
+    }
+
+    console.log("FRA search result:", data);
+
+    const activities = Array.isArray(data) ? data : data.activities || [];
+
+    campaigns = activities.map(function (activity) {
+      return mapActivityToCampaign(activity);
+    });
+
+    renderCards();
+  } catch (error) {
+    console.error("Search FRA error:", error);
+
+    if (campaignGrid) {
+      campaignGrid.innerHTML = `
+        <div class="empty-message">
+          Failed to search campaigns.
+        </div>
+      `;
+    }
+
+    updateResultCount(0);
+
+    if (exploreText) {
+      exploreText.textContent = "Explore 0 campaigns";
+    }
+  }
+}
+
+/* =========================
+   MAP ACTIVITY TO CARD
+========================= */
+function mapActivityToCampaign(activity) {
+  const goal = Number(activity.fundraise_goal) || 0;
+  const currentAmount = Number(activity.current_amount) || 0;
+
+  const creatorName = `${activity.creator_f_name || ""} ${
+    activity.creator_l_name || ""
+  }`.trim();
+
+  const daysLeft = calculateDaysLeft(activity.end_date);
+  const endedByAmount = goal > 0 && currentAmount >= goal;
+  const endedByDate = isCampaignDateEnded(activity.end_date);
+  const isEnded = endedByAmount || endedByDate;
+
+  let progress = 0;
+
+  if (goal > 0) {
+    progress = Math.round((currentAmount / goal) * 100);
+  }
+
+  if (progress > 100) {
+    progress = 100;
+  }
+
+  return {
+    id: Number(activity.activity_id),
+    title: activity.activity_name || "Untitled Campaign",
+    category: formatCategoryName(activity.category_name),
+    categoryClass: getCategoryClass(activity.category_name),
+
+    org: creatorName || "Unknown Creator",
+    email: activity.creator_email || "No email available",
+
+    raisedAmount: currentAmount,
+    goalAmount: goal,
+    raised: "$" + currentAmount.toLocaleString(),
+    goal: "$" + goal.toLocaleString(),
+    donors: Number(activity.donor_count) || 0,
+
+    daysLeft: daysLeft,
+    durationText: isEnded ? "Ended" : daysLeft + " days left",
+
+    progress: progress,
+    shortDesc: activity.description || "",
+    about: activity.description || "",
+
+    status: isEnded ? "Ended" : "Active",
+    statusClass: isEnded ? "ended" : "active",
+
+    endedByAmount: endedByAmount,
+    endedByDate: endedByDate,
+    isEnded: isEnded,
+
+    startDate: activity.start_date,
+    endDate: activity.end_date,
+    createdBy: activity.created_by,
+  };
+}
+
+/* =========================
    HELPER FUNCTIONS
 ========================= */
 function calculateDaysLeft(endDate) {
@@ -242,6 +392,18 @@ function calculateDaysLeft(endDate) {
   const daysLeft = Math.ceil(difference / (1000 * 60 * 60 * 24));
 
   return daysLeft > 0 ? daysLeft : 0;
+}
+
+function isCampaignDateEnded(endDate) {
+  if (!endDate) return false;
+
+  const today = new Date();
+  const end = new Date(endDate);
+
+  today.setHours(0, 0, 0, 0);
+  end.setHours(0, 0, 0, 0);
+
+  return end <= today;
 }
 
 function formatCategoryName(categoryName) {
@@ -261,11 +423,19 @@ function formatCategoryName(categoryName) {
     return "Animals";
   }
 
+  if (name.includes("emergency")) {
+    return "Disaster";
+  }
+
   if (name.includes("disaster") || name.includes("relief")) {
     return "Disaster";
   }
 
   if (name.includes("community")) {
+    return "Community";
+  }
+
+  if (name.includes("environment")) {
     return "Community";
   }
 
@@ -284,30 +454,30 @@ function getCategoryClass(categoryName) {
   return "others";
 }
 
-function getCategoryImage(categoryName) {
-  const category = formatCategoryName(categoryName);
+function getStatusText(status) {
+  if (!status) return "Active";
 
-  if (category === "Health") {
-    return "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=900&q=80";
+  if (status.toLowerCase() === "ended") {
+    return "Ended";
   }
 
-  if (category === "Education") {
-    return "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=900&q=80";
+  if (status.toLowerCase() === "completed") {
+    return "Ended";
   }
 
-  if (category === "Animals") {
-    return "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=900&q=80";
+  return "Active";
+}
+
+function getStatusClass(status) {
+  if (!status) return "active";
+
+  const value = status.toLowerCase();
+
+  if (value === "ended" || value === "completed") {
+    return "ended";
   }
 
-  if (category === "Disaster") {
-    return "https://images.unsplash.com/photo-1593113598332-cd59a93c6132?auto=format&fit=crop&w=900&q=80";
-  }
-
-  if (category === "Community") {
-    return "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=900&q=80";
-  }
-
-  return "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=900&q=80";
+  return "active";
 }
 
 /* =========================
@@ -359,41 +529,82 @@ function updateCategoryUrl() {
 /* =========================
    FAVOURITES
 ========================= */
-function getFavoriteIds() {
-  const saved = localStorage.getItem("fav_id");
+function isFavorite(id) {
+  return favoriteIds.includes(Number(id));
+}
 
-  if (!saved) {
-    return [];
+async function toggleFavorite(id) {
+  const userId = getLoggedInUserId();
+
+  if (!userId) {
+    alert("Please sign in first to save favourite campaign.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  const activityId = Number(id);
+
+  if (!activityId) {
+    alert("Invalid campaign selected.");
+    return;
+  }
+
+  if (isFavorite(activityId)) {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/fav/user/${userId}/activity/${activityId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const data = await readJsonResponse(response);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to remove favourite campaign.");
+      }
+
+      favoriteIds = favoriteIds.filter(function (favoriteId) {
+        return Number(favoriteId) !== activityId;
+      });
+
+      renderCards();
+    } catch (error) {
+      console.error("Remove favourite error:", error);
+      alert("Failed to remove favourite campaign.");
+    }
+
+    return;
   }
 
   try {
-    return JSON.parse(saved);
-  } catch (error) {
-    return [];
-  }
-}
+    const saveRequest = {
+      user_id: userId,
+      activity_id: activityId,
+    };
 
-function saveFavoriteIds(ids) {
-  localStorage.setItem("fav_id", JSON.stringify(ids));
-}
+    console.log("Saving favourite request:", saveRequest);
 
-function isFavorite(id) {
-  return getFavoriteIds().includes(id);
-}
-
-function toggleFavorite(id) {
-  let favoriteIds = getFavoriteIds();
-
-  if (favoriteIds.includes(id)) {
-    favoriteIds = favoriteIds.filter(function (favoriteId) {
-      return favoriteId !== id;
+    const response = await fetch(`${API_BASE_URL}/fav`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(saveRequest),
     });
-  } else {
-    favoriteIds.push(id);
-  }
 
-  saveFavoriteIds(favoriteIds);
-  renderCards();
+    const data = await readJsonResponse(response);
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to save favourite campaign.");
+    }
+
+    favoriteIds.push(activityId);
+    renderCards();
+  } catch (error) {
+    console.error("Save favourite error:", error);
+    alert("Failed to save favourite campaign.");
+  }
 }
 
 /* =========================
@@ -414,20 +625,6 @@ function getVisibleCampaigns() {
     });
   }
 
-  if (searchKeyword.trim() !== "") {
-    const keyword = searchKeyword.toLowerCase();
-
-    visibleCampaigns = visibleCampaigns.filter(function (campaign) {
-      return (
-        campaign.title.toLowerCase().includes(keyword) ||
-        campaign.category.toLowerCase().includes(keyword) ||
-        campaign.shortDesc.toLowerCase().includes(keyword) ||
-        campaign.org.toLowerCase().includes(keyword) ||
-        campaign.email.toLowerCase().includes(keyword)
-      );
-    });
-  }
-
   return visibleCampaigns;
 }
 
@@ -436,7 +633,7 @@ function getVisibleCampaigns() {
 ========================= */
 function updateResultCount(count) {
   if (resultCountBtn) {
-    resultCountBtn.textContent = count + " ▼";
+    resultCountBtn.textContent = count;
   }
 }
 
@@ -471,22 +668,57 @@ function renderCards() {
 
   visibleCampaigns.forEach(function (campaign) {
     const card = document.createElement("article");
-    card.className = "campaign-card";
+    card.className =
+      "campaign-card no-image-campaign-card category-" + campaign.categoryClass;
 
     card.innerHTML = `
-      <div class="card-image" style="background-image:url('${campaign.image}')">
-        <button class="heart-btn ${isFavorite(campaign.id) ? "active" : ""}" data-id="${campaign.id}" type="button">
-          ${isFavorite(campaign.id) ? "❤" : "♡"}
-        </button>
-      </div>
+      <div class="card-accent"></div>
 
-      <div class="card-body">
+      <div class="card-body no-image-card-body">
+        <div class="card-top-row">
+          <span class="category-pill ${campaign.categoryClass}">
+            ${campaign.category}
+          </span>
+
+          <button class="heart-btn ${isFavorite(campaign.id) ? "active" : ""}" data-id="${campaign.id}" type="button">
+            ${isFavorite(campaign.id) ? "❤" : "♡"}
+          </button>
+        </div>
+
         <div class="card-title">${campaign.title}</div>
-        <div class="card-line">👤 ${campaign.org}</div>
-        <div class="card-line">✉️ ${campaign.email}</div>
 
-        <div class="card-amount">
-          <strong>${campaign.raised}</strong> raised of ${campaign.goal}
+        <p class="card-desc">
+          ${campaign.shortDesc || "No campaign description provided."}
+        </p>
+
+        <div class="creator-box">
+          <div class="creator-avatar">
+            ${(campaign.org || "U").charAt(0).toUpperCase()}
+          </div>
+
+          <div class="creator-info">
+            <div class="creator-name">${campaign.org}</div>
+            <div class="creator-email">${campaign.email}</div>
+          </div>
+        </div>
+
+        <div class="amount-row">
+          <div>
+            <div class="amount-label">Raised</div>
+            <div class="amount-value">${campaign.raised}</div>
+          </div>
+
+          <div class="goal-box">
+            <div class="amount-label">Goal</div>
+            <div class="goal-value">${campaign.goal}</div>
+          </div>
+        </div>
+
+        <div class="progress-info-row">
+          <span>${campaign.progress}% funded</span>
+          <span class="status-pill ${campaign.statusClass}">
+            ${campaign.status}
+          </span>
         </div>
 
         <div class="progress-track">
@@ -494,8 +726,8 @@ function renderCards() {
         </div>
 
         <div class="card-footer">
-          <span>${campaign.donors} donors</span>
-          <span>${campaign.daysLeft} days left</span>
+          <span>👥 ${campaign.donors} donors</span>
+          <span>⏳ ${campaign.durationText}</span>
         </div>
       </div>
     `;
@@ -552,8 +784,14 @@ document.querySelectorAll(".chip-item").forEach(function (item) {
     event.stopPropagation();
 
     activeCategory = item.dataset.category || "all";
-    causesBtn.textContent = item.textContent + " ▼";
-    causesDropdown.classList.remove("open");
+
+    if (causesBtn) {
+      causesBtn.textContent = item.textContent + " ▼";
+    }
+
+    if (causesDropdown) {
+      causesDropdown.classList.remove("open");
+    }
 
     updateCategoryUrl();
     renderCards();
@@ -565,13 +803,11 @@ document.querySelectorAll(".chip-item").forEach(function (item) {
 ========================= */
 if (searchBtn && campaignSearch) {
   searchBtn.addEventListener("click", function () {
-    searchKeyword = campaignSearch.value;
-    renderCards();
+    searchActivitiesFromDatabase();
   });
 
   campaignSearch.addEventListener("input", function () {
-    searchKeyword = campaignSearch.value;
-    renderCards();
+    searchActivitiesFromDatabase();
   });
 }
 

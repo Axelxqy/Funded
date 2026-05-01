@@ -42,15 +42,8 @@
       </a>
     </div>
 
-    <div class="header-center">
-      <div class="header-search">
-        <span class="search-icon">🔍</span>
-        <input type="text" placeholder="Search campaigns" />
-      </div>
-    </div>
-
     <nav class="header-right">
-      <a href="homePage.html" class="nav-link">Home</a>
+      <a href="homepage.html" class="nav-link">Home</a>
 
       <div class="nav-dropdown">
         <button type="button" class="nav-link nav-button">
@@ -164,11 +157,6 @@
                 <i class="fa-solid fa-leaf"></i>
                 <span>Environment</span>
               </div>
-
-              <div class="select-option others-option" data-value="Others">
-                <i class="fa-solid fa-pen"></i>
-                <span>Others:</span>
-              </div>
             </div>
 
             <input type="hidden" id="categoryValue" name="category" />
@@ -198,6 +186,8 @@
               type="number"
               id="fundraisingGoal"
               placeholder="e.g. 1000.00"
+              min="1"
+              step="0.01"
             />
           </div>
         </div>
@@ -231,39 +221,6 @@
         </div>
       </div>
 
-      <!-- Upload Image -->
-      <div class="form-group upload-section">
-        <label>Upload Campaign Image <span class="required-star" id="imageStar">*</span></label>
-        <p>Upload an image that represents your campaign.</p>
-
-        <div class="upload-box" id="uploadBox">
-          <div class="upload-placeholder" id="uploadPlaceholder">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-
-            <p id="uploadText">Drag and drop your image here</p>
-            <p>or</p>
-
-            <button type="button" id="chooseFileBtn">Choose File</button>
-          </div>
-
-          <img id="imagePreview" class="image-preview" alt="Campaign image preview" />
-
-          <div class="image-overlay">
-            <button type="button" id="uploadAgainBtn" class="upload-again-btn">
-              <i class="fa-solid fa-rotate-right"></i>
-              Upload Again
-            </button>
-          </div>
-
-          <input
-            type="file"
-            id="campaignImageInput"
-            accept="image/*"
-            hidden
-          />
-        </div>
-      </div>
-
       <!-- Description -->
       <div class="form-group full-width">
         <label>Description <span class="required-star" id="descriptionStar">*</span></label>
@@ -283,7 +240,7 @@
       <!-- Buttons -->
       <div class="form-buttons">
         <button type="submit" class="submit-btn">Submit Campaign</button>
-        <button type="button" class="cancel-btn">Cancel</button>
+        <button type="button" class="cancel-btn" id="cancelCampaignBtn">Cancel</button>
       </div>
 
     </form>
@@ -300,12 +257,12 @@
     <div class="footer-col">
       <h4>Fundraise</h4>
       <a href="startCampaign.html">Start a Campaign</a>
-      <a href="myCampaigns.html">My Campaigns</a>
+      <a href="myCampaign.html">My Campaigns</a>
     </div>
 
     <div class="footer-col">
       <h4>About</h4>
-      <a href="#">About Us</a>
+      <a href="aboutUs.html">About Us</a>
     </div>
   </footer>
 
@@ -313,6 +270,6 @@
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
   <!-- External JS -->
-  <script src="startCampaign.js"></script>
+  <script src="/startCampaign.js"></script>
 </body>
 </html>

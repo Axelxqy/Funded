@@ -1,17 +1,17 @@
 const Donation = require("../entity/donation.js");
 
-class ViewDonationHistoryController {
+class DoneeViewDonationHistoryController {
+  static async viewHistory(user_id) {
+    return await Donation.getByUser(user_id);
+  }
 
-  static async viewDonationHistory(user_id) {
+  static async viewActivityDonations(activity_id) {
+    return await Donation.getByActivity(activity_id);
+  }
 
-    if (!user_id) {
-      throw new Error("User ID required");
-    }
-
-    const donations = await Donation.getByUser(user_id);
-
-    return donations;
+  static async viewUserActivityDonations(user_id, activity_id) {
+    return await Donation.getByUserAndActivity(user_id, activity_id);
   }
 }
 
-module.exports = ViewDonationHistoryController;
+module.exports = DoneeViewDonationHistoryController;
