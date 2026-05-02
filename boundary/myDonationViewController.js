@@ -43,22 +43,46 @@ const signOutBtn = document.getElementById("signOutBtn");
 function getLoggedInUser() {
   const saved = localStorage.getItem("loggedInUser");
 
-  if (!saved) return null;
+  if (!saved) {
+    return null;
+  }
 
   try {
-    return JSON.parse(saved);
+    const parsed = JSON.parse(saved);
+
+    if (parsed && parsed.user && parsed.user.user_id) {
+      return parsed.user;
+    }
+
+    return parsed;
   } catch (error) {
     localStorage.removeItem("loggedInUser");
     return null;
   }
 }
 
+function getLoggedInUserId() {
+  const user = getLoggedInUser();
+
+  if (!user) {
+    return null;
+  }
+
+  return user.user_id || user.userId || user.id || null;
+}
+
 function renderHeaderProfile() {
   const user = getLoggedInUser();
 
   if (!user) {
-    if (headerAvatar) headerAvatar.textContent = "U";
-    if (headerName) headerName.textContent = "User";
+    if (headerAvatar) {
+      headerAvatar.textContent = "U";
+    }
+
+    if (headerName) {
+      headerName.textContent = "User";
+    }
+
     return;
   }
 
@@ -66,8 +90,13 @@ function renderHeaderProfile() {
   const email = user.email || "";
   const initial = (firstName || email || "U").charAt(0).toUpperCase();
 
-  if (headerAvatar) headerAvatar.textContent = initial;
-  if (headerName) headerName.textContent = firstName || "User";
+  if (headerAvatar) {
+    headerAvatar.textContent = initial;
+  }
+
+  if (headerName) {
+    headerName.textContent = firstName || "User";
+  }
 }
 
 if (signOutBtn) {
@@ -109,6 +138,25 @@ let currentCampaign = null;
 let campaignDonations = [];
 
 /* =========================
+   SAFE JSON
+========================= */
+async function readJsonResponse(response) {
+  const text = await response.text();
+
+  if (!text) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    return {
+      message: text,
+    };
+  }
+}
+
+/* =========================
    HELPERS
 ========================= */
 function getCampaignIdFromUrl() {
@@ -116,20 +164,67 @@ function getCampaignIdFromUrl() {
   return Number(params.get("id"));
 }
 
+function makeLocalDateFromSql(dateValue) {
+  if (!dateValue) {
+    return null;
+  }
+
+  const dateOnly = String(dateValue).split("T")[0];
+  const parts = dateOnly.split("-");
+
+  if (parts.length !== 3) {
+    const fallbackDate = new Date(dateValue);
+
+    if (Number.isNaN(fallbackDate.getTime())) {
+      return null;
+    }
+
+    return new Date(
+      fallbackDate.getFullYear(),
+      fallbackDate.getMonth(),
+      fallbackDate.getDate()
+    );
+  }
+
+  const year = Number(parts[0]);
+  const month = Number(parts[1]) - 1;
+  const day = Number(parts[2]);
+
+  const localDate = new Date(year, month, day);
+
+  if (Number.isNaN(localDate.getTime())) {
+    return null;
+  }
+
+  return localDate;
+}
+
 function formatDisplayDate(dateValue) {
-  if (!dateValue) return "-";
+  if (!dateValue) {
+    return "-";
+  }
 
-  const dateObj = new Date(dateValue);
+  const dateObj = makeLocalDateFromSql(dateValue);
 
-  if (Number.isNaN(dateObj.getTime())) {
+  if (!dateObj) {
     return "-";
   }
 
   const d = String(dateObj.getDate()).padStart(2, "0");
 
   const months = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
 
   const m = months[dateObj.getMonth()];
@@ -139,35 +234,93 @@ function formatDisplayDate(dateValue) {
 }
 
 function getCategoryClass(categoryName) {
-  if (!categoryName) return "others";
+  if (!categoryName) {
+    return "others";
+  }
 
   const category = categoryName.toLowerCase();
 
-  if (category.includes("health") || category.includes("medical")) return "health";
-  if (category.includes("education")) return "education";
-  if (category.includes("animal")) return "animals";
-  if (category.includes("disaster") || category.includes("relief")) return "disaster";
-  if (category.includes("community")) return "community";
+  if (category.includes("health") || category.includes("medical")) {
+    return "health";
+  }
+
+  if (category.includes("education")) {
+    return "education";
+  }
+
+  if (category.includes("animal")) {
+    return "animals";
+  }
+
+  if (category.includes("disaster") || category.includes("relief")) {
+    return "disaster";
+  }
+
+  if (category.includes("community")) {
+    return "community";
+  }
 
   return "others";
 }
 
-function getStatusClass(status) {
-  if (!status) return "status-active";
+function isCampaignDateEnded(endDate) {
+  if (!endDate) {
+    return false;
+  }
 
-  const value = status.toLowerCase();
+  const today = new Date();
+  const end = makeLocalDateFromSql(endDate);
 
-  if (value === "completed") {
+  if (!end) {
+    return false;
+  }
+
+  today.setHours(0, 0, 0, 0);
+  end.setHours(0, 0, 0, 0);
+
+  return end <= today;
+}
+
+function isCampaignStatusEnded(status) {
+  if (!status) {
+    return false;
+  }
+
+  const value = String(status).trim().toLowerCase();
+
+  return (
+    value === "completed" ||
+    value === "complete" ||
+    value === "ended" ||
+    value === "end"
+  );
+}
+
+function isCampaignEnded(campaign) {
+  if (!campaign) {
+    return false;
+  }
+
+  const currentAmount = Number(campaign.current_amount) || 0;
+  const goalAmount = Number(campaign.fundraise_goal) || 0;
+
+  const endedByAmount = goalAmount > 0 && currentAmount >= goalAmount;
+  const endedByDate = isCampaignDateEnded(campaign.end_date);
+  const endedByStatus = isCampaignStatusEnded(campaign.status);
+
+  return endedByAmount || endedByDate || endedByStatus;
+}
+
+function getStatusClass(campaign) {
+  if (isCampaignEnded(campaign)) {
     return "status-completed";
   }
 
   return "status-active";
 }
 
-function getStatusText(status) {
-  if (!status) return "Active";
-
-  if (status.toLowerCase() === "completed") {
+function getStatusText(campaign) {
+  if (isCampaignEnded(campaign)) {
     return "Completed";
   }
 
@@ -176,11 +329,12 @@ function getStatusText(status) {
 
 /* =========================
    LOAD FROM DATABASE
+   GET /donations/user/:user_id/activity/:activity_id
 ========================= */
 async function loadDonationViewFromDatabase() {
-  const user = getLoggedInUser();
+  const userId = getLoggedInUserId();
 
-  if (!user || !user.user_id) {
+  if (!userId) {
     alert("Please sign in first to view your donation.");
     window.location.href = "login.html";
     return;
@@ -204,10 +358,10 @@ async function loadDonationViewFromDatabase() {
 
   try {
     const response = await fetch(
-      `${API_BASE_URL}/donations/user/${user.user_id}/activity/${currentCampaignId}`
+      `${API_BASE_URL}/donations/user/${userId}/activity/${currentCampaignId}`
     );
 
-    const data = await response.json();
+    const data = await readJsonResponse(response);
 
     if (!response.ok) {
       throw new Error(data.message || "Failed to load donation view.");
@@ -239,8 +393,8 @@ function renderDonationView() {
 
   const categoryName = currentCampaign.category_name || "Others";
   const categoryClass = getCategoryClass(categoryName);
-  const statusText = getStatusText(currentCampaign.status);
-  const statusClass = getStatusClass(currentCampaign.status);
+  const statusText = getStatusText(currentCampaign);
+  const statusClass = getStatusClass(currentCampaign);
 
   if (campaignTitle) {
     campaignTitle.textContent =
@@ -266,7 +420,9 @@ function renderDonationView() {
   }
 
   if (campaignStartedOn) {
-    campaignStartedOn.textContent = formatDisplayDate(currentCampaign.start_date);
+    campaignStartedOn.textContent = formatDisplayDate(
+      currentCampaign.start_date
+    );
   }
 
   if (sideCategory) {

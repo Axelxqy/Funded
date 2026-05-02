@@ -44,16 +44,31 @@ function getLoggedInUser() {
   }
 
   try {
-    return JSON.parse(saved);
+    const parsed = JSON.parse(saved);
+
+    if (parsed && parsed.user && parsed.user.user_id) {
+      return parsed.user;
+    }
+
+    return parsed;
   } catch (error) {
     localStorage.removeItem("loggedInUser");
     return null;
   }
 }
 
-function isLoggedIn() {
+function getLoggedInUserId() {
   const user = getLoggedInUser();
-  return user && user.user_id;
+
+  if (!user) {
+    return null;
+  }
+
+  return user.user_id || user.userId || user.id || null;
+}
+
+function isLoggedIn() {
+  return getLoggedInUserId() !== null;
 }
 
 function requireLogin(event) {
@@ -158,6 +173,25 @@ const detailTabs = document.querySelectorAll(".detail-tab");
 const detailPanels = document.querySelectorAll(".detail-panel");
 
 /* =========================
+   SAFE JSON
+========================= */
+async function readJsonResponse(response) {
+  const text = await response.text();
+
+  if (!text) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    return {
+      message: text,
+    };
+  }
+}
+
+/* =========================
    HELPERS
 ========================= */
 function getCampaignIdFromUrl() {
@@ -193,13 +227,38 @@ function calculateProgress(currentAmount, goalAmount) {
   return progress > 100 ? 100 : progress;
 }
 
+function makeLocalDateFromSql(dateValue) {
+  if (!dateValue) return null;
+
+  const dateOnly = String(dateValue).split("T")[0];
+  const parts = dateOnly.split("-");
+
+  if (parts.length !== 3) return null;
+
+  const year = Number(parts[0]);
+  const month = Number(parts[1]) - 1;
+  const day = Number(parts[2]);
+
+  const localDate = new Date(year, month, day);
+
+  if (Number.isNaN(localDate.getTime())) {
+    return null;
+  }
+
+  return localDate;
+}
+
 function calculateDaysLeft(endDate) {
   if (!endDate) {
     return 0;
   }
 
   const today = new Date();
-  const end = new Date(endDate);
+  const end = makeLocalDateFromSql(endDate);
+
+  if (!end) {
+    return 0;
+  }
 
   today.setHours(0, 0, 0, 0);
   end.setHours(0, 0, 0, 0);
@@ -216,7 +275,11 @@ function isCampaignDateEnded(endDate) {
   }
 
   const today = new Date();
-  const end = new Date(endDate);
+  const end = makeLocalDateFromSql(endDate);
+
+  if (!end) {
+    return false;
+  }
 
   today.setHours(0, 0, 0, 0);
   end.setHours(0, 0, 0, 0);
@@ -357,6 +420,7 @@ function activateDetailTab(panelId) {
 
 /* =========================
    LOAD CAMPAIGN DETAIL
+   GET /fra/:id
 ========================= */
 async function loadCampaignDetail() {
   currentCampaignId = getCampaignIdFromUrl();
@@ -369,7 +433,7 @@ async function loadCampaignDetail() {
 
   try {
     const response = await fetch(`${API_BASE_URL}/fra/${currentCampaignId}`);
-    const data = await response.json();
+    const data = await readJsonResponse(response);
 
     if (!response.ok) {
       alert(data.message || "Failed to load campaign detail.");
@@ -391,18 +455,22 @@ async function loadCampaignDetail() {
   }
 }
 
+/* =========================
+   LOAD ACTIVITY DONATIONS
+   GET /donations/activity/:activity_id
+========================= */
 async function loadActivityDonations() {
   try {
     const response = await fetch(
       `${API_BASE_URL}/donations/activity/${currentCampaignId}`
     );
 
+    const data = await readJsonResponse(response);
+
     if (!response.ok) {
       activityDonations = [];
       return;
     }
-
-    const data = await response.json();
 
     activityDonations = Array.isArray(data) ? data : data.donations || [];
   } catch (error) {
@@ -411,6 +479,9 @@ async function loadActivityDonations() {
   }
 }
 
+/* =========================
+   RENDER CAMPAIGN DETAIL
+========================= */
 function renderCampaignDetail() {
   if (!currentCampaign) return;
 
@@ -471,18 +542,10 @@ function renderCampaignDetail() {
     donationInput.max = Math.max(remainingAmount, 0);
   }
 
-  /*
-    Keep your original donation section design.
-    Do not disable input.
-    Do not change placeholder.
-    Do not change button style.
-    Only block donation when user clicks Donate Now.
-  */
-
   if (donateNowBtn) {
-    if (remainingAmount <= 0) {
+    if (remainingAmount <= 0 || isCampaignDonationClosed()) {
       donateNowBtn.disabled = true;
-      donateNowBtn.textContent = "Campaign Goal Reached";
+      donateNowBtn.textContent = "Campaign Closed";
     } else {
       donateNowBtn.disabled = false;
       donateNowBtn.textContent = "Donate Now";
@@ -490,6 +553,9 @@ function renderCampaignDetail() {
   }
 }
 
+/* =========================
+   RENDER DONORS
+========================= */
 function renderDonors() {
   if (!donorsPanel) return;
 
@@ -573,24 +639,19 @@ if (donationInput) {
   donationInput.addEventListener("input", function () {
     const value = Number(donationInput.value) || 0;
 
-    if (isCampaignDonationClosed()) {
-      if (donationSummary) {
-        donationSummary.textContent = "SGD " + value.toFixed(2);
-      }
-      return;
-    }
-
     if (currentCampaign) {
       const currentAmount = Number(currentCampaign.current_amount) || 0;
       const goalAmount = Number(currentCampaign.fundraise_goal) || 0;
       const remainingAmount = goalAmount - currentAmount;
 
       if (value > remainingAmount) {
-        donationSummary.textContent =
-          "SGD " +
-          value.toFixed(2) +
-          " exceeds remaining SGD " +
-          remainingAmount.toFixed(2);
+        if (donationSummary) {
+          donationSummary.textContent =
+            "SGD " +
+            value.toFixed(2) +
+            " exceeds remaining SGD " +
+            remainingAmount.toFixed(2);
+        }
 
         return;
       }
@@ -602,6 +663,10 @@ if (donationInput) {
   });
 }
 
+/* =========================
+   CREATE DONATION
+   POST /donations
+========================= */
 if (donateNowBtn) {
   donateNowBtn.addEventListener("click", async function () {
     if (!isLoggedIn()) {
@@ -648,14 +713,16 @@ if (donateNowBtn) {
         }),
       });
 
-      const data = await response.json();
+      const data = await readJsonResponse(response);
 
       if (!response.ok) {
         alert(data.message || "Donation failed.");
         return;
       }
 
-      donationInput.value = "";
+      if (donationInput) {
+        donationInput.value = "";
+      }
 
       if (donationSummary) {
         donationSummary.textContent = "SGD 0";

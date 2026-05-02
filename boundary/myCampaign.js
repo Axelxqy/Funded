@@ -141,6 +141,7 @@ const statusFilterBtn = document.getElementById("statusFilterBtn");
 const statusFilterOptions = document.querySelectorAll(".status-filter-option");
 
 const campaignsPerPage = 5;
+
 let currentPage = 1;
 let allCampaigns = [];
 let filteredCampaigns = [];
@@ -167,6 +168,7 @@ async function readJsonResponse(response) {
 
 /* =========================
    LOAD MY CAMPAIGNS
+   GET /fra/my/:userId
 ========================= */
 document.addEventListener("DOMContentLoaded", async function () {
   const loggedInUser = protectMyCampaignPage();
@@ -200,8 +202,6 @@ async function loadMyCampaignsFromDatabase() {
       alert(data.message || "Failed to load campaigns.");
       return;
     }
-
-    console.log("My campaigns from backend:", data);
 
     allCampaigns = Array.isArray(data) ? data : data.activities || [];
 
@@ -266,7 +266,7 @@ function updateStatusFilterButton(status) {
 }
 
 /* =========================
-   COMPLETE THROUGH CONTROLLER
+   LOAD COMPLETED THROUGH CONTROLLER
    GET /fra/completed
 ========================= */
 async function loadCompleteCampaignsFromController() {
@@ -329,7 +329,11 @@ function applyCurrentFilter() {
 
 /* =========================
    SEARCH THROUGH CONTROLLER
+   ALL:
    GET /fra/search/:name
+
+   COMPLETE:
+   GET /fra/completed/search/:name
 ========================= */
 async function searchMyCampaignsFromController() {
   const userId = getLoggedInUserId();
@@ -344,26 +348,31 @@ async function searchMyCampaignsFromController() {
   currentPage = 1;
 
   if (keyword === "") {
-    selectedStatusFilter = "all";
-    updateStatusFilterButton("all");
+    if (selectedStatusFilter === "complete") {
+      await loadCompleteCampaignsFromController();
+      return;
+    }
+
     await loadMyCampaignsFromDatabase();
     return;
   }
 
   try {
-    selectedStatusFilter = "all";
-    updateStatusFilterButton("all");
-
     if (myCampaignList) {
       myCampaignList.innerHTML = `
         <p class="empty-message">Searching campaigns...</p>
       `;
     }
 
-    const response = await fetch(
-      `${API_BASE_URL}/fra/search/${encodeURIComponent(keyword)}`
-    );
+    let searchUrl = `${API_BASE_URL}/fra/search/${encodeURIComponent(keyword)}`;
 
+    if (selectedStatusFilter === "complete") {
+      searchUrl = `${API_BASE_URL}/fra/completed/search/${encodeURIComponent(
+        keyword
+      )}`;
+    }
+
+    const response = await fetch(searchUrl);
     const data = await readJsonResponse(response);
 
     if (!response.ok) {
@@ -373,9 +382,17 @@ async function searchMyCampaignsFromController() {
 
     const results = Array.isArray(data) ? data : data.activities || [];
 
-    filteredCampaigns = results.filter(function (activity) {
+    let userResults = results.filter(function (activity) {
       return String(activity.created_by) === String(userId);
     });
+
+    if (selectedStatusFilter === "ongoing") {
+      userResults = userResults.filter(function (activity) {
+        return !isCampaignEnded(activity);
+      });
+    }
+
+    filteredCampaigns = userResults;
 
     displayCampaignsByPage(currentPage);
     renderPagination();
@@ -404,7 +421,11 @@ if (searchInput) {
 
   searchInput.addEventListener("input", function () {
     if (searchInput.value.trim() === "") {
-      loadMyCampaignsFromDatabase();
+      if (selectedStatusFilter === "complete") {
+        loadCompleteCampaignsFromController();
+      } else {
+        loadMyCampaignsFromDatabase();
+      }
     }
   });
 }
@@ -799,7 +820,7 @@ async function deleteCampaign(activityId) {
     displayCampaignsByPage(currentPage);
     renderPagination();
 
-    alert(data.message || "Campaign deleted successfully.");
+    alert("Campaign deleted successfully.");
   } catch (error) {
     console.error("Delete campaign error:", error);
     alert("Cannot connect to backend while deleting campaign.");

@@ -294,7 +294,9 @@ class FRActivity {
   }
 
   // View completed activities
-  static async getCompleted() {
+  static async getCompleted(activity_name = "") {
+    const keyword = `%${activity_name}%`;
+
     const result = await pool.query(
       `
       SELECT
@@ -332,12 +334,22 @@ class FRActivity {
         ON fa.activity_id = donor_data.activity_id
 
       WHERE
-        LOWER(fa.status) IN ('completed', 'complete', 'ended', 'end')
-        OR fa.current_amount >= fa.fundraise_goal
-        OR fa.end_date <= CURRENT_DATE
+        (
+          LOWER(fa.status) IN ('completed', 'complete', 'ended', 'end')
+          OR fa.current_amount >= fa.fundraise_goal
+          OR fa.end_date <= CURRENT_DATE
+        )
+        AND
+        (
+          $1 = '%%'
+          OR fa.activity_name ILIKE $1
+          OR fa.description ILIKE $1
+          OR ac.name ILIKE $1
+        )
 
       ORDER BY fa.activity_id DESC;
-      `
+      `,
+      [keyword]
     );
 
     return result.rows;

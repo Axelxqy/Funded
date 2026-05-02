@@ -1,11 +1,11 @@
 const UserProfile = require("../entity/user_profile.js");
 
 class CreateUserProfileController {
-  static async createRole(data) {
-    if (!data.role_name) {
-      throw new Error("Role name is required");
-    }
+  static async createProfile(data) {
+    return await UserProfile.create(data);
+  }
 
+  static async createRole(data) {
     return await UserProfile.create(data);
   }
 }

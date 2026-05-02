@@ -29,7 +29,7 @@ router.post("/", async (req, res) => {
 // Must be before /:user_id
 router.get("/:user_id/search/:name", async (req, res) => {
   try {
-    const favourites = await SearchFav.searchFav(
+    const favourites = await SearchFav.searchFavFRA(
       req.params.user_id,
       req.params.name
     );

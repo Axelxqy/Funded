@@ -44,7 +44,24 @@ document.addEventListener("click", function () {
    LOGIN CHECK + HEADER USER
 ========================= */
 function getLoggedInUser() {
-  return JSON.parse(localStorage.getItem("loggedInUser"));
+  const saved = localStorage.getItem("loggedInUser");
+
+  if (!saved) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(saved);
+
+    if (parsed && parsed.user && parsed.user.user_id) {
+      return parsed.user;
+    }
+
+    return parsed;
+  } catch (error) {
+    localStorage.removeItem("loggedInUser");
+    return null;
+  }
 }
 
 function protectFundraiserPage() {
@@ -337,9 +354,23 @@ function makeLocalDateFromSql(dateValue) {
 
   const localDate = new Date(year, month, day);
 
-  if (isNaN(localDate.getTime())) return null;
+  if (Number.isNaN(localDate.getTime())) {
+    return null;
+  }
 
   return localDate;
+}
+
+function makeLocalDateFromDisplay(dateText) {
+  if (!dateText) return null;
+
+  const date = new Date(dateText);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
 function convertDateToSql(dateText, picker) {
@@ -354,16 +385,6 @@ function convertDateToSql(dateText, picker) {
   if (!date) return null;
 
   return formatDateLocal(date);
-}
-
-function makeLocalDateFromDisplay(dateText) {
-  if (!dateText) return null;
-
-  const date = new Date(dateText);
-
-  if (isNaN(date.getTime())) return null;
-
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
 function formatDateForFlatpickr(dateValue) {
@@ -443,6 +464,10 @@ function applyKnownOrOtherCategory(categoryName) {
   checkCategoryStar();
 }
 
+/* =========================
+   LOAD EDIT DATA
+   GET /fra/:id
+========================= */
 async function loadEditCampaignData() {
   if (!editActivityId) return;
 
@@ -525,6 +550,8 @@ if (cancelCampaignBtn) {
 
 /* =========================
    SUBMIT CREATE / EDIT
+   POST /fra
+   PUT /fra/:id
 ========================= */
 if (campaignForm) {
   campaignForm.addEventListener("submit", async function (event) {
@@ -558,6 +585,11 @@ if (campaignForm) {
       return;
     }
 
+    if (Number(fundraise_goal) <= 0) {
+      alert("Fundraising goal must be greater than 0.");
+      return;
+    }
+
     const requestUrl = isEditMode
       ? `${API_BASE_URL}/fra/${editActivityId}`
       : `${API_BASE_URL}/fra`;
@@ -571,23 +603,19 @@ if (campaignForm) {
       });
 
       const requestBody = {
-        activity_name,
-        category_id,
+        activity_name: activity_name,
+        category_id: category_id,
         category_name: categoryName,
-        fundraise_goal,
-        start_date,
-        end_date,
-        description,
+        fundraise_goal: fundraise_goal,
+        start_date: start_date,
+        end_date: end_date,
+        description: description,
+        status: "Ongoing",
       };
 
       if (!isEditMode) {
         requestBody.created_by = loggedInUser.user_id;
         requestBody.current_amount = 0;
-        requestBody.status = "Ongoing";
-      }
-
-      if (isEditMode) {
-        requestBody.status = "Ongoing";
       }
 
       const response = await fetch(requestUrl, {

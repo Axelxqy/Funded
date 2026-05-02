@@ -7,6 +7,7 @@ const UpdateFRA = require("../controller/FR_UpdateFRActivityController.js");
 const DeleteFRA = require("../controller/FR_DeleteFRActivityController.js");
 const SearchFRA = require("../controller/FR_SearchFRActivityController.js");
 const ViewCompletedFRA = require("../controller/FR_ViewCompletedFRActivityController.js");
+const SearchCompletedFRA = require("../controller/FR_SearchCompletedFRActivityController.js");
 
 // CREATE
 router.post("/", async (req, res) => {
@@ -113,6 +114,20 @@ router.put("/:id", async (req, res) => {
 
     res.status(400).json({
       message: error.message || "Failed to update campaign.",
+    });
+  }
+});
+
+// SEARCH COMPLETED
+// Must be before /:id
+router.get("/completed/search/:name", async (req, res) => {
+  try {
+    res.json(
+      await SearchCompletedFRA.searchCompletedActivities(req.params.name)
+    );
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || "Failed to search completed campaigns.",
     });
   }
 });

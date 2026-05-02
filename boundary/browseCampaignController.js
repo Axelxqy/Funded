@@ -379,11 +379,34 @@ function mapActivityToCampaign(activity) {
 /* =========================
    HELPER FUNCTIONS
 ========================= */
+function makeLocalDateFromSql(dateValue) {
+  if (!dateValue) return null;
+
+  const dateOnly = String(dateValue).split("T")[0];
+  const parts = dateOnly.split("-");
+
+  if (parts.length !== 3) return null;
+
+  const year = Number(parts[0]);
+  const month = Number(parts[1]) - 1;
+  const day = Number(parts[2]);
+
+  const localDate = new Date(year, month, day);
+
+  if (Number.isNaN(localDate.getTime())) {
+    return null;
+  }
+
+  return localDate;
+}
+
 function calculateDaysLeft(endDate) {
   if (!endDate) return 0;
 
   const today = new Date();
-  const end = new Date(endDate);
+  const end = makeLocalDateFromSql(endDate);
+
+  if (!end) return 0;
 
   today.setHours(0, 0, 0, 0);
   end.setHours(0, 0, 0, 0);
@@ -398,7 +421,9 @@ function isCampaignDateEnded(endDate) {
   if (!endDate) return false;
 
   const today = new Date();
-  const end = new Date(endDate);
+  const end = makeLocalDateFromSql(endDate);
+
+  if (!end) return false;
 
   today.setHours(0, 0, 0, 0);
   end.setHours(0, 0, 0, 0);
@@ -457,11 +482,9 @@ function getCategoryClass(categoryName) {
 function getStatusText(status) {
   if (!status) return "Active";
 
-  if (status.toLowerCase() === "ended") {
-    return "Ended";
-  }
+  const value = String(status).toLowerCase();
 
-  if (status.toLowerCase() === "completed") {
+  if (value === "ended" || value === "completed" || value === "complete") {
     return "Ended";
   }
 
@@ -471,9 +494,9 @@ function getStatusText(status) {
 function getStatusClass(status) {
   if (!status) return "active";
 
-  const value = status.toLowerCase();
+  const value = String(status).toLowerCase();
 
-  if (value === "ended" || value === "completed") {
+  if (value === "ended" || value === "completed" || value === "complete") {
     return "ended";
   }
 
@@ -668,6 +691,7 @@ function renderCards() {
 
   visibleCampaigns.forEach(function (campaign) {
     const card = document.createElement("article");
+
     card.className =
       "campaign-card no-image-campaign-card category-" + campaign.categoryClass;
 
@@ -740,10 +764,12 @@ function renderCards() {
 
     const heartBtn = card.querySelector(".heart-btn");
 
-    heartBtn.addEventListener("click", function (event) {
-      event.stopPropagation();
-      toggleFavorite(campaign.id);
-    });
+    if (heartBtn) {
+      heartBtn.addEventListener("click", function (event) {
+        event.stopPropagation();
+        toggleFavorite(campaign.id);
+      });
+    }
 
     campaignGrid.appendChild(card);
   });

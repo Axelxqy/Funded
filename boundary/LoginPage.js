@@ -65,6 +65,8 @@ if (passwordInput) {
 
 if (togglePassword) {
   togglePassword.addEventListener("click", function () {
+    if (!passwordInput) return;
+
     if (passwordInput.type === "password") {
       passwordInput.type = "text";
       togglePassword.textContent = "🙈";

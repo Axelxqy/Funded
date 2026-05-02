@@ -44,16 +44,31 @@ function getLoggedInUser() {
   }
 
   try {
-    return JSON.parse(saved);
+    const parsed = JSON.parse(saved);
+
+    if (parsed && parsed.user && parsed.user.user_id) {
+      return parsed.user;
+    }
+
+    return parsed;
   } catch (error) {
     localStorage.removeItem("loggedInUser");
     return null;
   }
 }
 
-function isLoggedIn() {
+function getLoggedInUserId() {
   const user = getLoggedInUser();
-  return user && user.user_id;
+
+  if (!user) {
+    return null;
+  }
+
+  return user.user_id || user.userId || user.id || null;
+}
+
+function isLoggedIn() {
+  return getLoggedInUserId() !== null;
 }
 
 function requireLogin(event) {
@@ -74,23 +89,44 @@ function renderHeaderAuth() {
   const user = getLoggedInUser();
 
   if (!user) {
-    if (signinHeaderBtn) signinHeaderBtn.classList.remove("hidden");
-    if (profileDropdown) profileDropdown.classList.add("hidden");
+    if (signinHeaderBtn) {
+      signinHeaderBtn.classList.remove("hidden");
+    }
 
-    if (headerAvatar) headerAvatar.textContent = "U";
-    if (headerName) headerName.textContent = "User";
+    if (profileDropdown) {
+      profileDropdown.classList.add("hidden");
+    }
+
+    if (headerAvatar) {
+      headerAvatar.textContent = "U";
+    }
+
+    if (headerName) {
+      headerName.textContent = "User";
+    }
+
     return;
   }
 
-  if (signinHeaderBtn) signinHeaderBtn.classList.add("hidden");
-  if (profileDropdown) profileDropdown.classList.remove("hidden");
+  if (signinHeaderBtn) {
+    signinHeaderBtn.classList.add("hidden");
+  }
+
+  if (profileDropdown) {
+    profileDropdown.classList.remove("hidden");
+  }
 
   const firstName = user.f_name || "";
   const email = user.email || "";
   const initial = (firstName || email || "U").charAt(0).toUpperCase();
 
-  if (headerAvatar) headerAvatar.textContent = initial;
-  if (headerName) headerName.textContent = firstName || "User";
+  if (headerAvatar) {
+    headerAvatar.textContent = initial;
+  }
+
+  if (headerName) {
+    headerName.textContent = firstName || "User";
+  }
 }
 
 if (signOutBtn) {
@@ -134,32 +170,91 @@ const RECORDS_PER_PAGE = 5;
 
 let currentPage = 1;
 
-// This stores data from backend view/search controller
 let backendDonationRecords = [];
-
-// This stores data after local date filter
 let donationRecords = [];
 
 let activeStartDate = "";
 let activeEndDate = "";
 
 /* =========================
+   SAFE JSON
+========================= */
+async function readJsonResponse(response) {
+  const text = await response.text();
+
+  if (!text) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    return {
+      message: text,
+    };
+  }
+}
+
+/* =========================
    HELPERS
 ========================= */
+function makeLocalDateFromSql(dateValue) {
+  if (!dateValue) return null;
+
+  const dateOnly = String(dateValue).split("T")[0];
+  const parts = dateOnly.split("-");
+
+  if (parts.length !== 3) {
+    const normalDate = new Date(dateValue);
+
+    if (Number.isNaN(normalDate.getTime())) {
+      return null;
+    }
+
+    return new Date(
+      normalDate.getFullYear(),
+      normalDate.getMonth(),
+      normalDate.getDate()
+    );
+  }
+
+  const year = Number(parts[0]);
+  const month = Number(parts[1]) - 1;
+  const day = Number(parts[2]);
+
+  const localDate = new Date(year, month, day);
+
+  if (Number.isNaN(localDate.getTime())) {
+    return null;
+  }
+
+  return localDate;
+}
+
 function formatDisplayDate(dateValue) {
   if (!dateValue) return "-";
 
-  const dateObj = new Date(dateValue);
+  const dateObj = makeLocalDateFromSql(dateValue);
 
-  if (Number.isNaN(dateObj.getTime())) {
+  if (!dateObj) {
     return "-";
   }
 
   const d = String(dateObj.getDate()).padStart(2, "0");
 
   const months = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
 
   const m = months[dateObj.getMonth()];
@@ -169,9 +264,9 @@ function formatDisplayDate(dateValue) {
 }
 
 function getDateOnlyTime(dateValue) {
-  const dateObj = new Date(dateValue);
+  const dateObj = makeLocalDateFromSql(dateValue);
 
-  if (Number.isNaN(dateObj.getTime())) {
+  if (!dateObj) {
     return 0;
   }
 
@@ -252,9 +347,9 @@ function applyDateRangeFilter(records) {
    GET /donations/:user_id
 ========================= */
 async function loadDonationHistoryFromDatabase() {
-  const user = getLoggedInUser();
+  const userId = getLoggedInUserId();
 
-  if (!user || !user.user_id) {
+  if (!userId) {
     return;
   }
 
@@ -267,8 +362,8 @@ async function loadDonationHistoryFromDatabase() {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/donations/${user.user_id}`);
-    const data = await response.json();
+    const response = await fetch(`${API_BASE_URL}/donations/${userId}`);
+    const data = await readJsonResponse(response);
 
     if (!response.ok) {
       throw new Error(data.message || "Failed to load donations.");
@@ -302,9 +397,9 @@ async function loadDonationHistoryFromDatabase() {
    GET /donations/:user_id/search/:keyword
 ========================= */
 async function searchDonationHistoryFromDatabase() {
-  const user = getLoggedInUser();
+  const userId = getLoggedInUserId();
 
-  if (!user || !user.user_id) {
+  if (!userId) {
     return;
   }
 
@@ -325,10 +420,10 @@ async function searchDonationHistoryFromDatabase() {
 
   try {
     const response = await fetch(
-      `${API_BASE_URL}/donations/${user.user_id}/search/${encodeURIComponent(keyword)}`
+      `${API_BASE_URL}/donations/${userId}/search/${encodeURIComponent(keyword)}`
     );
 
-    const data = await response.json();
+    const data = await readJsonResponse(response);
 
     if (!response.ok) {
       throw new Error(data.message || "Failed to search donations.");
@@ -376,8 +471,14 @@ function renderStats(records) {
   }
 
   if (records.length === 0) {
-    if (firstDonation) firstDonation.textContent = "-";
-    if (latestDonation) latestDonation.textContent = "-";
+    if (firstDonation) {
+      firstDonation.textContent = "-";
+    }
+
+    if (latestDonation) {
+      latestDonation.textContent = "-";
+    }
+
     return;
   }
 
@@ -547,10 +648,16 @@ function renderDonations() {
 /* =========================
    EVENTS
 ========================= */
+let searchTimer = null;
+
 if (donationSearch) {
   donationSearch.addEventListener("input", function () {
-    currentPage = 1;
-    searchDonationHistoryFromDatabase();
+    clearTimeout(searchTimer);
+
+    searchTimer = setTimeout(function () {
+      currentPage = 1;
+      searchDonationHistoryFromDatabase();
+    }, 250);
   });
 }
 
@@ -571,8 +678,13 @@ if (applyDateFilterBtn) {
 
 if (clearDateFilterBtn) {
   clearDateFilterBtn.addEventListener("click", function () {
-    if (startDateInput) startDateInput.value = "";
-    if (endDateInput) endDateInput.value = "";
+    if (startDateInput) {
+      startDateInput.value = "";
+    }
+
+    if (endDateInput) {
+      endDateInput.value = "";
+    }
 
     activeStartDate = "";
     activeEndDate = "";

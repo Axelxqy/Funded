@@ -179,6 +179,7 @@ async function readJsonResponse(response) {
 
 /* =========================
    LOAD FAVOURITE FRA FROM DATABASE
+   GET /fav/:user_id
 ========================= */
 async function loadFavFRAFromDatabase() {
   const userId = getLoggedInUserId();
@@ -417,11 +418,34 @@ function mapActivityToCampaign(activity) {
 /* =========================
    HELPERS
 ========================= */
+function makeLocalDateFromSql(dateValue) {
+  if (!dateValue) return null;
+
+  const dateOnly = String(dateValue).split("T")[0];
+  const parts = dateOnly.split("-");
+
+  if (parts.length !== 3) return null;
+
+  const year = Number(parts[0]);
+  const month = Number(parts[1]) - 1;
+  const day = Number(parts[2]);
+
+  const localDate = new Date(year, month, day);
+
+  if (Number.isNaN(localDate.getTime())) {
+    return null;
+  }
+
+  return localDate;
+}
+
 function calculateDaysLeft(endDate) {
   if (!endDate) return 0;
 
   const today = new Date();
-  const end = new Date(endDate);
+  const end = makeLocalDateFromSql(endDate);
+
+  if (!end) return 0;
 
   today.setHours(0, 0, 0, 0);
   end.setHours(0, 0, 0, 0);
@@ -436,7 +460,9 @@ function isCampaignDateEnded(endDate) {
   if (!endDate) return false;
 
   const today = new Date();
-  const end = new Date(endDate);
+  const end = makeLocalDateFromSql(endDate);
+
+  if (!end) return false;
 
   today.setHours(0, 0, 0, 0);
   end.setHours(0, 0, 0, 0);
