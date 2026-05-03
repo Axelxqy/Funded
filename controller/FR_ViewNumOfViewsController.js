@@ -1,21 +1,13 @@
 const ActivityAnalytics = require("../entity/activity_analytics.js");
 
-class FundraiserViewNumOfViewsController {
+class FR_ViewNumOfViewsController {
+  static async getViews(activity_id) {
+    return await ActivityAnalytics.viewNumOfViews(activity_id);
+  }
 
-  static async viewNumOfViews(activity_id) {
-
-    if (!activity_id) {
-      throw new Error("Activity ID required");
-    }
-
-    const analytics = await ActivityAnalytics.getByActivity(activity_id);
-
-    if (!analytics) {
-      throw new Error("Analytics not found");
-    }
-
-    return analytics.views_count;
+  static async incrementViews(activity_id) {
+    return await ActivityAnalytics.incrementViews(activity_id);
   }
 }
 
-module.exports = FundraiserViewNumOfViewsController;
+module.exports = FR_ViewNumOfViewsController;

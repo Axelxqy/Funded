@@ -165,12 +165,17 @@ class FRActivity {
         fa.description,
         fa.created_by,
 
-        COALESCE(donor_data.donor_count, 0) AS donor_count
+        COALESCE(donor_data.donor_count, 0) AS donor_count,
+        COALESCE(aa.views_count, 0) AS views_count,
+        COALESCE(aa.shortlisted_count, 0) AS shortlisted_count
 
       FROM public.fr_activity fa
 
       LEFT JOIN public.activity_category ac
         ON fa.category_id = ac.category_id
+
+      LEFT JOIN public.activity_analytics aa
+        ON fa.activity_id = aa.activity_id
 
       LEFT JOIN (
         SELECT activity_id, COUNT(*) AS donor_count
@@ -180,7 +185,6 @@ class FRActivity {
         ON fa.activity_id = donor_data.activity_id
 
       WHERE fa.created_by = $1
-
       ORDER BY fa.activity_id DESC;
       `,
       [user_id]

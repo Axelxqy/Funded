@@ -191,6 +191,26 @@ async function readJsonResponse(response) {
 }
 
 /* =========================
+   INCREMENT CAMPAIGN VIEW
+   PATCH /analytics/:activity_id/views
+========================= */
+async function incrementCampaignView(activityId) {
+  if (!activityId) return;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/analytics/${activityId}/views`, {
+      method: "PATCH",
+    });
+
+    const data = await readJsonResponse(response);
+
+    console.log("View count updated:", data);
+  } catch (error) {
+    console.error("Increment campaign view error:", error);
+  }
+}
+
+/* =========================
    HELPERS
 ========================= */
 function getCampaignIdFromUrl() {
@@ -429,6 +449,8 @@ async function loadCampaignDetail() {
     window.location.href = "browseCampaign.html";
     return;
   }
+
+  await incrementCampaignView(currentCampaignId);
 
   try {
     const response = await fetch(`${API_BASE_URL}/fra/${currentCampaignId}`);
@@ -727,7 +749,30 @@ if (donateNowBtn) {
         donationSummary.textContent = "SGD 0";
       }
 
-      await loadCampaignDetail();
+      /* ==================================================
+         IMPORTANT:
+         Do NOT call loadCampaignDetail() here.
+         It would increment the view count again.
+         Instead, update the current page data manually.
+      ================================================== */
+      currentCampaign.current_amount =
+        Number(currentCampaign.current_amount || 0) + amount;
+
+      currentCampaign.donor_count =
+        Number(currentCampaign.donor_count || 0) + 1;
+
+      if (
+        Number(currentCampaign.fundraise_goal || 0) > 0 &&
+        Number(currentCampaign.current_amount || 0) >=
+          Number(currentCampaign.fundraise_goal || 0)
+      ) {
+        currentCampaign.status = "Completed";
+      }
+
+      renderCampaignDetail();
+
+      await loadActivityDonations();
+      renderDonors();
 
       activateDetailTab("donorsPanel");
 

@@ -614,6 +614,8 @@ function displayCampaigns(activities) {
       const category = formatCategoryName(activity.category_name);
       const categoryClass = getCategoryClass(activity.category_name);
 
+      const viewsCount = Number(activity.views_count) || 0;
+
       const ended = isCampaignEnded(activity);
       const statusText = ended ? "Ended" : "Active";
       const statusClass = ended ? "ended" : "active";
@@ -653,9 +655,16 @@ function displayCampaigns(activities) {
 
           <div class="card-body no-image-card-body">
             <div class="card-top-row">
-              <span class="category-pill ${categoryClass}">
-                ${category}
-              </span>
+              <div class="category-view-wrap">
+                <span class="category-pill ${categoryClass}">
+                  ${category}
+                </span>
+
+                <span class="view-count-pill" title="Number of views">
+                  <i class="fa-regular fa-eye"></i>
+                  ${viewsCount}
+                </span>
+              </div>
 
               <span class="status-pill ${statusClass}">
                 ${statusText}

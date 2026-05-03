@@ -129,11 +129,17 @@ if (signupPasswordInput) {
     clearError(signupPasswordInput, signupPasswordError);
 
     if (value === "") {
-      signupPasswordRules.classList.add("hidden");
+      if (signupPasswordRules) {
+        signupPasswordRules.classList.add("hidden");
+      }
+
       return;
     }
 
-    signupPasswordRules.classList.remove("hidden");
+    if (signupPasswordRules) {
+      signupPasswordRules.classList.remove("hidden");
+    }
+
     checkPasswordRules(value, signupRules);
   });
 }
@@ -178,10 +184,17 @@ if (signupBtn) {
         signupPasswordError,
         "Please enter your password."
       );
-      signupPasswordRules.classList.add("hidden");
+
+      if (signupPasswordRules) {
+        signupPasswordRules.classList.add("hidden");
+      }
+
       hasError = true;
     } else if (!checkPasswordRules(passwordValue, signupRules)) {
-      signupPasswordRules.classList.remove("hidden");
+      if (signupPasswordRules) {
+        signupPasswordRules.classList.remove("hidden");
+      }
+
       showError(
         signupPasswordInput,
         signupPasswordError,
@@ -263,7 +276,7 @@ if (signupBtn) {
         return;
       }
 
-      alert(data.message || "Signup successful.");
+      alert("Signup successful. Your account has been created.");
       window.location.href = "login.html";
     } catch (error) {
       console.error("Signup request error:", error);

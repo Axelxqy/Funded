@@ -1068,3 +1068,31 @@ button {
 .hidden {
   display: none !important;
 }
+
+/* =========================
+   CATEGORY + VIEW COUNT
+========================= */
+.category-view-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.view-count-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #f5f8f3;
+  color: #4f5f54;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.view-count-pill i {
+  font-size: 10px;
+  color: #4f8c52;
+}

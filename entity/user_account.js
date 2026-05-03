@@ -1,9 +1,43 @@
 const pool = require("../helper/db.js");
 
 class UserAccount {
+  // Get default User role
+  static async getDefaultUserProfile() {
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM public.user_profile
+      WHERE LOWER(role_name) = LOWER($1)
+      LIMIT 1;
+      `,
+      ["User"]
+    );
+
+    if (result.rows[0]) {
+      return result.rows[0];
+    }
+
+    const createResult = await pool.query(
+      `
+      INSERT INTO public.user_profile
+      (
+        role_name,
+        role_desc,
+        suspended
+      )
+      VALUES
+      ($1, $2, false)
+      RETURNING *;
+      `,
+      ["User", "Normal platform user"]
+    );
+
+    return createResult.rows[0];
+  }
+
   // Create user
-  static async create({ email, password, f_name, l_name, dob, phone, profile_id }) {
-    if (!email || !password || !f_name || !l_name || !dob || !phone || !profile_id) {
+  static async create({ email, password, f_name, l_name, dob, phone }) {
+    if (!email || !password || !f_name || !l_name || !dob || !phone) {
       throw new Error("All fields are required.");
     }
 
@@ -11,6 +45,12 @@ class UserAccount {
 
     if (existingUser) {
       throw new Error("Email already exists.");
+    }
+
+    const userProfile = await UserAccount.getDefaultUserProfile();
+
+    if (!userProfile || !userProfile.profile_id) {
+      throw new Error("Default User role not found.");
     }
 
     const query = `
@@ -22,10 +62,19 @@ class UserAccount {
         l_name,
         dob,
         phone,
-        profile_id
+        profile_id,
+        suspended
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING *;
+      VALUES ($1, $2, $3, $4, $5, $6, $7, false)
+      RETURNING
+        user_id,
+        email,
+        f_name,
+        l_name,
+        dob,
+        phone,
+        suspended,
+        profile_id;
     `;
 
     const values = [
@@ -35,18 +84,12 @@ class UserAccount {
       l_name,
       dob,
       phone,
-      profile_id,
+      userProfile.profile_id,
     ];
 
     const result = await pool.query(query, values);
 
-    const user = result.rows[0];
-
-    if (user && user.password) {
-      delete user.password;
-    }
-
-    return user;
+    return result.rows[0];
   }
 
   // View all users
@@ -66,7 +109,7 @@ class UserAccount {
         up.role_desc
       FROM public.user_account ua
       LEFT JOIN public.user_profile up
-      ON ua.profile_id = up.profile_id
+        ON ua.profile_id = up.profile_id
       ORDER BY ua.f_name;
       `
     );
@@ -91,7 +134,7 @@ class UserAccount {
         up.role_desc
       FROM public.user_account ua
       LEFT JOIN public.user_profile up
-      ON ua.profile_id = up.profile_id
+        ON ua.profile_id = up.profile_id
       WHERE ua.user_id = $1;
       `,
       [user_id]
@@ -104,6 +147,20 @@ class UserAccount {
   static async getByEmail(email) {
     const result = await pool.query(
       `
+      SELECT *
+      FROM public.user_account
+      WHERE email = $1;
+      `,
+      [email]
+    );
+
+    return result.rows[0];
+  }
+
+  // Login
+  static async login({ email, password }) {
+    const result = await pool.query(
+      `
       SELECT
         ua.user_id,
         ua.email,
@@ -114,22 +171,16 @@ class UserAccount {
         ua.phone,
         ua.suspended,
         ua.profile_id,
-        up.role_name,
-        up.role_desc
+        up.role_name
       FROM public.user_account ua
       LEFT JOIN public.user_profile up
-      ON ua.profile_id = up.profile_id
+        ON ua.profile_id = up.profile_id
       WHERE ua.email = $1;
       `,
       [email]
     );
 
-    return result.rows[0];
-  }
-
-  // Login
-  static async login({ email, password }) {
-    const user = await UserAccount.getByEmail(email);
+    const user = result.rows[0];
 
     if (!user) {
       throw new Error("User not found.");
@@ -150,38 +201,37 @@ class UserAccount {
 
   // Update account
   static async update(user_id, data) {
-    const query = `
+    const result = await pool.query(
+      `
       UPDATE public.user_account
       SET
         f_name = $1,
         l_name = $2,
         dob = $3,
         phone = $4,
-        email = $5,
-        profile_id = $6
-      WHERE user_id = $7
-      RETURNING *;
-    `;
+        email = $5
+      WHERE user_id = $6
+      RETURNING
+        user_id,
+        email,
+        f_name,
+        l_name,
+        dob,
+        phone,
+        suspended,
+        profile_id;
+      `,
+      [
+        data.f_name,
+        data.l_name,
+        data.dob,
+        data.phone,
+        data.email,
+        user_id,
+      ]
+    );
 
-    const values = [
-      data.f_name,
-      data.l_name,
-      data.dob,
-      data.phone,
-      data.email,
-      data.profile_id,
-      user_id,
-    ];
-
-    const result = await pool.query(query, values);
-
-    const user = result.rows[0];
-
-    if (user && user.password) {
-      delete user.password;
-    }
-
-    return user;
+    return result.rows[0];
   }
 
   // Suspend user
@@ -191,18 +241,20 @@ class UserAccount {
       UPDATE public.user_account
       SET suspended = NOT suspended
       WHERE user_id = $1
-      RETURNING *;
+      RETURNING
+        user_id,
+        email,
+        f_name,
+        l_name,
+        dob,
+        phone,
+        suspended,
+        profile_id;
       `,
       [user_id]
     );
 
-    const user = result.rows[0];
-
-    if (user && user.password) {
-      delete user.password;
-    }
-
-    return user;
+    return result.rows[0];
   }
 }
 
