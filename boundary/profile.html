@@ -84,6 +84,8 @@
 
   <!-- MAIN -->
   <main class="profile-page">
+
+    <!-- LEFT PROFILE CARD -->
     <aside class="profile-sidebar">
       <div class="profile-avatar" id="profileAvatar">U</div>
 
@@ -91,11 +93,13 @@
       <p id="profileEmail">user@email.com</p>
     </aside>
 
+    <!-- RIGHT PROFILE FORM -->
     <section class="profile-content">
       <h1>Personal Information</h1>
 
       <form class="profile-form" id="profileForm">
         <input type="hidden" id="userIdInput" />
+        <input type="hidden" id="profileIdInput" />
 
         <div class="form-row">
           <div class="field-group">
@@ -118,6 +122,14 @@
           <div class="field-group">
             <label for="phoneInput">Phone Number</label>
             <input id="phoneInput" type="text" placeholder="e.g., +1234567890" disabled />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field-group full-width-field">
+            <label for="roleInput">Role</label>
+            <input id="roleInput" type="text" disabled />
+            <small class="role-note">Role cannot be modified on this page.</small>
           </div>
         </div>
 

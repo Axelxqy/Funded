@@ -38,6 +38,10 @@ document.addEventListener("click", function () {
   navDropdowns.forEach(function (dropdown) {
     dropdown.classList.remove("open");
   });
+
+  if (categorySelect) {
+    categorySelect.classList.remove("open");
+  }
 });
 
 /* =========================
@@ -155,7 +159,7 @@ function toggleStar(inputElement, starElement) {
 function checkCategoryStar() {
   if (!categoryValue || !categoryStar) return;
 
-  if (categoryValue.value.trim() !== "") {
+  if (categoryValue.value.trim() !== "" && categoryIdValue.value.trim() !== "") {
     categoryStar.classList.add("hide");
   } else {
     categoryStar.classList.remove("hide");
@@ -177,14 +181,18 @@ function checkDurationStar() {
 
 /* =========================
    CATEGORY DROPDOWN
+   LOADS FROM DATABASE
 ========================= */
 const categorySelect = document.getElementById("categorySelect");
 const categoryBtn = document.getElementById("categoryBtn");
 const categoryText = document.getElementById("categoryText");
 const categoryValue = document.getElementById("categoryValue");
+const categoryIdValue = document.getElementById("categoryIdValue");
+const categoryMenu = document.getElementById("categoryMenu");
 const otherCategoryInput = document.getElementById("otherCategoryInput");
 const otherCategoryArrow = document.getElementById("otherCategoryArrow");
-const categoryOptions = document.querySelectorAll(".select-option");
+
+let categoryList = [];
 
 if (categorySelect && categoryBtn) {
   categoryBtn.addEventListener("click", function (event) {
@@ -211,45 +219,180 @@ if (otherCategoryArrow && categorySelect) {
   });
 }
 
-categoryOptions.forEach(function (option) {
-  option.addEventListener("click", function (event) {
-    event.stopPropagation();
+async function loadCategoriesForSelect() {
+  if (!categoryMenu) return;
 
-    categoryOptions.forEach(function (item) {
-      item.classList.remove("selected");
-    });
+  try {
+    const response = await fetch(`${API_BASE_URL}/fra/categories`);
+    const data = await readJsonResponse(response);
 
-    option.classList.add("selected");
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to load categories.");
+    }
 
-    const selectedValue = option.getAttribute("data-value");
+    categoryList = Array.isArray(data) ? data : data.categories || [];
 
-    if (selectedValue === "Others") {
-      categorySelect.classList.add("typing-mode");
-      categorySelect.classList.remove("open");
+    renderCategoryOptions();
+  } catch (error) {
+    console.error("Load category options error:", error);
 
-      categoryText.textContent = "Others:";
-      categoryValue.value = otherCategoryInput.value.trim();
+    categoryList = [];
+    categoryMenu.innerHTML = `
+      <div class="select-empty">
+        Failed to load categories
+      </div>
+    `;
+  }
+}
 
-      otherCategoryInput.focus();
-      checkCategoryStar();
-    } else {
+function getCategoryIcon(categoryName) {
+  const name = String(categoryName || "").toLowerCase();
+
+  if (name.includes("medical") || name.includes("health")) {
+    return "fa-briefcase-medical";
+  }
+
+  if (name.includes("education") || name.includes("school")) {
+    return "fa-graduation-cap";
+  }
+
+  if (name.includes("emergency") || name.includes("disaster") || name.includes("relief")) {
+    return "fa-triangle-exclamation";
+  }
+
+  if (name.includes("animal") || name.includes("pet")) {
+    return "fa-paw";
+  }
+
+  if (name.includes("community") || name.includes("people")) {
+    return "fa-people-group";
+  }
+
+  if (name.includes("environment") || name.includes("green") || name.includes("earth")) {
+    return "fa-leaf";
+  }
+
+  return "fa-hand-holding-heart";
+}
+
+function renderCategoryOptions() {
+  if (!categoryMenu) return;
+
+  if (categoryList.length === 0) {
+    categoryMenu.innerHTML = `
+      <div class="select-empty">
+        No categories available
+      </div>
+    `;
+    return;
+  }
+
+  categoryMenu.innerHTML = categoryList.map(function (category) {
+    return `
+      <div class="select-option" data-id="${category.category_id}" data-value="${category.name}">
+        <i class="fa-solid ${getCategoryIcon(category.name)}"></i>
+        <span>${category.name}</span>
+      </div>
+    `;
+  }).join("");
+
+  attachCategoryOptionEvents();
+}
+
+function attachCategoryOptionEvents() {
+  if (!categoryMenu) return;
+
+  const categoryOptions = categoryMenu.querySelectorAll(".select-option");
+
+  categoryOptions.forEach(function (option) {
+    option.addEventListener("click", function (event) {
+      event.stopPropagation();
+
+      categoryOptions.forEach(function (item) {
+        item.classList.remove("selected");
+      });
+
+      option.classList.add("selected");
+
+      const selectedId = option.getAttribute("data-id");
+      const selectedValue = option.getAttribute("data-value");
+
       categorySelect.classList.remove("typing-mode");
       categorySelect.classList.remove("open");
 
       categoryText.textContent = selectedValue;
       categoryValue.value = selectedValue;
+      categoryIdValue.value = selectedId;
 
-      otherCategoryInput.value = "";
+      if (otherCategoryInput) {
+        otherCategoryInput.value = "";
+      }
+
       checkCategoryStar();
-    }
+    });
   });
-});
+}
 
 if (otherCategoryInput) {
   otherCategoryInput.addEventListener("input", function () {
     categoryValue.value = otherCategoryInput.value.trim();
+    categoryIdValue.value = "";
     checkCategoryStar();
   });
+}
+
+function findCategoryById(categoryId) {
+  return categoryList.find(function (category) {
+    return String(category.category_id) === String(categoryId);
+  });
+}
+
+function findCategoryByName(categoryName) {
+  return categoryList.find(function (category) {
+    return String(category.name).toLowerCase() === String(categoryName).toLowerCase();
+  });
+}
+
+function applyCategoryToSelect(categoryId, categoryName) {
+  if (!categorySelect || !categoryText || !categoryValue || !categoryIdValue) return;
+
+  const matchedById = categoryId ? findCategoryById(categoryId) : null;
+  const matchedByName = categoryName ? findCategoryByName(categoryName) : null;
+  const matched = matchedById || matchedByName;
+
+  if (!matched) {
+    categorySelect.classList.remove("typing-mode");
+    categoryText.textContent = "Select category";
+    categoryValue.value = "";
+    categoryIdValue.value = "";
+
+    if (otherCategoryInput) {
+      otherCategoryInput.value = "";
+    }
+
+    checkCategoryStar();
+    return;
+  }
+
+  categorySelect.classList.remove("typing-mode");
+  categoryText.textContent = matched.name;
+  categoryValue.value = matched.name;
+  categoryIdValue.value = matched.category_id;
+
+  if (otherCategoryInput) {
+    otherCategoryInput.value = "";
+  }
+
+  if (categoryMenu) {
+    categoryMenu.querySelectorAll(".select-option").forEach(function (option) {
+      option.classList.toggle(
+        "selected",
+        String(option.getAttribute("data-id")) === String(matched.category_id)
+      );
+    });
+  }
+
+  checkCategoryStar();
 }
 
 /* =========================
@@ -415,55 +558,6 @@ async function readJsonResponse(response) {
   }
 }
 
-function getCategoryId(categoryName) {
-  const categoryMap = {
-    Medical: 1,
-    Education: 2,
-    Emergency: 3,
-    "Animal Welfare": 4,
-    Community: 5,
-    Environment: 6,
-  };
-
-  return categoryMap[categoryName] || null;
-}
-
-function applyKnownOrOtherCategory(categoryName) {
-  if (!categoryName || !categorySelect || !categoryText || !categoryValue) return;
-
-  const knownCategoryId = getCategoryId(categoryName);
-
-  categoryOptions.forEach(function (option) {
-    const optionValue = option.getAttribute("data-value");
-
-    if (optionValue === categoryName) {
-      option.classList.add("selected");
-    } else {
-      option.classList.remove("selected");
-    }
-  });
-
-  if (knownCategoryId) {
-    categorySelect.classList.remove("typing-mode");
-    categoryText.textContent = categoryName;
-    categoryValue.value = categoryName;
-
-    if (otherCategoryInput) {
-      otherCategoryInput.value = "";
-    }
-  } else {
-    categorySelect.classList.add("typing-mode");
-    categoryText.textContent = "Others:";
-    categoryValue.value = categoryName;
-
-    if (otherCategoryInput) {
-      otherCategoryInput.value = categoryName;
-    }
-  }
-
-  checkCategoryStar();
-}
-
 /* =========================
    LOAD EDIT DATA
    GET /fra/:id
@@ -531,7 +625,7 @@ async function loadEditCampaignData() {
     }
 
     checkDurationStar();
-    applyKnownOrOtherCategory(activity.category_name);
+    applyCategoryToSelect(activity.category_id, activity.category_name);
   } catch (error) {
     console.error("Load edit campaign error:", error);
     alert("Cannot load campaign data.");
@@ -567,7 +661,7 @@ if (campaignForm) {
 
     const activity_name = campaignTitle.value.trim();
     const categoryName = categoryValue.value.trim();
-    const category_id = getCategoryId(categoryName);
+    const category_id = categoryIdValue.value.trim();
     const fundraise_goal = fundraisingGoal.value.trim();
     const start_date = convertDateToSql(startDateInput.value, startPicker);
     const end_date = convertDateToSql(endDateInput.value, endPicker);
@@ -576,6 +670,7 @@ if (campaignForm) {
     if (
       !activity_name ||
       !categoryName ||
+      !category_id ||
       !fundraise_goal ||
       !start_date ||
       !end_date ||
@@ -604,7 +699,7 @@ if (campaignForm) {
 
       const requestBody = {
         activity_name: activity_name,
-        category_id: category_id,
+        category_id: Number(category_id),
         category_name: categoryName,
         fundraise_goal: fundraise_goal,
         start_date: start_date,
@@ -651,8 +746,10 @@ if (campaignForm) {
 /* =========================
    PAGE INIT
 ========================= */
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
   protectFundraiserPage();
   updateHeaderUser();
-  loadEditCampaignData();
+
+  await loadCategoriesForSelect();
+  await loadEditCampaignData();
 });

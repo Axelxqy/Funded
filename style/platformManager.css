@@ -1,0 +1,57 @@
+/* ============================================================
+   PLATFORM MANAGER CSS
+   Place in: style/platformManager.css
+   Requires: style/Usermanagement.css (base styles)
+============================================================ */
+
+/* ===================== ADD CATEGORY BUTTON ===================== */
+.add-cat-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 38px; padding: 0 16px;
+  border: 1.5px solid #7c5c9f; border-radius: 8px;
+  color: #7c5c9f; font-size: 13px; font-weight: 600;
+  background: #fff; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+}
+.add-cat-btn:hover { background: #f5f0fb; }
+
+/* ===================== CATEGORY HEADER ===================== */
+.cat-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+
+/* ===================== CATEGORY ICON ===================== */
+.cat-icon-wrap { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.cat-icon-wrap svg { width: 18px; height: 18px; }
+
+/* ===================== CATEGORY BADGES ===================== */
+.cat-badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+.cat-health      { background: #d1fae5; color: #065f46; }
+.cat-education   { background: #dbeafe; color: #1e40af; }
+.cat-animals     { background: #fef3c7; color: #92400e; }
+.cat-environment { background: #d1fae5; color: #065f46; }
+.cat-disaster    { background: #fee2e2; color: #991b1b; }
+.cat-community   { background: #ede9fe; color: #5b21b6; }
+.cat-default     { background: #f3f4f6; color: #374151; }
+
+/* ===================== REPORT TABS ===================== */
+.report-tabs { display: flex; gap: 0; border-bottom: 2px solid #ebebeb; margin-bottom: 0; }
+.report-tab { padding: 10px 22px; font-size: 14px; font-weight: 500; color: #888; background: transparent; border: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+.report-tab:hover { color: #2f5b37; }
+.report-tab.active { color: #2f5b37; border-bottom-color: #2f5b37; font-weight: 700; }
+.report-section { display: block; }
+.report-section.hidden { display: none; }
+.report-table-title { font-size: 13px; font-weight: 700; color: #333; margin: 20px 0 10px; }
+
+/* ===================== STATS CARDS ===================== */
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: #f9f9f9; border-radius: 10px; border: 1px solid #ebebeb; padding: 16px; display: flex; align-items: center; gap: 14px; }
+.stat-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.stat-icon svg { width: 22px; height: 22px; }
+.stat-value { font-size: 22px; font-weight: 700; color: #1a1a1a; line-height: 1; }
+.stat-label { font-size: 12px; color: #888; margin-top: 4px; }
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 900px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .stats-row { grid-template-columns: 1fr; }
+}

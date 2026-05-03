@@ -1,0 +1,190 @@
+/* ============================================================
+   CATEGORY MANAGEMENT CSS
+   Place in: style/categoryManagement.css
+   Requires: style/userManagement.css
+============================================================ */
+
+/* ===================== ADD CATEGORY BUTTON ===================== */
+.add-cat-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 16px;
+  border: 1.5px solid #7c5c9f;
+  border-radius: 8px;
+  color: #7c5c9f;
+  font-size: 13px;
+  font-weight: 600;
+  background: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.add-cat-btn:hover {
+  background: #f5f0fb;
+}
+
+/* ===================== CATEGORY HEADER ===================== */
+.cat-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* ===================== CATEGORY ICON ===================== */
+.cat-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cat-icon-wrap svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ===================== CATEGORY BADGES ===================== */
+.cat-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.cat-health {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.cat-education {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.cat-animals {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.cat-environment {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.cat-disaster {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.cat-community {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.cat-default {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+/* ===================== CATEGORY TABLE ===================== */
+.table-wrap table th:nth-child(1),
+.table-wrap table td:nth-child(1) {
+  width: 45px;
+  text-align: left;
+  color: #888;
+  font-size: 13px;
+}
+
+.table-wrap table th:nth-child(2),
+.table-wrap table td:nth-child(2) {
+  width: 60px;
+}
+
+.table-wrap table th:nth-child(3),
+.table-wrap table td:nth-child(3) {
+  width: 180px;
+}
+
+.table-wrap table th:nth-child(4),
+.table-wrap table td:nth-child(4) {
+  color: #666;
+  font-size: 13px;
+}
+
+.table-wrap table th:nth-child(5),
+.table-wrap table td:nth-child(5) {
+  width: 120px;
+  white-space: nowrap;
+  color: #888;
+  font-size: 13px;
+}
+
+.table-wrap table th:nth-child(6),
+.table-wrap table td:nth-child(6) {
+  width: 100px;
+}
+
+/* ===================== MODAL DELETE BUTTON ===================== */
+.btn-delete {
+  height: 36px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 6px;
+  background: #dc2626;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.btn-delete:hover {
+  background: #b91c1c;
+}
+
+/* ===================== EMPTY TABLE MESSAGE ===================== */
+.empty-row {
+  text-align: center;
+  color: #888;
+  padding: 24px;
+  font-size: 13px;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 900px) {
+  .cat-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .add-cat-btn {
+    width: fit-content;
+  }
+}
+
+@media (max-width: 600px) {
+  .cat-header {
+    gap: 12px;
+  }
+
+  .add-cat-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cat-icon-wrap {
+    width: 32px;
+    height: 32px;
+  }
+
+  .cat-icon-wrap svg {
+    width: 16px;
+    height: 16px;
+  }
+}

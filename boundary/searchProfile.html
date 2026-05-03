@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Search Profile – Helping Hands</title>
+
+  <link rel="stylesheet" href="../style/searchProfile.css" />
+</head>
+<body>
+
+<!-- ===================== HEADER ===================== -->
+<header class="topbar">
+  <div class="header-left">
+    <a href="homepage.html" class="brand-logo">
+      <svg class="brand-icon" viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M32 18C28 10 15 10 15 23C15 33 32 43 32 43C32 43 49 33 49 23C49 10 36 10 32 18Z" />
+        <path d="M15 38C20 39 25 43 29 48" />
+        <path d="M49 38C44 39 39 43 35 48" />
+        <path d="M13 36C8 39 9 49 19 52C24 54 29 55 32 58" />
+        <path d="M51 36C56 39 55 49 45 52C40 54 35 55 32 58" />
+      </svg>
+
+      <div class="brand-text">
+        <div class="brand-title">Helping Hands</div>
+        <div class="brand-subtitle">Fundraising Platform</div>
+      </div>
+    </a>
+  </div>
+
+  <nav class="header-right">
+    <div class="nav-dropdown" id="profileDropdown">
+      <button class="nav-link nav-button profile-btn" id="profileMenuBtn" type="button">
+        <div class="avatar small-avatar" id="headerAvatar">U</div>
+        <span id="headerName">User</span>
+        <span class="small-arrow">▼</span>
+      </button>
+
+      <div class="nav-dropdown-menu profile-menu">
+        <a href="profile.html" class="nav-dropdown-item">Profile</a>
+        <a href="login.html" class="nav-dropdown-item" id="signOutBtn">Sign out</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<!-- ===================== BODY ===================== -->
+<div class="body-wrap">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="sidebar-label">Admin Management</div>
+
+    <a class="sidebar-link" href="userManagement.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        <path d="M21 21v-2a4 4 0 0 0-3-3.87"/>
+      </svg>
+      User Management
+    </a>
+
+    <a class="sidebar-link active" href="searchProfile.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      Search Profile
+    </a>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <div class="main-card">
+
+      <div class="top-title-row">
+        <div>
+          <div class="page-title">Search User Profile</div>
+          <div class="page-desc">
+            View and manage all user role profiles on the platform.
+          </div>
+        </div>
+
+        <button class="add-user-btn" onclick="openCreateProfile()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Create User Profile
+        </button>
+      </div>
+
+      <div class="controls-bar">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+
+          <input
+            class="search-input"
+            id="profileSearchInput"
+            type="search"
+            placeholder="Search by role..."
+            oninput="filterProfiles()"
+            autocomplete="off"
+          />
+        </div>
+
+        <button class="search-btn" onclick="filterProfiles()">Search</button>
+      </div>
+
+      <div id="profileCardList" class="act-card-list"></div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ===================== PROFILE DETAILS MODAL ===================== -->
+<div class="modal-overlay" id="profileDetailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Profile Details</div>
+      <button class="modal-close" onclick="closeModal('profileDetailModal')">×</button>
+    </div>
+
+    <div class="modal-body">
+      <p class="small-modal-text">Profile Information</p>
+      <div id="profileDetailBody"></div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-delete" onclick="openSuspendProfile()">Suspend / Activate</button>
+      <button class="btn-save" onclick="openProfileEdit()">Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SUSPEND PROFILE MODAL ===================== -->
+<div class="modal-overlay" id="profileSuspendModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="profileSuspendTitle">Suspend Profile</div>
+      <button class="modal-close" onclick="closeModal('profileSuspendModal')">×</button>
+    </div>
+
+    <div class="modal-body">
+      <p class="confirm-msg" id="profileSuspendMsg">Are you sure?</p>
+      <p class="confirm-sub">This will update the profile status.</p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('profileSuspendModal')">Cancel</button>
+      <button class="btn-delete" onclick="confirmProfileSuspend()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== EDIT PROFILE MODAL ===================== -->
+<div class="modal-overlay" id="profileEditModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Edit Profile</div>
+      <button class="modal-close" onclick="closeModal('profileEditModal')">×</button>
+    </div>
+
+    <div class="modal-body">
+      <input type="hidden" id="profileEditID"/>
+
+      <div class="field-group">
+        <label class="field-label">Role Name *</label>
+        <input class="field-input" id="profileEditName" type="text" placeholder="e.g. User"/>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Role Description *</label>
+        <textarea class="field-input textarea-input" id="profileEditDesc" rows="4" placeholder="Describe the role..."></textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('profileEditModal')">Cancel</button>
+      <button class="btn-save" onclick="saveProfileEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== CREATE PROFILE MODAL ===================== -->
+<div class="modal-overlay" id="createProfileModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Create User Profile</div>
+      <button class="modal-close" onclick="closeModal('createProfileModal')">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="field-group">
+        <label class="field-label">Role Name *</label>
+        <input class="field-input" id="createProfileName" type="text" placeholder="e.g. Moderator"/>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Role Description *</label>
+        <textarea class="field-input textarea-input" id="createProfileDesc" rows="4" placeholder="Describe the role..."></textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('createProfileModal')">Cancel</button>
+      <button class="btn-save" onclick="saveCreateProfile()">Create Profile</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="searchProfileController.js"></script>
+</body>
+</html>

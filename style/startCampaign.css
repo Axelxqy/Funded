@@ -352,7 +352,6 @@ textarea::placeholder {
   align-items: center;
   overflow: hidden;
   font-size: 16px;
-
 }
 
 .money-input span {
@@ -420,6 +419,8 @@ textarea::placeholder {
   top: 60px;
   left: 0;
   width: 100%;
+  max-height: 260px;
+  overflow-y: auto;
   background: #ffffff;
   border: 1px solid #dce8d8;
   border-radius: 14px;
@@ -477,6 +478,16 @@ textarea::placeholder {
   font-weight: 700;
 }
 
+.select-empty {
+  min-height: 45px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* keep old other-category styles safe */
 .others-option {
   border-top: 1px solid #edf2ea;
   margin-top: 6px;
@@ -745,120 +756,6 @@ span.flatpickr-weekday {
 }
 
 /* =========================
-   UPLOAD BOX
-========================= */
-.upload-section {
-  width: 560px;
-}
-
-.upload-box {
-  position: relative;
-  width: 100%;
-  height: 275px;
-  border: 1.5px dashed #b8c5b2;
-  border-radius: 16px;
-  background: #fbfdf9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.upload-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-}
-
-.upload-placeholder i {
-  font-size: 48px;
-  color: #557a46;
-  margin-bottom: 12px;
-}
-
-.upload-placeholder p {
-  font-size: 15px;
-  color: #1f2933;
-  margin-bottom: 6px;
-}
-
-.upload-placeholder button,
-.upload-again-btn {
-  margin-top: 10px;
-  background: #557a46;
-  color: #ffffff;
-  border: none;
-  border-radius: 10px;
-  padding: 13px 24px;
-  font-size: 10px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.upload-placeholder button:hover,
-.upload-again-btn:hover {
-  background: #45693a;
-  transform: translateY(-1px);
-}
-
-.image-preview {
-  display: none;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.image-overlay {
-  position: absolute;
-  inset: 0;
-  display: none;
-  align-items: flex-end;
-  justify-content: flex-end;
-  padding: 18px;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.38),
-    rgba(0, 0, 0, 0.05),
-    transparent
-  );
-}
-
-.upload-again-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 0;
-  background: rgba(255, 255, 255, 0.92);
-  color: #2f5f35;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
-}
-
-.upload-again-btn:hover {
-  background: #ffffff;
-  color: #234b27;
-}
-
-.upload-box.has-image {
-  border-style: solid;
-  border-color: #9fbe93;
-}
-
-.upload-box.has-image .upload-placeholder {
-  display: none;
-}
-
-.upload-box.has-image .image-preview {
-  display: block;
-}
-
-.upload-box.has-image .image-overlay {
-  display: flex;
-}
-
-/* =========================
    TEXTAREA
 ========================= */
 .textarea-wrapper {
@@ -897,7 +794,6 @@ textarea {
   border: none;
   padding: 14px 32px;
   border-radius: 24px;
-  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
   font-size: 14px;
@@ -909,7 +805,6 @@ textarea {
 
 .cancel-btn {
   border: none;
-  font-size: 14px;
   background: transparent;
   color: #4b5563;
   font-size: 12px;
@@ -993,8 +888,7 @@ textarea {
     gap: 14px;
   }
 
-  .date-box,
-  .upload-section {
+  .date-box {
     width: 100%;
   }
 
@@ -1006,16 +900,6 @@ textarea {
     flex-direction: column;
     gap: 24px;
     padding: 24px;
-  }
-}
-
-@media (max-width: 768px) {
-  .upload-section {
-    width: 100%;
-  }
-
-  .upload-box {
-    height: 240px;
   }
 }
 
@@ -1048,8 +932,6 @@ textarea {
 /* =========================
    HEADER FIX - MATCH HOMEPAGE
 ========================= */
-
-/* Search icon same as homepage */
 .search-icon {
   font-size: 18px;
   color: #4c626c;

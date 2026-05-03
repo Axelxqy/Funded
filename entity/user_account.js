@@ -2,8 +2,8 @@ const pool = require("../helper/db.js");
 
 class UserAccount {
   // Create user
-  static async create({ email, password, f_name, l_name, dob, phone }) {
-    if (!email || !password || !f_name || !l_name || !dob || !phone) {
+  static async create({ email, password, f_name, l_name, dob, phone, profile_id }) {
+    if (!email || !password || !f_name || !l_name || !dob || !phone || !profile_id) {
       throw new Error("All fields are required.");
     }
 
@@ -21,13 +21,22 @@ class UserAccount {
         f_name,
         l_name,
         dob,
-        phone
+        phone,
+        profile_id
       )
-      VALUES ($1, $2, $3, $4, $5, $6)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *;
     `;
 
-    const values = [email, password, f_name, l_name, dob, phone];
+    const values = [
+      email,
+      password,
+      f_name,
+      l_name,
+      dob,
+      phone,
+      profile_id,
+    ];
 
     const result = await pool.query(query, values);
 
@@ -44,9 +53,21 @@ class UserAccount {
   static async getAll() {
     const result = await pool.query(
       `
-      SELECT *
-      FROM public.user_account
-      ORDER BY f_name;
+      SELECT
+        ua.user_id,
+        ua.email,
+        ua.f_name,
+        ua.l_name,
+        ua.dob,
+        ua.phone,
+        ua.suspended,
+        ua.profile_id,
+        up.role_name,
+        up.role_desc
+      FROM public.user_account ua
+      LEFT JOIN public.user_profile up
+      ON ua.profile_id = up.profile_id
+      ORDER BY ua.f_name;
       `
     );
 
@@ -57,9 +78,21 @@ class UserAccount {
   static async getById(user_id) {
     const result = await pool.query(
       `
-      SELECT *
-      FROM public.user_account
-      WHERE user_id = $1;
+      SELECT
+        ua.user_id,
+        ua.email,
+        ua.f_name,
+        ua.l_name,
+        ua.dob,
+        ua.phone,
+        ua.suspended,
+        ua.profile_id,
+        up.role_name,
+        up.role_desc
+      FROM public.user_account ua
+      LEFT JOIN public.user_profile up
+      ON ua.profile_id = up.profile_id
+      WHERE ua.user_id = $1;
       `,
       [user_id]
     );
@@ -71,9 +104,22 @@ class UserAccount {
   static async getByEmail(email) {
     const result = await pool.query(
       `
-      SELECT *
-      FROM public.user_account
-      WHERE email = $1;
+      SELECT
+        ua.user_id,
+        ua.email,
+        ua.password,
+        ua.f_name,
+        ua.l_name,
+        ua.dob,
+        ua.phone,
+        ua.suspended,
+        ua.profile_id,
+        up.role_name,
+        up.role_desc
+      FROM public.user_account ua
+      LEFT JOIN public.user_profile up
+      ON ua.profile_id = up.profile_id
+      WHERE ua.email = $1;
       `,
       [email]
     );
@@ -93,6 +139,10 @@ class UserAccount {
       throw new Error("Wrong password.");
     }
 
+    if (user.suspended) {
+      throw new Error("Account is suspended.");
+    }
+
     delete user.password;
 
     return user;
@@ -107,8 +157,9 @@ class UserAccount {
         l_name = $2,
         dob = $3,
         phone = $4,
-        email = $5
-      WHERE user_id = $6
+        email = $5,
+        profile_id = $6
+      WHERE user_id = $7
       RETURNING *;
     `;
 
@@ -118,6 +169,7 @@ class UserAccount {
       data.dob,
       data.phone,
       data.email,
+      data.profile_id,
       user_id,
     ];
 
@@ -144,7 +196,13 @@ class UserAccount {
       [user_id]
     );
 
-    return result.rows[0];
+    const user = result.rows[0];
+
+    if (user && user.password) {
+      delete user.password;
+    }
+
+    return user;
   }
 }
 

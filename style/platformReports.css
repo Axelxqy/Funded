@@ -1,0 +1,153 @@
+/* ============================================================
+   PLATFORM REPORTS CSS
+   Place in: style/platformReports.css
+   Requires: style/userManagement.css
+============================================================ */
+
+/* ===================== REPORT TABS ===================== */
+.report-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid #ebebeb;
+  margin-top: 20px;
+  margin-bottom: 0;
+}
+
+.report-tab {
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #888;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
+
+.report-tab:hover {
+  color: #2f5b37;
+}
+
+.report-tab.active {
+  color: #2f5b37;
+  border-bottom-color: #2f5b37;
+  font-weight: 700;
+}
+
+.report-section {
+  display: block;
+}
+
+.report-section.hidden {
+  display: none;
+}
+
+.report-table-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  margin: 20px 0 10px;
+}
+
+/* ===================== STATS CARDS ===================== */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: #f9f9f9;
+  border-radius: 10px;
+  border: 1px solid #ebebeb;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.stat-info {
+  min-width: 0;
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1;
+  word-break: break-word;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+}
+
+/* ===================== REPORT TABLE ===================== */
+.report-section .table-wrap table {
+  min-width: 650px;
+}
+
+.report-section td {
+  line-height: 1.5;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 1100px) {
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .report-tabs {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .report-tab {
+    flex-shrink: 0;
+  }
+
+  .stats-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .stat-card {
+    padding: 14px;
+  }
+
+  .stat-value {
+    font-size: 20px;
+  }
+
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .stat-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+}

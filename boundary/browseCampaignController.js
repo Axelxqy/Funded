@@ -143,9 +143,12 @@ renderHeaderAuth();
    API / CAMPAIGN DATA
 ========================= */
 const API_BASE_URL = "http://localhost:3000";
+const CATEGORY_API = `${API_BASE_URL}/fra/categories`;
 
 let campaigns = [];
 let favoriteIds = [];
+let categoryList = [];
+
 let activeCampaignTab = "all";
 let activeCategory = "all";
 let searchKeyword = "";
@@ -158,6 +161,7 @@ const searchBtn = document.getElementById("searchBtn");
 
 const causesDropdown = document.getElementById("causesDropdown");
 const causesBtn = document.getElementById("causesBtn");
+const causesMenu = document.getElementById("causesMenu");
 const resultCountBtn = document.getElementById("resultCountBtn");
 
 /* =========================
@@ -177,6 +181,128 @@ async function readJsonResponse(response) {
       message: text,
     };
   }
+}
+
+/* =========================
+   LOAD CATEGORY FILTER
+   GET /fra/categories
+========================= */
+async function loadCategoriesForFilter() {
+  if (!causesMenu) return;
+
+  try {
+    const response = await fetch(CATEGORY_API);
+    const data = await readJsonResponse(response);
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to load categories.");
+    }
+
+    categoryList = Array.isArray(data) ? data : data.categories || [];
+
+    renderCategoryMenu();
+  } catch (error) {
+    console.error("Load categories error:", error);
+
+    categoryList = [];
+    renderCategoryMenu();
+  }
+}
+
+function renderCategoryMenu() {
+  if (!causesMenu) return;
+
+  let html = `
+    <button class="chip-item active" data-category="all" type="button">
+      All
+    </button>
+  `;
+
+  categoryList.forEach(function (category) {
+    html += `
+      <button
+        class="chip-item"
+        data-category="${category.category_id}"
+        type="button"
+      >
+        ${category.name}
+      </button>
+    `;
+  });
+
+  causesMenu.innerHTML = html;
+
+  attachCategoryEvents();
+}
+
+function attachCategoryEvents() {
+  if (!causesMenu) return;
+
+  causesMenu.querySelectorAll(".chip-item").forEach(function (item) {
+    item.addEventListener("click", function (event) {
+      event.stopPropagation();
+
+      activeCategory = item.dataset.category || "all";
+
+      causesMenu.querySelectorAll(".chip-item").forEach(function (chip) {
+        chip.classList.remove("active");
+      });
+
+      item.classList.add("active");
+
+      if (causesBtn) {
+        causesBtn.textContent = item.textContent.trim() + " ▼";
+      }
+
+      if (causesDropdown) {
+        causesDropdown.classList.remove("open");
+      }
+
+      updateCategoryUrl();
+      renderCards();
+    });
+  });
+}
+
+function getCategoryNameById(categoryId, fallbackName) {
+  const matched = categoryList.find(function (category) {
+    return String(category.category_id) === String(categoryId);
+  });
+
+  if (matched) {
+    return matched.name;
+  }
+
+  return fallbackName || "Others";
+}
+
+function getCategoryIdFromActivity(activity) {
+  if (activity.category_id) {
+    return String(activity.category_id);
+  }
+
+  if (activity.category_name) {
+    const matched = categoryList.find(function (category) {
+      return String(category.name).toLowerCase() === String(activity.category_name).toLowerCase();
+    });
+
+    if (matched) {
+      return String(matched.category_id);
+    }
+  }
+
+  return "";
+}
+
+function makeCategoryClass(categoryName) {
+  if (!categoryName) return "others";
+
+  return (
+    String(categoryName)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "others"
+  );
 }
 
 /* =========================
@@ -341,11 +467,16 @@ function mapActivityToCampaign(activity) {
     progress = 100;
   }
 
+  const categoryId = getCategoryIdFromActivity(activity);
+  const categoryName = getCategoryNameById(categoryId, activity.category_name);
+
   return {
     id: Number(activity.activity_id),
     title: activity.activity_name || "Untitled Campaign",
-    category: formatCategoryName(activity.category_name),
-    categoryClass: getCategoryClass(activity.category_name),
+
+    categoryId: categoryId,
+    category: categoryName,
+    categoryClass: makeCategoryClass(categoryName),
 
     org: creatorName || "Unknown Creator",
     email: activity.creator_email || "No email available",
@@ -431,54 +562,6 @@ function isCampaignDateEnded(endDate) {
   return end <= today;
 }
 
-function formatCategoryName(categoryName) {
-  if (!categoryName) return "Others";
-
-  const name = categoryName.toLowerCase();
-
-  if (name.includes("medical") || name.includes("health")) {
-    return "Health";
-  }
-
-  if (name.includes("education")) {
-    return "Education";
-  }
-
-  if (name.includes("animal")) {
-    return "Animals";
-  }
-
-  if (name.includes("emergency")) {
-    return "Disaster";
-  }
-
-  if (name.includes("disaster") || name.includes("relief")) {
-    return "Disaster";
-  }
-
-  if (name.includes("community")) {
-    return "Community";
-  }
-
-  if (name.includes("environment")) {
-    return "Community";
-  }
-
-  return categoryName;
-}
-
-function getCategoryClass(categoryName) {
-  const category = formatCategoryName(categoryName).toLowerCase();
-
-  if (category === "health") return "health";
-  if (category === "education") return "education";
-  if (category === "animals") return "animals";
-  if (category === "disaster") return "disaster";
-  if (category === "community") return "community";
-
-  return "others";
-}
-
 function getStatusText(status) {
   if (!status) return "Active";
 
@@ -510,30 +593,50 @@ function applyCategoryFromUrl() {
   const params = new URLSearchParams(window.location.search);
   const selectedCategory = params.get("category");
 
-  const validCategories = [
-    "all",
-    "Health",
-    "Education",
-    "Disaster",
-    "Animals",
-    "Community",
-  ];
-
-  if (!selectedCategory || !validCategories.includes(selectedCategory)) {
+  if (!selectedCategory || selectedCategory === "all") {
     activeCategory = "all";
 
     if (causesBtn) {
       causesBtn.textContent = "Causes ▼";
     }
 
+    setActiveCategoryChip("all");
     return;
   }
 
-  activeCategory = selectedCategory;
+  const matched = categoryList.find(function (category) {
+    return String(category.category_id) === String(selectedCategory);
+  });
+
+  if (!matched) {
+    activeCategory = "all";
+
+    if (causesBtn) {
+      causesBtn.textContent = "Causes ▼";
+    }
+
+    setActiveCategoryChip("all");
+    return;
+  }
+
+  activeCategory = String(matched.category_id);
 
   if (causesBtn) {
-    causesBtn.textContent = selectedCategory + " ▼";
+    causesBtn.textContent = matched.name + " ▼";
   }
+
+  setActiveCategoryChip(activeCategory);
+}
+
+function setActiveCategoryChip(categoryId) {
+  if (!causesMenu) return;
+
+  causesMenu.querySelectorAll(".chip-item").forEach(function (item) {
+    item.classList.toggle(
+      "active",
+      String(item.dataset.category || "all") === String(categoryId)
+    );
+  });
 }
 
 function updateCategoryUrl() {
@@ -644,7 +747,7 @@ function getVisibleCampaigns() {
 
   if (activeCategory !== "all") {
     visibleCampaigns = visibleCampaigns.filter(function (campaign) {
-      return campaign.category === activeCategory;
+      return String(campaign.categoryId) === String(activeCategory);
     });
   }
 
@@ -674,7 +777,10 @@ function renderCards() {
   updateResultCount(count);
 
   if (exploreText) {
-    const categoryText = activeCategory === "all" ? "" : " in " + activeCategory;
+    const categoryText =
+      activeCategory === "all"
+        ? ""
+        : " in " + getCategoryNameById(activeCategory, "Selected Category");
 
     exploreText.textContent =
       "Explore " +
@@ -805,25 +911,6 @@ if (causesBtn && causesDropdown) {
   });
 }
 
-document.querySelectorAll(".chip-item").forEach(function (item) {
-  item.addEventListener("click", function (event) {
-    event.stopPropagation();
-
-    activeCategory = item.dataset.category || "all";
-
-    if (causesBtn) {
-      causesBtn.textContent = item.textContent + " ▼";
-    }
-
-    if (causesDropdown) {
-      causesDropdown.classList.remove("open");
-    }
-
-    updateCategoryUrl();
-    renderCards();
-  });
-});
-
 /* =========================
    SEARCH
 ========================= */
@@ -853,5 +940,10 @@ document.addEventListener("click", function () {
 /* =========================
    START PAGE
 ========================= */
-applyCategoryFromUrl();
-loadActivitiesFromDatabase();
+async function startBrowsePage() {
+  await loadCategoriesForFilter();
+  applyCategoryFromUrl();
+  await loadActivitiesFromDatabase();
+}
+
+startBrowsePage();

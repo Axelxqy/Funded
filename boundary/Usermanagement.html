@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>User Management – Helping Hands</title>
+
+  <link rel="stylesheet" href="../style/userManagement.css" />
+</head>
+<body>
+
+<!-- ===================== HEADER ===================== -->
+<header class="topbar">
+  <div class="header-left">
+    <a href="homepage.html" class="brand-logo">
+      <svg class="brand-icon" viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M32 18C28 10 15 10 15 23C15 33 32 43 32 43C32 43 49 33 49 23C49 10 36 10 32 18Z" />
+        <path d="M15 38C20 39 25 43 29 48" />
+        <path d="M49 38C44 39 39 43 35 48" />
+        <path d="M13 36C8 39 9 49 19 52C24 54 29 55 32 58" />
+        <path d="M51 36C56 39 55 49 45 52C40 54 35 55 32 58" />
+      </svg>
+
+      <div class="brand-text">
+        <div class="brand-title">Helping Hands</div>
+        <div class="brand-subtitle">Fundraising Platform</div>
+      </div>
+    </a>
+  </div>
+
+  <nav class="header-right">
+    <div class="nav-dropdown" id="profileDropdown">
+      <button class="nav-link nav-button profile-btn" id="profileMenuBtn" type="button">
+        <div class="avatar small-avatar" id="headerAvatar">U</div>
+        <span id="headerName">User</span>
+        <span class="small-arrow">▼</span>
+      </button>
+
+      <div class="nav-dropdown-menu profile-menu">
+        <a href="profile.html" class="nav-dropdown-item">Profile</a>
+        <a href="login.html" class="nav-dropdown-item" id="signOutBtn">Sign out</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<!-- ===================== BODY ===================== -->
+<div class="body-wrap">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="sidebar-label">Admin Management</div>
+
+    <a class="sidebar-link active" href="userManagement.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        <path d="M21 21v-2a4 4 0 0 0-3-3.87"/>
+      </svg>
+      User Management
+    </a>
+
+    <a class="sidebar-link" href="searchProfile.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      Search Profile
+    </a>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <div class="main-card">
+
+      <div class="top-title-row">
+        <div>
+          <div class="page-title">User Management</div>
+          <div class="page-desc">
+            Manage all users in the fundraising platform. You can view, edit, suspend or activate user accounts.
+          </div>
+        </div>
+
+        <button class="add-user-btn" onclick="openAddUser()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add New User
+        </button>
+      </div>
+
+      <!-- ===================== FILTER / SEARCH ===================== -->
+      <div class="controls-bar">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+
+          <input
+            class="search-input"
+            id="searchInput"
+            type="search"
+            placeholder="Search users by name, email or role..."
+            oninput="filterUsers()"
+            autocomplete="off"
+          />
+        </div>
+
+        <!-- Role options will be loaded from database by JS -->
+        <select class="filter-select" id="roleFilter" onchange="filterUsers()">
+          <option value="">All Roles</option>
+        </select>
+
+        <select class="filter-select" id="statusFilter" onchange="filterUsers()">
+          <option value="">All Status</option>
+          <option value="Active">Active</option>
+          <option value="Suspended">Suspended</option>
+        </select>
+      </div>
+
+      <!-- ===================== USER TABLE ===================== -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Date of Birth</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody id="usersBody">
+            <!-- Users will be rendered by userManagementController.js -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination-row">
+        <span id="paginationInfo"></span>
+        <div class="pager" id="pager"></div>
+      </div>
+
+      <!-- ===================== LEGEND ===================== -->
+      <div class="legend-row">
+        <div class="legend-card">
+          <h4>User Roles</h4>
+
+          <div class="legend-item">
+            <span class="badge badge-donee">User</span>
+            <span>Normal user role loaded from user profile table.</span>
+          </div>
+
+          <div class="legend-item">
+            <span class="badge badge-admin">Manager</span>
+            <span>Manager role loaded from user profile table.</span>
+          </div>
+
+          <div class="legend-item">
+            <span class="badge badge-fundraiser">Admin</span>
+            <span>Admin role loaded from user profile table.</span>
+          </div>
+        </div>
+
+        <div class="legend-card">
+          <h4>Account Status</h4>
+
+          <div class="legend-item">
+            <span class="status-badge status-active">Active</span>
+            <span>Account is active and can access the platform.</span>
+          </div>
+
+          <div class="legend-item">
+            <span class="status-badge status-suspended">Suspended</span>
+            <span>Account is suspended and cannot access the platform.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ===================== VIEW USER MODAL ===================== -->
+<div class="modal-overlay" id="viewModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">User Details</div>
+      <button class="modal-close" onclick="closeModal('viewModal')">×</button>
+    </div>
+
+    <div class="modal-body" id="viewBody"></div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('viewModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== EDIT USER MODAL ===================== -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Edit User</div>
+      <button class="modal-close" onclick="closeModal('editModal')">×</button>
+    </div>
+
+    <div class="modal-body">
+      <input type="hidden" id="editUID"/>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">First Name</label>
+          <input class="field-input" id="editFName" type="text"/>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Last Name</label>
+          <input class="field-input" id="editLName" type="text"/>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <input class="field-input" id="editEmail" type="email"/>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Role</label>
+
+          <!-- Role options will be loaded from database by JS -->
+          <select class="field-select" id="editRole"></select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Status</label>
+          <select class="field-select" id="editStatus">
+            <option value="Active">Active</option>
+            <option value="Suspended">Suspended</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Date of Birth</label>
+          <input class="field-input" id="editDob" type="date"/>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Phone</label>
+          <input class="field-input" id="editPhone" type="tel"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('editModal')">Cancel</button>
+      <button class="btn-save" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ADD USER MODAL ===================== -->
+<div class="modal-overlay" id="addUserModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add New User</div>
+      <button class="modal-close" onclick="closeModal('addUserModal')">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">First Name *</label>
+          <input class="field-input" id="addFName" type="text" placeholder="First name"/>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Last Name *</label>
+          <input class="field-input" id="addLName" type="text" placeholder="Last name"/>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Email *</label>
+        <input class="field-input" id="addEmail" type="email" placeholder="user@example.com"/>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Password *</label>
+        <input class="field-input" id="addPassword" type="password" placeholder="Minimum 8 characters"/>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Role *</label>
+
+          <!-- Role options will be loaded from database by JS -->
+          <select class="field-select" id="addRole"></select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Phone *</label>
+          <input class="field-input" id="addPhone" type="tel" placeholder="+60..."/>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Date of Birth *</label>
+        <input class="field-input" id="addDob" type="date"/>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('addUserModal')">Cancel</button>
+      <button class="btn-save" onclick="saveAddUser()">Add User</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SUSPEND USER MODAL ===================== -->
+<div class="modal-overlay" id="suspendModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="suspendTitle">Suspend User</div>
+      <button class="modal-close" onclick="closeModal('suspendModal')">×</button>
+    </div>
+
+    <div class="modal-body">
+      <input type="hidden" id="suspendUID"/>
+      <p class="confirm-msg" id="suspendMsg"></p>
+      <p class="confirm-sub" id="suspendSub"></p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('suspendModal')">Cancel</button>
+      <button class="btn-save" id="suspendConfirmBtn" onclick="confirmSuspend()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="userManagementController.js"></script>
+</body>
+</html>

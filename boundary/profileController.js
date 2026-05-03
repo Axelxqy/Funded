@@ -1,3 +1,16 @@
+/* ============================================================
+   PROFILE PAGE CONTROLLER
+   Place in: boundary/profileController.js
+
+   Uses:
+   GET /users/:id
+   PUT /users/:id
+   GET /profiles/:id
+============================================================ */
+
+/* =========================
+   DROPDOWN SETUP
+========================= */
 function setupDropdown(buttonId, dropdownId) {
   const button = document.getElementById(buttonId);
   const dropdown = document.getElementById(dropdownId);
@@ -33,11 +46,17 @@ document.addEventListener("click", function () {
   });
 });
 
+/* =========================
+   ELEMENTS
+========================= */
 const userIdInput = document.getElementById("userIdInput");
+const profileIdInput = document.getElementById("profileIdInput");
+
 const firstNameInput = document.getElementById("firstNameInput");
 const lastNameInput = document.getElementById("lastNameInput");
 const dobInput = document.getElementById("dobInput");
 const phoneInput = document.getElementById("phoneInput");
+const roleInput = document.getElementById("roleInput");
 
 const profileForm = document.getElementById("profileForm");
 const editProfileBtn = document.getElementById("editProfileBtn");
@@ -52,6 +71,9 @@ const headerAvatar = document.getElementById("headerAvatar");
 const headerName = document.getElementById("headerName");
 const signOutBtn = document.getElementById("signOutBtn");
 
+/* =========================
+   LOCAL STORAGE
+========================= */
 function getLoggedInUser() {
   const saved = localStorage.getItem("loggedInUser");
 
@@ -70,6 +92,9 @@ function saveLoggedInUser(user) {
   localStorage.setItem("loggedInUser", JSON.stringify(user));
 }
 
+/* =========================
+   HELPERS
+========================= */
 function setMessage(message, isError = false) {
   if (!profileMessage) return;
 
@@ -78,44 +103,98 @@ function setMessage(message, isError = false) {
 }
 
 function setInputsDisabled(disabled) {
-  firstNameInput.disabled = disabled;
-  lastNameInput.disabled = disabled;
-  dobInput.disabled = disabled;
-  phoneInput.disabled = disabled;
-  saveProfileBtn.disabled = disabled;
+  if (firstNameInput) firstNameInput.disabled = disabled;
+  if (lastNameInput) lastNameInput.disabled = disabled;
+  if (dobInput) dobInput.disabled = disabled;
+  if (phoneInput) phoneInput.disabled = disabled;
+
+  /* Role is always read-only */
+  if (roleInput) {
+    roleInput.disabled = true;
+  }
+
+  if (saveProfileBtn) {
+    saveProfileBtn.disabled = disabled;
+  }
 }
 
 function formatDateForInput(dob) {
   if (!dob) return "";
 
-  const date = new Date(dob);
-
-  if (Number.isNaN(date.getTime())) {
-    return dob;
-  }
-
-  return date.toISOString().split("T")[0];
+  return String(dob).split("T")[0];
 }
 
-function renderUser(user) {
+async function readJsonResponse(response) {
+  const text = await response.text();
+
+  if (!text) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    return {
+      message: text,
+    };
+  }
+}
+
+/* =========================
+   LOAD ROLE NAME
+========================= */
+async function loadRoleName(user) {
+  if (user.role_name) {
+    return user.role_name;
+  }
+
+  if (!user.profile_id) {
+    return "No Role";
+  }
+
+  try {
+    const response = await fetch(`/profiles/${user.profile_id}`);
+    const profile = await readJsonResponse(response);
+
+    if (!response.ok || !profile) {
+      return "No Role";
+    }
+
+    return profile.role_name || "No Role";
+  } catch (error) {
+    console.error("Load role error:", error);
+    return "No Role";
+  }
+}
+
+/* =========================
+   RENDER USER
+========================= */
+async function renderUser(user) {
   const firstName = user.f_name || "";
   const lastName = user.l_name || "";
   const email = user.email || "";
   const phone = user.phone || "";
   const dob = user.dob || "";
+  const profileId = user.profile_id || "";
+
+  const roleName = await loadRoleName(user);
 
   const fullName = `${firstName} ${lastName}`.trim() || "User";
   const initial = (firstName || email || "U").charAt(0).toUpperCase();
 
-  userIdInput.value = user.user_id || "";
-  firstNameInput.value = firstName;
-  lastNameInput.value = lastName;
-  dobInput.value = formatDateForInput(dob);
-  phoneInput.value = phone;
+  if (userIdInput) userIdInput.value = user.user_id || "";
+  if (profileIdInput) profileIdInput.value = profileId;
 
-  profileFullName.textContent = fullName;
-  profileEmail.textContent = email;
-  profileAvatar.textContent = initial;
+  if (firstNameInput) firstNameInput.value = firstName;
+  if (lastNameInput) lastNameInput.value = lastName;
+  if (dobInput) dobInput.value = formatDateForInput(dob);
+  if (phoneInput) phoneInput.value = phone;
+  if (roleInput) roleInput.value = roleName;
+
+  if (profileFullName) profileFullName.textContent = fullName;
+  if (profileEmail) profileEmail.textContent = email;
+  if (profileAvatar) profileAvatar.textContent = initial;
 
   if (headerAvatar) {
     headerAvatar.textContent = initial;
@@ -124,8 +203,19 @@ function renderUser(user) {
   if (headerName) {
     headerName.textContent = firstName || "User";
   }
+
+  const updatedStorageUser = {
+    ...user,
+    role_name: roleName
+  };
+
+  saveLoggedInUser(updatedStorageUser);
 }
 
+/* =========================
+   LOAD USER DETAILS
+   GET /users/:id
+========================= */
 async function loadProfile() {
   const loggedInUser = getLoggedInUser();
 
@@ -135,16 +225,20 @@ async function loadProfile() {
   }
 
   try {
-    const response = await fetch(`/auth/profile/${loggedInUser.user_id}`);
-    const data = await response.json();
+    const response = await fetch(`/users/${loggedInUser.user_id}`);
+    const data = await readJsonResponse(response);
 
     if (!response.ok) {
       setMessage(data.message || "Failed to load profile.", true);
       return;
     }
 
-    saveLoggedInUser(data.user);
-    renderUser(data.user);
+    if (!data) {
+      setMessage("User profile was not found.", true);
+      return;
+    }
+
+    await renderUser(data);
     setInputsDisabled(true);
     setMessage("");
   } catch (error) {
@@ -153,54 +247,70 @@ async function loadProfile() {
   }
 }
 
-editProfileBtn.addEventListener("click", function () {
-  setInputsDisabled(false);
-  setMessage("You can now edit your personal information.", false);
-});
+/* =========================
+   EDIT PROFILE
+========================= */
+if (editProfileBtn) {
+  editProfileBtn.addEventListener("click", function () {
+    setInputsDisabled(false);
+    setMessage("You can now edit your personal information. Role cannot be modified here.", false);
+  });
+}
 
-profileForm.addEventListener("submit", async function (event) {
-  event.preventDefault();
+/* =========================
+   UPDATE USER DETAILS
+   PUT /users/:id
+========================= */
+if (profileForm) {
+  profileForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
 
-  const userId = userIdInput.value;
+    const userId = userIdInput.value;
+    const profileId = profileIdInput.value;
 
-  const updatedUser = {
-    f_name: firstNameInput.value.trim(),
-    l_name: lastNameInput.value.trim(),
-    dob: dobInput.value,
-    phone: phoneInput.value.trim()
-  };
+    const updatedUser = {
+      f_name: firstNameInput.value.trim(),
+      l_name: lastNameInput.value.trim(),
+      dob: dobInput.value,
+      phone: phoneInput.value.trim(),
+      email: profileEmail.textContent.trim(),
+      profile_id: profileId
+    };
 
-  if (!updatedUser.f_name || !updatedUser.l_name || !updatedUser.dob || !updatedUser.phone) {
-    setMessage("Please fill in all fields.", true);
-    return;
-  }
-
-  try {
-    const response = await fetch(`/auth/profile/${userId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(updatedUser)
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      setMessage(data.message || "Failed to update profile.", true);
+    if (!updatedUser.f_name || !updatedUser.l_name || !updatedUser.dob || !updatedUser.phone) {
+      setMessage("Please fill in all fields.", true);
       return;
     }
 
-    saveLoggedInUser(data.user);
-    renderUser(data.user);
-    setInputsDisabled(true);
-    setMessage("Profile updated successfully.", false);
-  } catch (error) {
-    console.error("Update profile error:", error);
-    setMessage("Cannot connect to server.", true);
-  }
-});
+    try {
+      const response = await fetch(`/users/${userId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(updatedUser)
+      });
 
+      const data = await readJsonResponse(response);
+
+      if (!response.ok) {
+        setMessage(data.message || "Failed to update profile.", true);
+        return;
+      }
+
+      await renderUser(data);
+      setInputsDisabled(true);
+      setMessage("Profile updated successfully.", false);
+    } catch (error) {
+      console.error("Update profile error:", error);
+      setMessage("Cannot connect to server.", true);
+    }
+  });
+}
+
+/* =========================
+   SIGN OUT
+========================= */
 if (signOutBtn) {
   signOutBtn.addEventListener("click", function (event) {
     event.preventDefault();

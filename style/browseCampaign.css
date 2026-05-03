@@ -387,11 +387,12 @@ a {
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
-  min-width: 150px;
+  min-width: 190px;
+  max-height: 260px;
+  overflow-y: auto;
   background: white;
   border-radius: 12px;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
-  overflow: hidden;
   display: none;
   z-index: 1000;
 }
@@ -410,8 +411,11 @@ a {
   text-align: left;
 }
 
-.chip-item:hover {
-  background: #f5f5f5;
+.chip-item:hover,
+.chip-item.active {
+  background: #f5f8f3;
+  color: var(--green);
+  font-weight: 700;
 }
 
 .explore-text {
@@ -422,7 +426,6 @@ a {
 
 /* =========================
    CAMPAIGN CARDS
-   SMALLER NO IMAGE CARD
 ========================= */
 .campaign-grid {
   display: grid;
@@ -430,7 +433,6 @@ a {
   gap: 16px;
   width: 100%;
   align-items: start;
-
   max-height: 560px;
   overflow-y: auto;
   padding-right: 8px;
@@ -483,7 +485,8 @@ a {
   background: linear-gradient(90deg, #9b61c3, #c9ddc2);
 }
 
-.category-health .card-accent {
+.category-health .card-accent,
+.category-medical .card-accent {
   background: linear-gradient(90deg, #4f8c52, #c9ddc2);
 }
 
@@ -495,7 +498,8 @@ a {
   background: linear-gradient(90deg, #b08534, #f6ecd8);
 }
 
-.category-disaster .card-accent {
+.category-disaster .card-accent,
+.category-emergency .card-accent {
   background: linear-gradient(90deg, #8d72b5, #efe6f8);
 }
 
@@ -503,7 +507,12 @@ a {
   background: linear-gradient(90deg, #8b6ab4, #eee6f7);
 }
 
-.category-others .card-accent {
+.category-environment .card-accent {
+  background: linear-gradient(90deg, #4f8c52, #d6f3d6);
+}
+
+.category-others .card-accent,
+.category-others-miscellaneous .card-accent {
   background: linear-gradient(90deg, #777, #eeeeee);
 }
 
@@ -705,7 +714,13 @@ a {
   font-weight: 700;
 }
 
-.category-pill.health {
+.category-pill {
+  background: #eeeeee;
+  color: #666666;
+}
+
+.category-pill.health,
+.category-pill.medical {
   background: #e7f4e8;
   color: #4f8c52;
 }
@@ -725,12 +740,19 @@ a {
   color: #8b6ab4;
 }
 
-.category-pill.disaster {
+.category-pill.disaster,
+.category-pill.emergency {
   background: #efe6f8;
   color: #8d72b5;
 }
 
-.category-pill.others {
+.category-pill.environment {
+  background: #e7f4e8;
+  color: #4f8c52;
+}
+
+.category-pill.others,
+.category-pill.others-miscellaneous {
   background: #eeeeee;
   color: #666666;
 }
@@ -744,13 +766,14 @@ a {
   color: #4f8c52;
 }
 
-.status-pill.completed {
-  background: #efe6f8;
-  color: #8d72b5;
+.status-pill.completed,
+.status-pill.ended {
+  background: #eeeeee;
+  color: #666666;
 }
 
 /* =========================
-   FOOTER - SAME AS HOMEPAGE
+   FOOTER
 ========================= */
 .site-footer {
   background: #eef4ec;
@@ -880,11 +903,6 @@ a {
   align-items: center;
   justify-content: center;
   transition: 0.2s ease;
-}
-
-.status-pill.ended {
-  background: #eeeeee;
-  color: #666666;
 }
 
 .signin-header-btn:hover {

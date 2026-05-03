@@ -93,6 +93,22 @@ async function readJsonResponse(response) {
   }
 }
 
+function redirectByRole(user) {
+  const roleName = user.role_name || "";
+
+  if (roleName === "User Admin") {
+    window.location.href = "userManagement.html";
+    return;
+  }
+
+  if (roleName === "Platform Manager") {
+    window.location.href = "platformReports.html";
+    return;
+  }
+
+  window.location.href = "homepage.html";
+}
+
 if (signInBtn) {
   signInBtn.addEventListener("click", async function () {
     const emailValue = emailInput.value.trim();
@@ -139,6 +155,8 @@ if (signInBtn) {
           showEmailError("Email is not registered.");
         } else if (data.message === "Wrong password.") {
           showPasswordError("Incorrect password.");
+        } else if (data.message === "Account is suspended.") {
+          alert("This account has been suspended.");
         } else {
           alert(data.message || "Login failed.");
         }
@@ -154,7 +172,7 @@ if (signInBtn) {
       localStorage.setItem("loggedInUser", JSON.stringify(data.user));
 
       alert("Login successful.");
-      window.location.href = "homepage.html";
+      redirectByRole(data.user);
     } catch (error) {
       console.error("Login request error:", error);
       alert("Cannot connect to server.");

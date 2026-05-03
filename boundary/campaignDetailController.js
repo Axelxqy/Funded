@@ -166,7 +166,6 @@ const donatePanel = document.getElementById("donatePanel");
 const donationInput = document.getElementById("donationInput");
 const donationSummary = document.getElementById("donationSummary");
 const donateNowBtn = document.getElementById("donateNowBtn");
-const anonymousCheckbox = document.getElementById("anonymousCheckbox");
 
 const donorsPanel = document.getElementById("donorsPanel");
 const detailTabs = document.querySelectorAll(".detail-tab");
@@ -726,10 +725,6 @@ if (donateNowBtn) {
 
       if (donationSummary) {
         donationSummary.textContent = "SGD 0";
-      }
-
-      if (anonymousCheckbox) {
-        anonymousCheckbox.checked = false;
       }
 
       await loadCampaignDetail();
