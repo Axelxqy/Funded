@@ -1,4 +1,5 @@
 const pool = require("../helper/db.js");
+const ActivityAnalytics = require("./activity_analytics.js");
 
 class FRActivity {
   // Create activity
@@ -54,7 +55,9 @@ class FRActivity {
       ]
     );
 
-    return result.rows[0];
+    const activity = result.rows[0];
+    await ActivityAnalytics.create(activity.activity_id);
+    return activity;
   }
 
   // View all activities

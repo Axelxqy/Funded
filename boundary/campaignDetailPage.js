@@ -1,3 +1,7 @@
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 function setupDropdown(buttonId, dropdownId) {
   const button = document.getElementById(buttonId);
   const dropdown = document.getElementById(dropdownId);
@@ -145,6 +149,8 @@ const detailProgressBar = document.getElementById("detailProgressBar");
 const detailDonors = document.getElementById("detailDonors");
 const detailDays = document.getElementById("detailDays");
 const detailAbout = document.getElementById("detailAbout");
+const detailViews = document.getElementById("detailViews");
+const detailShortlisted = document.getElementById("detailShortlisted");
 
 const scrollDonateBtn = document.getElementById("scrollDonateBtn");
 const donatePanel = document.getElementById("donatePanel");
@@ -384,6 +390,11 @@ async function loadCampaignDetail() {
 
     await loadActivityDonations();
     renderDonors();
+    await loadAnalytics();
+    
+    trackView();
+    trackShortlistedView();
+
   } catch (error) {
     console.error("Load campaign detail error:", error);
     alert("Failed to load campaign detail.");
@@ -408,6 +419,31 @@ async function loadActivityDonations() {
   } catch (error) {
     console.error("Load donors error:", error);
     activityDonations = [];
+  }
+}
+
+async function loadAnalytics() {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/analytics/${currentCampaignId}`
+    );
+
+    if (!response.ok) {
+      return;
+    }
+
+    const data = await response.json();
+
+    if (detailViews) {
+      detailViews.textContent = data.views_count ?? 0;
+    }
+
+    if (detailShortlisted) {
+      detailShortlisted.textContent = data.shortlisted_count ?? 0;
+    }
+
+  } catch (error) {
+    console.error("Load analytics error:", error);
   }
 }
 
@@ -685,6 +721,120 @@ document.addEventListener("click", function () {
     item.classList.remove("open");
   });
 });
+
+let viewTracked = false;
+let shortlistedTracked = false;
+
+let hasScrolledEnough = false;
+let hasStayedEnough = false;
+
+let shortlistListenerAttached = false;
+let shortlistTimerStarted = false;
+
+const MIN_TIME_MS = 20000;
+const MIN_SCROLL_PERCENT = 30;
+
+
+// NORMAL VIEW 
+function trackView() {
+  if (!currentCampaignId) return;
+
+  const user = getLoggedInUser();
+  const user_id = user?.user_id;
+
+  //Block invalid / missing email
+  if (!user_id) return;
+
+  const key = `view_${currentCampaignId}_${user_id}`;
+
+  // prevent duplicate views per email per session
+  const now = Date.now();
+  const lastViewed = Number(localStorage.getItem(key)) || 0;
+
+  // 10 min cooldown (adjust if needed)
+  const COOLDOWN = 10 * 60 * 1000;
+
+  if (now - lastViewed < COOLDOWN) return;
+
+  localStorage.setItem(key, now);
+  viewTracked = true;
+
+  fetch(`${API_BASE_URL}/analytics/${currentCampaignId}/view`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ user_id })
+  })
+  .then(() => console.log("View recorded"))
+  .catch(err => console.error("View failed:", err));
+}
+
+
+// SHORTLISTED 
+function trackShortlistedView() {
+  if (!currentCampaignId || shortlistedTracked) return;
+
+  const user = getLoggedInUser();
+  const user_id = user?.user_id;
+
+  if (!user_id) return;
+
+  const key = `shortlisted_${currentCampaignId}_${user_id}`;
+
+  hasScrolledEnough = false;
+  hasStayedEnough = false;
+
+  // Time condition
+  setTimeout(() => {
+    hasStayedEnough = true;
+    tryTrigger();
+  }, MIN_TIME_MS);
+
+  // Scroll condition
+  function onScroll() {
+    const scrollTop = window.scrollY;
+    const docHeight =
+      document.documentElement.scrollHeight - window.innerHeight;
+
+    if (docHeight <= 0) return;
+
+    const scrollPercent = (scrollTop / docHeight) * 100;
+
+    if (scrollPercent >= MIN_SCROLL_PERCENT) {
+      hasScrolledEnough = true;
+      tryTrigger();
+      window.removeEventListener("scroll", onScroll);
+    }
+  }
+
+  window.addEventListener("scroll", onScroll);
+
+  async function tryTrigger() {
+    if (shortlistedTracked) return;
+
+    if (!(hasScrolledEnough && hasStayedEnough)) return;
+
+    // Block duplicates ONLY after success condition met
+    if (sessionStorage.getItem(key)) return;
+
+    shortlistedTracked = true;
+    sessionStorage.setItem(key, "true");
+
+    try {
+      await fetch(`${API_BASE_URL}/analytics/${currentCampaignId}/shortlisted`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id }),
+      });
+
+      await loadAnalytics();
+
+    } catch (err) {
+      console.error("Shortlist failed:", err);
+    }
+  }
+}
 
 /* =========================
    START PAGE

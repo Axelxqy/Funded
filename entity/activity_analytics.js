@@ -34,16 +34,31 @@ class ActivityAnalytics {
     return result.rows[0];
   }
 
+  //Num Views
+  static async addViewOnce(activity_id, user_id) {
+    //Try insert into log
+    const log = await pool.query(
+      `
+      INSERT INTO num_view_log (activity_id, user_id)
+      VALUES ($1, $2)
+      ON CONFLICT DO NOTHING
+      RETURNING *;
+      `,
+      [activity_id, user_id]
+    );
 
-  // Increment views
-  static async incrementViews(activity_id) {
+    //If already exists → stop
+    if (log.rowCount === 0) {
+      return null;
+    }
 
+    //Increment analytics
     const result = await pool.query(
       `
       UPDATE activity_analytics
       SET views_count = views_count + 1
       WHERE activity_id = $1
-      RETURNING *;
+      RETURNING views_count;
       `,
       [activity_id]
     );
@@ -51,16 +66,28 @@ class ActivityAnalytics {
     return result.rows[0];
   }
 
+  //Num Shortlisted
+  static async addShortlistedOnce(activity_id, user_id) {
+    const log = await pool.query(
+      `
+      INSERT INTO num_shortlist_log (activity_id, user_id)
+      VALUES ($1, $2)
+      ON CONFLICT DO NOTHING
+      RETURNING *;
+      `,
+      [activity_id, user_id]
+    );
 
-  // Increment shortlisted (when added to favourites)
-  static async incrementShortlisted(activity_id) {
+    if (log.rowCount === 0) {
+      return null;
+    }
 
     const result = await pool.query(
       `
       UPDATE activity_analytics
       SET shortlisted_count = shortlisted_count + 1
       WHERE activity_id = $1
-      RETURNING *;
+      RETURNING shortlisted_count;
       `,
       [activity_id]
     );
@@ -68,23 +95,7 @@ class ActivityAnalytics {
     return result.rows[0];
   }
 
-
-  // Decrement shortlisted (when removed from favourites)
-  static async decrementShortlisted(activity_id) {
-
-    const result = await pool.query(
-      `
-      UPDATE activity_analytics
-      SET shortlisted_count = GREATEST(shortlisted_count - 1, 0)
-      WHERE activity_id = $1
-      RETURNING *;
-      `,
-      [activity_id]
-    );
-
-    return result.rows[0];
-  }
-
+  
 }
 
 module.exports = ActivityAnalytics;

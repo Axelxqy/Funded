@@ -336,6 +336,7 @@ select {
   color: #4e5965;
   max-width: 850px;
   margin: 0;
+  margin-bottom: 26px;
   white-space: pre-wrap;
 }
 
@@ -867,4 +868,31 @@ select {
 .signin-header-btn:hover {
   background: #f5f8f3;
   color: #4f8c52;
+}
+
+.analytics-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #6f7985;
+  margin-top: 14px;
+  margin-bottom: 20px;
+}
+
+.analytics-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.analytics-item strong {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1f2d3d;
+}
+
+.analytics-dot {
+  font-size: 18px;
+  color: #aaa;
 }
