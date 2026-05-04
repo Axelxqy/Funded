@@ -210,6 +210,27 @@ button {
   color: #222;
 }
 
+/* ===================== ADMIN / MANAGER BACK BUTTON ===================== */
+.hidden {
+  display: none !important;
+}
+
+.back-admin-btn {
+  height: 36px;
+  padding: 0 16px;
+  border: 1.5px solid var(--dark-green);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--dark-green);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.back-admin-btn:hover {
+  background: #f0f5ef;
+}
+
 /* ===================== PROFILE PAGE LAYOUT ===================== */
 .profile-page {
   width: 100%;

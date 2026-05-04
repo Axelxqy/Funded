@@ -209,8 +209,9 @@ class UserAccount {
         l_name = $2,
         dob = $3,
         phone = $4,
-        email = $5
-      WHERE user_id = $6
+        email = $5,
+        profile_id = $6
+      WHERE user_id = $7
       RETURNING
         user_id,
         email,
@@ -227,6 +228,7 @@ class UserAccount {
         data.dob,
         data.phone,
         data.email,
+        data.profile_id,
         user_id,
       ]
     );

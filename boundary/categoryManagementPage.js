@@ -286,7 +286,7 @@ function renderCategories(page) {
   if (slice.length === 0) {
     body.innerHTML = `
       <tr>
-        <td colspan="6" class="empty-row">
+        <td colspan="5" class="empty-row">
           No categories found.
         </td>
       </tr>
@@ -299,7 +299,6 @@ function renderCategories(page) {
           <td>${catSvgIcon(category.name)}</td>
           <td style="font-weight:600">${category.name}</td>
           <td>${category.description || "—"}</td>
-          <td>—</td>
           <td>
             <div class="actions">
               <button class="action-btn" onclick="openCatEdit('${category.category_id}')">

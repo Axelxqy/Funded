@@ -1,6 +1,6 @@
 /* ============================================================
    PROFILE PAGE CONTROLLER
-   Place in: boundary/profileController.js
+   Place in: boundary/profilePage.js
 
    Uses:
    GET /users/:id
@@ -71,6 +71,9 @@ const headerAvatar = document.getElementById("headerAvatar");
 const headerName = document.getElementById("headerName");
 const signOutBtn = document.getElementById("signOutBtn");
 
+const adminBackBtn = document.getElementById("adminBackBtn");
+const publicNavItems = document.querySelectorAll(".public-nav-item");
+
 /* =========================
    LOCAL STORAGE
 ========================= */
@@ -82,7 +85,13 @@ function getLoggedInUser() {
   }
 
   try {
-    return JSON.parse(saved);
+    const parsed = JSON.parse(saved);
+
+    if (parsed && parsed.user && parsed.user.user_id) {
+      return parsed.user;
+    }
+
+    return parsed;
   } catch (error) {
     return null;
   }
@@ -140,6 +149,55 @@ async function readJsonResponse(response) {
   }
 }
 
+function isAdminOrPlatformManager(roleName) {
+  const role = String(roleName || "").toLowerCase();
+
+  return (
+    role.includes("admin") ||
+    role.includes("platform manager")
+  );
+}
+
+function applyRoleBasedHeader(roleName) {
+  const isAdminRole = isAdminOrPlatformManager(roleName);
+
+  publicNavItems.forEach(function (item) {
+    item.classList.toggle("hidden", isAdminRole);
+  });
+
+  if (adminBackBtn) {
+    adminBackBtn.classList.toggle("hidden", !isAdminRole);
+  }
+}
+
+function goBackForAdminRole(roleName) {
+  const role = String(roleName || "").toLowerCase();
+
+  if (window.history.length > 1) {
+    window.history.back();
+    return;
+  }
+
+  if (role.includes("platform manager")) {
+    window.location.href = "categoryManagement.html";
+    return;
+  }
+
+  if (role.includes("admin")) {
+    window.location.href = "userManagement.html";
+    return;
+  }
+
+  window.location.href = "homepage.html";
+}
+
+if (adminBackBtn) {
+  adminBackBtn.addEventListener("click", function () {
+    const roleName = roleInput ? roleInput.value : "";
+    goBackForAdminRole(roleName);
+  });
+}
+
 /* =========================
    LOAD ROLE NAME
 ========================= */
@@ -180,6 +238,8 @@ async function renderUser(user) {
 
   const roleName = await loadRoleName(user);
 
+  applyRoleBasedHeader(roleName);
+
   const fullName = `${firstName} ${lastName}`.trim() || "User";
   const initial = (firstName || email || "U").charAt(0).toUpperCase();
 
@@ -201,12 +261,12 @@ async function renderUser(user) {
   }
 
   if (headerName) {
-    headerName.textContent = firstName || "User";
+    headerName.textContent = firstName || roleName || "User";
   }
 
   const updatedStorageUser = {
     ...user,
-    role_name: roleName
+    role_name: roleName,
   };
 
   saveLoggedInUser(updatedStorageUser);
@@ -274,10 +334,15 @@ if (profileForm) {
       dob: dobInput.value,
       phone: phoneInput.value.trim(),
       email: profileEmail.textContent.trim(),
-      profile_id: profileId
+      profile_id: profileId,
     };
 
-    if (!updatedUser.f_name || !updatedUser.l_name || !updatedUser.dob || !updatedUser.phone) {
+    if (
+      !updatedUser.f_name ||
+      !updatedUser.l_name ||
+      !updatedUser.dob ||
+      !updatedUser.phone
+    ) {
       setMessage("Please fill in all fields.", true);
       return;
     }
@@ -286,9 +351,9 @@ if (profileForm) {
       const response = await fetch(`/users/${userId}`, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(updatedUser)
+        body: JSON.stringify(updatedUser),
       });
 
       const data = await readJsonResponse(response);
@@ -317,7 +382,7 @@ if (signOutBtn) {
 
     localStorage.removeItem("loggedInUser");
 
-    window.location.href = "homepage.html";
+    window.location.href = "login.html";
   });
 }
 

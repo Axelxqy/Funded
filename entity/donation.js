@@ -342,6 +342,7 @@ class Donation {
     };
   }
 
+  // Weekly report
   static async getWeeklyReport() {
     const summaryResult = await pool.query(
       `
@@ -424,6 +425,7 @@ class Donation {
     };
   }
 
+  // Monthly report
   static async getMonthlyReport() {
     const summaryResult = await pool.query(
       `
