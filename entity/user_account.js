@@ -36,7 +36,15 @@ class UserAccount {
   }
 
   // Create user
-  static async create({ email, password, f_name, l_name, dob, phone }) {
+  static async create({
+    email,
+    password,
+    f_name,
+    l_name,
+    dob,
+    phone,
+    profile_id,
+  }) {
     if (!email || !password || !f_name || !l_name || !dob || !phone) {
       throw new Error("All fields are required.");
     }
@@ -47,10 +55,20 @@ class UserAccount {
       throw new Error("Email already exists.");
     }
 
-    const userProfile = await UserAccount.getDefaultUserProfile();
+    let finalProfileId = profile_id;
 
-    if (!userProfile || !userProfile.profile_id) {
-      throw new Error("Default User role not found.");
+    // Normal signup page does not send profile_id,
+    // so assign default User role.
+    // User Management page sends profile_id,
+    // so it will use the selected role.
+    if (!finalProfileId) {
+      const userProfile = await UserAccount.getDefaultUserProfile();
+
+      if (!userProfile || !userProfile.profile_id) {
+        throw new Error("Default User role not found.");
+      }
+
+      finalProfileId = userProfile.profile_id;
     }
 
     const query = `
@@ -84,7 +102,7 @@ class UserAccount {
       l_name,
       dob,
       phone,
-      userProfile.profile_id,
+      finalProfileId,
     ];
 
     const result = await pool.query(query, values);
@@ -201,6 +219,17 @@ class UserAccount {
 
   // Update account
   static async update(user_id, data) {
+    if (
+      !data.f_name ||
+      !data.l_name ||
+      !data.dob ||
+      !data.phone ||
+      !data.email ||
+      !data.profile_id
+    ) {
+      throw new Error("All fields are required.");
+    }
+
     const result = await pool.query(
       `
       UPDATE public.user_account
@@ -233,7 +262,13 @@ class UserAccount {
       ]
     );
 
-    return result.rows[0];
+    const updatedUser = result.rows[0];
+
+    if (!updatedUser) {
+      throw new Error("User not found.");
+    }
+
+    return updatedUser;
   }
 
   // Suspend user
@@ -256,7 +291,13 @@ class UserAccount {
       [user_id]
     );
 
-    return result.rows[0];
+    const user = result.rows[0];
+
+    if (!user) {
+      throw new Error("User not found.");
+    }
+
+    return user;
   }
 }
 
