@@ -19,13 +19,32 @@ const CAT_PER = 10;
 /* ============================================================
    INIT
 ============================================================ */
-window.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", async function () {
+
+  // GLOBAL UI SETUP
   setupDropdown("profileMenuBtn", "profileDropdown");
   renderHeaderProfile();
   setupSignOut();
 
   await loadCategories();
+
+  // MY CAMPAIGN PAGE LOGIC
+  const loggedInUser = protectMyCampaignPage();
+  if (!loggedInUser) return;
+
+  updateHeaderUser();
+
+  const fromDetail = localStorage.getItem("fromCampaignDetail");
+
+  if (fromDetail === "true") {
+    localStorage.removeItem("fromCampaignDetail");
+    window.location.reload(); 
+    return;
+  }
+
+  await loadMyCampaignsFromDatabase();
 });
+
 
 /* ============================================================
    HEADER PROFILE

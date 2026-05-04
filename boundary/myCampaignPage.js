@@ -170,12 +170,12 @@ async function readJsonResponse(response) {
    LOAD MY CAMPAIGNS
    GET /fra/my/:userId
 ========================= */
-document.addEventListener("DOMContentLoaded", async function () {
+window.addEventListener("pageshow", async (event) => {
   const loggedInUser = protectMyCampaignPage();
-
   if (!loggedInUser) return;
 
   updateHeaderUser();
+
   await loadMyCampaignsFromDatabase();
 });
 
@@ -615,6 +615,7 @@ function displayCampaigns(activities) {
       const categoryClass = getCategoryClass(activity.category_name);
 
       const viewsCount = Number(activity.views_count) || 0;
+      const shortlistedCount = Number(activity.shortlisted_count) || 0;
 
       const ended = isCampaignEnded(activity);
       const statusText = ended ? "Ended" : "Active";
@@ -663,6 +664,11 @@ function displayCampaigns(activities) {
                 <span class="view-count-pill" title="Number of views">
                   <i class="fa-regular fa-eye"></i>
                   ${viewsCount}
+                </span>
+
+                <span class="shortlisted-count-pill" title="Shortlisted">
+                  <i class="fa-solid fa-bookmark"></i>
+                  ${shortlistedCount}
                 </span>
               </div>
 
@@ -911,6 +917,7 @@ function changePage(page) {
 ========================= */
 function viewCampaign(activityId) {
   localStorage.setItem("selectedActivityId", activityId);
+  localStorage.setItem("fromCampaignDetail", "true");
   window.location.href = "campaignDetail.html?id=" + activityId;
 }
 

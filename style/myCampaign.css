@@ -1096,3 +1096,21 @@ button {
   font-size: 10px;
   color: #4f8c52;
 }
+
+.shortlisted-count-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #f5f8f3;
+  color: #7a5a00;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.shortlisted-count-pill i {
+  font-size: 10px;
+  color: #f0ad4e;
+}

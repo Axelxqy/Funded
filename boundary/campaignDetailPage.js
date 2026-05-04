@@ -147,6 +147,9 @@ const API_BASE_URL = "http://localhost:3000";
 let currentCampaignId = null;
 let currentCampaign = null;
 let activityDonations = [];
+let hasShortlisted = false;
+let startTime = Date.now();
+let maxScroll = 0;
 
 const backBtn = document.getElementById("backBtn");
 
@@ -170,6 +173,9 @@ const donateNowBtn = document.getElementById("donateNowBtn");
 const donorsPanel = document.getElementById("donorsPanel");
 const detailTabs = document.querySelectorAll(".detail-tab");
 const detailPanels = document.querySelectorAll(".detail-panel");
+
+const MIN_TIME = 10000;
+const MIN_SCROLL = 30; 
 
 /* =========================
    SAFE JSON
@@ -207,6 +213,29 @@ async function incrementCampaignView(activityId) {
     console.log("View count updated:", data);
   } catch (error) {
     console.error("Increment campaign view error:", error);
+  }
+}
+
+/* =========================
+   INCREMENT CAMPAIGN SHORTLIST
+   PATCH /analytics/:activity_id/shortlisted
+========================= */
+async function incrementCampaignShortlist() {
+  if (!currentCampaignId) return;
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/analytics/${currentCampaignId}/shortlisted`,
+      {
+        method: "PATCH",
+      }
+    );
+
+    const data = await readJsonResponse(response);
+
+    console.log("Shortlisted updated:", data);
+  } catch (error) {
+    console.error("Increment shortlisted error:", error);
   }
 }
 
@@ -373,6 +402,17 @@ function formatDateTime(dateValue) {
   h = h % 12 || 12;
 
   return d + "/" + m + "/" + y + " " + h + ":" + min + " " + ap;
+}
+
+function checkShortlistTrigger() {
+  if (hasShortlisted) return;
+
+  const timeSpent = Date.now() - startTime;
+
+  if (timeSpent >= MIN_TIME && maxScroll >= MIN_SCROLL) {
+    hasShortlisted = true;
+    incrementCampaignShortlist();
+  }
 }
 
 /* =========================
@@ -791,6 +831,21 @@ document.addEventListener("click", function () {
   document.querySelectorAll(".nav-dropdown").forEach(function (item) {
     item.classList.remove("open");
   });
+});
+
+/* =========================
+   SHORTLIST TRACKING (SCROLL + TIME)
+========================= */
+window.addEventListener("scroll", function () {
+  const scrollTop = window.scrollY;
+  const docHeight = document.body.scrollHeight - window.innerHeight;
+
+  if (docHeight <= 0) return;
+
+  const scrollPercent = (scrollTop / docHeight) * 100;
+  maxScroll = Math.max(maxScroll, scrollPercent);
+
+  checkShortlistTrigger();
 });
 
 /* =========================

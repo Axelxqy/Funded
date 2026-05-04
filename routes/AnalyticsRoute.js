@@ -22,20 +22,38 @@ router.patch("/:activity_id/views", async (req, res) => {
   }
 });
 
+
+// increment shortlisted count
+router.patch("/:activity_id/shortlisted", async (req, res) => {
+  try {
+    const analytics = await ViewShortlisted.incrementShortlisted(
+      req.params.activity_id
+    );
+
+    res.json({
+      message: "Shortlisted count updated successfully.",
+      analytics: analytics,
+    });
+  } catch (error) {
+    console.error("Increment shortlisted route error:", error);
+
+    res.status(400).json({
+      message: error.message || "Failed to update shortlisted count.",
+    });
+  }
+});
+
 // views count
 router.get("/:activity_id/views", async (req, res) => {
   try {
-    const views_count = await ViewViews.getViews(req.params.activity_id);
-
+    const views = await ViewViews.getViews(req.params.activity_id);
     res.json({
-      activity_id: Number(req.params.activity_id),
-      views_count: views_count,
+      count: views
     });
   } catch (error) {
-    console.error("View views route error:", error);
-
+    console.error("Get views route error:", error);
     res.status(400).json({
-      message: error.message || "Failed to view views count.",
+      message: error.message || "Failed to get views count.",
     });
   }
 });
@@ -43,19 +61,16 @@ router.get("/:activity_id/views", async (req, res) => {
 // shortlisted count
 router.get("/:activity_id/shortlisted", async (req, res) => {
   try {
-    const shortlisted_count = await ViewShortlisted.getShortlisted(
+    const shortlisted = await ViewShortlisted.getShortlisted(
       req.params.activity_id
     );
-
     res.json({
-      activity_id: Number(req.params.activity_id),
-      shortlisted_count: shortlisted_count,
+      count: shortlisted
     });
   } catch (error) {
-    console.error("View shortlisted route error:", error);
-
+    console.error("Get shortlisted route error:", error);
     res.status(400).json({
-      message: error.message || "Failed to view shortlisted count.",
+      message: error.message || "Failed to get shortlisted count.",
     });
   }
 });

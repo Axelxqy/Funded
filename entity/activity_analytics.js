@@ -26,12 +26,12 @@ class ActivityAnalytics {
   }
 
   static async getByActivity(activity_id) {
-    if (!activity_id) {
-      throw new Error("Activity ID required");
-    }
-
     const result = await pool.query(
       `
+      INSERT INTO public.activity_analytics (activity_id, views_count, shortlisted_count)
+      VALUES ($1, 0, 0)
+      ON CONFLICT (activity_id) DO NOTHING;
+
       SELECT *
       FROM public.activity_analytics
       WHERE activity_id = $1;
@@ -41,7 +41,7 @@ class ActivityAnalytics {
 
     return result.rows[0];
   }
-
+  
   static async viewNumOfViews(activity_id) {
     if (!activity_id) {
       throw new Error("Activity ID required");
