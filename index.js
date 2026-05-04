@@ -49,6 +49,7 @@ app.use("/analytics", analyticsRoutes);
 app.use("/reports", reportRoutes);
 
 app.get("/", (req, res) => {
+  res.clearCookie("cookie-parser");
   res.sendFile(path.join(__dirname, "boundary", "homepage.html"));
 });
 
