@@ -170,11 +170,22 @@ async function readJsonResponse(response) {
    LOAD MY CAMPAIGNS
    GET /fra/my/:userId
 ========================= */
-window.addEventListener("pageshow", async (event) => {
+window.addEventListener("pageshow", async function () {
   const loggedInUser = protectMyCampaignPage();
+
   if (!loggedInUser) return;
 
   updateHeaderUser();
+
+  const shouldRefresh = localStorage.getItem("refreshMyCampaign");
+
+  if (shouldRefresh === "true") {
+    localStorage.removeItem("refreshMyCampaign");
+
+    await loadMyCampaignsFromDatabase();
+
+    return;
+  }
 
   await loadMyCampaignsFromDatabase();
 });
@@ -488,42 +499,49 @@ function calculateProgress(currentAmount, goalAmount) {
   return progress > 100 ? 100 : progress;
 }
 
-function calculateDaysLeft(endDate) {
-  if (!endDate) return 0;
+function calculateDaysLeft(startDate, endDate) {
+  if (!endDate) {
+    return 0;
+  }
 
   const today = new Date();
+  const start = makeLocalDateFromSql(startDate);
   const end = makeLocalDateFromSql(endDate);
 
-  if (!end) return 0;
+  if (!end) {
+    return 0;
+  }
 
   today.setHours(0, 0, 0, 0);
+
+  if (start) {
+    start.setHours(0, 0, 0, 0);
+  }
+
   end.setHours(0, 0, 0, 0);
 
-  const difference = end - today;
+  let baseDate = today;
+
+  // campaign not started yet
+  if (start && start > today) {
+    baseDate = start;
+  }
+
+  const difference = end - baseDate;
   const daysLeft = Math.ceil(difference / (1000 * 60 * 60 * 24));
 
   return daysLeft > 0 ? daysLeft : 0;
 }
 
+
 function makeLocalDateFromSql(dateValue) {
   if (!dateValue) return null;
 
-  const dateOnly = String(dateValue).split("T")[0];
-  const parts = dateOnly.split("-");
+  const d = new Date(dateValue);
 
-  if (parts.length !== 3) return null;
+  if (Number.isNaN(d.getTime())) return null;
 
-  const year = Number(parts[0]);
-  const month = Number(parts[1]) - 1;
-  const day = Number(parts[2]);
-
-  const localDate = new Date(year, month, day);
-
-  if (Number.isNaN(localDate.getTime())) {
-    return null;
-  }
-
-  return localDate;
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
 
 function isCampaignDateEnded(endDate) {
@@ -621,7 +639,11 @@ function displayCampaigns(activities) {
       const statusText = ended ? "Ended" : "Active";
       const statusClass = ended ? "ended" : "active";
 
-      const daysLeft = calculateDaysLeft(activity.end_date);
+      const daysLeft = calculateDaysLeft(
+        activity.start_date,
+        activity.end_date
+      );
+
       const durationText = ended ? "Ended" : daysLeft + " days left";
 
       const description =
@@ -932,5 +954,6 @@ function editCampaign(activityId) {
   }
 
   localStorage.setItem("editActivityId", activityId);
+
   window.location.href = "startCampaign.html";
 }

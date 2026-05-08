@@ -296,12 +296,13 @@ function makeLocalDateFromSql(dateValue) {
   return localDate;
 }
 
-function calculateDaysLeft(endDate) {
+function calculateDaysLeft(startDate, endDate) {
   if (!endDate) {
     return 0;
   }
 
   const today = new Date();
+  const start = makeLocalDateFromSql(startDate);
   const end = makeLocalDateFromSql(endDate);
 
   if (!end) {
@@ -309,9 +310,21 @@ function calculateDaysLeft(endDate) {
   }
 
   today.setHours(0, 0, 0, 0);
+
+  if (start) {
+    start.setHours(0, 0, 0, 0);
+  }
+
   end.setHours(0, 0, 0, 0);
 
-  const difference = end - today;
+  let baseDate = today;
+
+  // campaign not started yet
+  if (start && start > today) {
+    baseDate = start;
+  }
+
+  const difference = end - baseDate;
   const daysLeft = Math.ceil(difference / (1000 * 60 * 60 * 24));
 
   return daysLeft > 0 ? daysLeft : 0;
@@ -554,7 +567,10 @@ function renderCampaignDetail() {
   const goalAmount = Number(currentCampaign.fundraise_goal) || 0;
   const donorCount = Number(currentCampaign.donor_count) || 0;
   const progress = calculateProgress(currentAmount, goalAmount);
-  const daysLeft = calculateDaysLeft(currentCampaign.end_date);
+  const daysLeft = calculateDaysLeft(
+    activity.start_date,
+    activity.end_date
+  );
   const remainingAmount = goalAmount - currentAmount;
 
   if (detailTitle) {
@@ -789,12 +805,6 @@ if (donateNowBtn) {
         donationSummary.textContent = "SGD 0";
       }
 
-      /* ==================================================
-         IMPORTANT:
-         Do NOT call loadCampaignDetail() here.
-         It would increment the view count again.
-         Instead, update the current page data manually.
-      ================================================== */
       currentCampaign.current_amount =
         Number(currentCampaign.current_amount || 0) + amount;
 
@@ -851,4 +861,6 @@ window.addEventListener("scroll", function () {
 /* =========================
    START PAGE
 ========================= */
-loadCampaignDetail();
+window.addEventListener("pageshow", function () {
+  loadCampaignDetail();
+});

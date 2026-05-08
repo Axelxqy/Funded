@@ -452,7 +452,10 @@ function mapActivityToCampaign(activity) {
     activity.creator_l_name || ""
   }`.trim();
 
-  const daysLeft = calculateDaysLeft(activity.end_date);
+  const daysLeft = calculateDaysLeft(
+    activity.start_date,
+    activity.end_date
+  );
   const endedByAmount = goal > 0 && currentAmount >= goal;
   const endedByDate = isCampaignDateEnded(activity.end_date);
   const isEnded = endedByAmount || endedByDate;
@@ -531,18 +534,35 @@ function makeLocalDateFromSql(dateValue) {
   return localDate;
 }
 
-function calculateDaysLeft(endDate) {
-  if (!endDate) return 0;
+function calculateDaysLeft(startDate, endDate) {
+  if (!endDate) {
+    return 0;
+  }
 
   const today = new Date();
+  const start = makeLocalDateFromSql(startDate);
   const end = makeLocalDateFromSql(endDate);
 
-  if (!end) return 0;
+  if (!end) {
+    return 0;
+  }
 
   today.setHours(0, 0, 0, 0);
+
+  if (start) {
+    start.setHours(0, 0, 0, 0);
+  }
+
   end.setHours(0, 0, 0, 0);
 
-  const difference = end - today;
+  let baseDate = today;
+
+  // campaign not started yet
+  if (start && start > today) {
+    baseDate = start;
+  }
+
+  const difference = end - baseDate;
   const daysLeft = Math.ceil(difference / (1000 * 60 * 60 * 24));
 
   return daysLeft > 0 ? daysLeft : 0;

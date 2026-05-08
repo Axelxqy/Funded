@@ -735,6 +735,7 @@ if (campaignForm) {
       );
 
       localStorage.removeItem("editActivityId");
+      localStorage.setItem("refreshMyCampaign", "true");
       window.location.href = "myCampaign.html";
     } catch (error) {
       console.error("Save campaign error:", error);

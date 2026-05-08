@@ -1,3 +1,8 @@
+if (!sessionStorage.getItem("booted")) {
+  localStorage.removeItem("loggedInUser");
+  sessionStorage.setItem("booted", "true");
+}
+
 function setupDropdown(buttonId, dropdownId) {
   const button = document.getElementById(buttonId);
   const dropdown = document.getElementById(dropdownId);
