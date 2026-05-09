@@ -323,12 +323,18 @@ class Donation {
 
         SELECT
           avl.viewed_at AS log_time,
-          'Visitor' AS user_name,
+          COALESCE(CONCAT(ua.f_name, ' ', ua.l_name), 'User') AS user_name,
           'Viewed campaign "' || fa.activity_name || '"' AS action,
           'Viewed' AS status
         FROM public.activity_view_log avl
         LEFT JOIN public.fr_activity fa
           ON avl.activity_id = fa.activity_id
+        LEFT JOIN public.user_account ua
+          ON ua.user_id = (
+            SELECT created_by
+            FROM public.fr_activity
+            WHERE activity_id = avl.activity_id
+          )
         WHERE DATE(avl.viewed_at) = CURRENT_DATE
       ) report_logs
       ORDER BY log_time DESC

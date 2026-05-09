@@ -568,8 +568,8 @@ function renderCampaignDetail() {
   const donorCount = Number(currentCampaign.donor_count) || 0;
   const progress = calculateProgress(currentAmount, goalAmount);
   const daysLeft = calculateDaysLeft(
-    activity.start_date,
-    activity.end_date
+    currentCampaign.start_date,
+    currentCampaign.end_date
   );
   const remainingAmount = goalAmount - currentAmount;
 
