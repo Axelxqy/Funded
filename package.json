@@ -4,7 +4,13 @@
   "description": "A Fund Raiser Website that allows people to help person in needs by funding!",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "jest"
+  },
+  "jest": {
+    "testMatch": [
+      "**/test_script/**/*_test.js"
+    ]
   },
   "repository": {
     "type": "git",
@@ -30,7 +36,6 @@
     "express": "^5.2.1",
     "html2canvas": "^1.4.1",
     "http": "^0.0.1-security",
-    "jest": "^30.4.0",
     "jsonwebtoken": "^9.0.3",
     "jspdf": "^4.2.1",
     "leaflet": "^1.9.4",
@@ -43,10 +48,12 @@
     "react-icons": "^5.6.0",
     "react-leaflet": "^5.0.0",
     "socket.io": "^4.8.3",
-    "styled-components": "^6.4.0",
-    "supertest": "^7.2.2"
+    "styled-components": "^6.4.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.4.1",
+    "nodemon": "^3.1.14",
+    "supertest": "^7.2.2"
   }
 }
