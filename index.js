@@ -67,8 +67,12 @@ io.on("connection", (socket) => {
 
 const PORT = 3000;
 
-server.listen(PORT, async () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+if (require.main === module) {
+  server.listen(PORT, async () => {
+    console.log(`Server running on http://localhost:${PORT}`);
 
-  await open(`http://localhost:${PORT}`);
-});
+    await open(`http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
