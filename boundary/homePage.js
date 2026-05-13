@@ -1,4 +1,13 @@
 /* =========================
+   ACCOUNT RETAIN ISSUE  
+========================= */
+
+if (!sessionStorage.getItem("booted")) {
+  localStorage.removeItem("loggedInUser");
+  sessionStorage.setItem("booted", "true");
+}
+
+/* =========================
    LOGIN CHECK
 ========================= */
 function getLoggedInUser() {
