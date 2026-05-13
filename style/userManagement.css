@@ -486,19 +486,24 @@ td {
   font-weight: 500;
 }
 
-.badge-admin {
-  background: #fef9c3;
-  color: #854d0e;
+.badge-donee {
+  background: #fce7f3;
+  color: #db2777;
 }
 
 .badge-fundraiser {
+  background: #fce7f3;
+  color: #db2777;
+}
+
+.badge-admin {
   background: #dbeafe;
   color: #2563eb;
 }
 
-.badge-donee {
-  background: #fce7f3;
-  color: #db2777;
+.badge-platform-manager {
+  background: #fef3c7;
+  color: #b45309;
 }
 
 .status-badge {

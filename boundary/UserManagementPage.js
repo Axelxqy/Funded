@@ -280,14 +280,26 @@ function getDisplayRole(user) {
 }
 
 function getRoleBadgeClass(role) {
-  const roleLower = String(role || "").toLowerCase();
+  const roleLower = String(role || "").toLowerCase().trim();
 
-  if (roleLower.includes("admin")) {
+  if (roleLower === "donee") {
+    return "badge-donee";
+  }
+
+  if (
+    roleLower === "fundraiser" ||
+    roleLower === "fund raiser" ||
+    roleLower === "fund_raiser"
+  ) {
     return "badge-fundraiser";
   }
 
-  if (roleLower.includes("manager")) {
+  if (roleLower.includes("user admin") || roleLower === "admin") {
     return "badge-admin";
+  }
+
+  if (roleLower.includes("platform manager") || roleLower === "manager") {
+    return "badge-platform-manager";
   }
 
   return "badge-donee";
