@@ -1,51 +1,5 @@
 /* =========================
-   HEADER NAV DROPDOWNS
-========================= */
-const navDropdowns = document.querySelectorAll(".nav-dropdown");
-const profileDropdown = document.getElementById("profileDropdown");
-
-navDropdowns.forEach(function (dropdown) {
-  const button = dropdown.querySelector(".nav-button");
-
-  if (!button) return;
-
-  button.addEventListener("click", function (event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    navDropdowns.forEach(function (item) {
-      if (item !== dropdown) {
-        item.classList.remove("open");
-      }
-    });
-
-    dropdown.classList.toggle("open");
-  });
-
-  const menu = dropdown.querySelector(".nav-dropdown-menu");
-
-  if (menu) {
-    menu.addEventListener("click", function (event) {
-      event.stopPropagation();
-    });
-  }
-});
-
-/* =========================
-   CLOSE DROPDOWNS WHEN CLICK OUTSIDE
-========================= */
-document.addEventListener("click", function () {
-  navDropdowns.forEach(function (dropdown) {
-    dropdown.classList.remove("open");
-  });
-
-  if (categorySelect) {
-    categorySelect.classList.remove("open");
-  }
-});
-
-/* =========================
-   LOGIN CHECK + HEADER USER
+   LOGIN / ROLE CHECK
 ========================= */
 function getLoggedInUser() {
   const saved = localStorage.getItem("loggedInUser");
@@ -68,6 +22,95 @@ function getLoggedInUser() {
   }
 }
 
+function getLoggedInUserId() {
+  const user = getLoggedInUser();
+
+  if (!user) {
+    return null;
+  }
+
+  return user.user_id || user.userId || user.id || null;
+}
+
+function isLoggedIn() {
+  return getLoggedInUserId() !== null;
+}
+
+function getUserRole() {
+  const user = getLoggedInUser();
+
+  if (!user || !user.role_name) {
+    return "";
+  }
+
+  return String(user.role_name).toLowerCase().trim();
+}
+
+function isDonee() {
+  return getUserRole() === "donee";
+}
+
+function isFundraiser() {
+  const role = getUserRole();
+
+  return (
+    role === "fundraiser" ||
+    role === "fund raiser" ||
+    role === "fund_raiser"
+  );
+}
+
+function requireLogin(event) {
+  if (isLoggedIn()) {
+    return true;
+  }
+
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  alert("Please login first before creating a campaign.");
+  window.location.href = "login.html";
+
+  return false;
+}
+
+/* =========================
+   ROLE BLOCKING
+========================= */
+function blockFundraiseIfDonee(event) {
+  if (!isLoggedIn()) {
+    return requireLogin(event);
+  }
+
+  if (isDonee()) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    alert("Donee users cannot access Fundraise functions.");
+    return false;
+  }
+
+  return true;
+}
+
+function blockDonateIfFundraiser(event) {
+  if (!isLoggedIn()) {
+    return requireLogin(event);
+  }
+
+  if (isFundraiser()) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    alert("Fundraiser users cannot access Donee functions.");
+    return false;
+  }
+
+  return true;
+}
+
 function protectFundraiserPage() {
   const loggedInUser = getLoggedInUser();
 
@@ -77,9 +120,108 @@ function protectFundraiserPage() {
     return null;
   }
 
+  if (isDonee()) {
+    alert("Donee users cannot access Fundraise functions.");
+    window.location.href = "homepage.html";
+    return null;
+  }
+
   return loggedInUser;
 }
 
+/* =========================
+   HEADER NAV DROPDOWNS
+========================= */
+const navDropdowns = document.querySelectorAll(".nav-dropdown");
+const profileDropdown = document.getElementById("profileDropdown");
+
+navDropdowns.forEach(function (dropdown) {
+  const button = dropdown.querySelector(".nav-button");
+
+  if (!button) return;
+
+  button.addEventListener("click", function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const dropdownId = dropdown.id;
+
+    if (dropdownId === "donateDropdown") {
+      const allowed = blockDonateIfFundraiser(event);
+
+      if (!allowed) {
+        return;
+      }
+    }
+
+    if (dropdownId === "fundraiseDropdown") {
+      const allowed = blockFundraiseIfDonee(event);
+
+      if (!allowed) {
+        return;
+      }
+    }
+
+    navDropdowns.forEach(function (item) {
+      if (item !== dropdown) {
+        item.classList.remove("open");
+      }
+    });
+
+    dropdown.classList.toggle("open");
+  });
+
+  const menu = dropdown.querySelector(".nav-dropdown-menu");
+
+  if (menu) {
+    menu.addEventListener("click", function (event) {
+      event.stopPropagation();
+    });
+  }
+});
+
+/* =========================
+   PROTECT LINKS BASED ON ROLE
+========================= */
+function protectRoleLinks() {
+  const allLinks = document.querySelectorAll("a");
+
+  allLinks.forEach(function (link) {
+    const href = link.getAttribute("href");
+
+    if (!href) return;
+
+    const lowerHref = href.toLowerCase();
+
+    const isDoneeLink =
+      lowerHref.includes("browsecampaign.html") ||
+      lowerHref.includes("mydonation.html") ||
+      lowerHref.includes("mydonationview.html") ||
+      lowerHref.includes("campaigndetail.html");
+
+    const isFundraiserLink =
+      lowerHref.includes("startcampaign.html") ||
+      lowerHref.includes("mycampaign.html");
+
+    if (isDoneeLink) {
+      link.addEventListener("click", function (event) {
+        blockDonateIfFundraiser(event);
+      });
+    }
+
+    if (isFundraiserLink) {
+      link.addEventListener("click", function (event) {
+        blockFundraiseIfDonee(event);
+      });
+    }
+  });
+}
+
+protectRoleLinks();
+
+/* =========================
+   LOGIN CHECK + HEADER USER
+========================= */
 function updateHeaderUser() {
   const loggedInUser = getLoggedInUser();
 
@@ -659,6 +801,12 @@ if (campaignForm) {
       return;
     }
 
+    if (isDonee()) {
+      alert("Donee users cannot access Fundraise functions.");
+      window.location.href = "homepage.html";
+      return;
+    }
+
     const activity_name = campaignTitle.value.trim();
     const categoryName = categoryValue.value.trim();
     const category_id = categoryIdValue.value.trim();
@@ -745,10 +893,28 @@ if (campaignForm) {
 }
 
 /* =========================
+   CLOSE DROPDOWNS WHEN CLICK OUTSIDE
+========================= */
+document.addEventListener("click", function () {
+  navDropdowns.forEach(function (dropdown) {
+    dropdown.classList.remove("open");
+  });
+
+  if (categorySelect) {
+    categorySelect.classList.remove("open");
+  }
+});
+
+/* =========================
    PAGE INIT
 ========================= */
 document.addEventListener("DOMContentLoaded", async function () {
-  protectFundraiserPage();
+  const user = protectFundraiserPage();
+
+  if (!user) {
+    return;
+  }
+
   updateHeaderUser();
 
   await loadCategoriesForSelect();

@@ -1,41 +1,3 @@
-function setupDropdown(buttonId, dropdownId) {
-  const button = document.getElementById(buttonId);
-  const dropdown = document.getElementById(dropdownId);
-
-  if (!button || !dropdown) return;
-
-  button.addEventListener("click", function (event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    document.querySelectorAll(".nav-dropdown").forEach(function (item) {
-      if (item !== dropdown) {
-        item.classList.remove("open");
-      }
-    });
-
-    dropdown.classList.toggle("open");
-  });
-
-  dropdown.addEventListener("click", function (event) {
-    event.stopPropagation();
-  });
-}
-
-setupDropdown("donateMenuBtn", "donateDropdown");
-setupDropdown("fundraiseMenuBtn", "fundraiseDropdown");
-setupDropdown("aboutMenuBtn", "aboutDropdown");
-setupDropdown("profileMenuBtn", "profileDropdown");
-
-/* =========================
-   LOGIN / PROFILE
-========================= */
-const signinHeaderBtn = document.getElementById("signinHeaderBtn");
-const profileDropdown = document.getElementById("profileDropdown");
-const headerAvatar = document.getElementById("headerAvatar");
-const headerName = document.getElementById("headerName");
-const signOutBtn = document.getElementById("signOutBtn");
-
 function getLoggedInUser() {
   const saved = localStorage.getItem("loggedInUser");
 
@@ -71,15 +33,129 @@ function isLoggedIn() {
   return getLoggedInUserId() !== null;
 }
 
-function requireLogin(event) {
-  if (isLoggedIn()) {
-    return;
+function getUserRole() {
+  const user = getLoggedInUser();
+
+  if (!user || !user.role_name) {
+    return "";
   }
 
-  event.preventDefault();
+  return String(user.role_name).toLowerCase().trim();
+}
+
+function isDonee() {
+  return getUserRole() === "donee";
+}
+
+function isFundraiser() {
+  const role = getUserRole();
+
+  return (
+    role === "fundraiser" ||
+    role === "fund raiser" ||
+    role === "fund_raiser"
+  );
+}
+
+function requireLogin(event) {
+  if (isLoggedIn()) {
+    return true;
+  }
+
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
   alert("Please sign in first to continue.");
   window.location.href = "login.html";
+
+  return false;
 }
+
+function blockFundraiseIfDonee(event) {
+  if (!isLoggedIn()) {
+    return requireLogin(event);
+  }
+
+  if (isDonee()) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    alert("Donee users cannot access Fundraise functions.");
+    return false;
+  }
+
+  return true;
+}
+
+function blockDonateIfFundraiser(event) {
+  if (!isLoggedIn()) {
+    return requireLogin(event);
+  }
+
+  if (isFundraiser()) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    alert("Fundraiser users are not allowed to donate.");
+    return false;
+  }
+
+  return true;
+}
+
+/* =========================
+   DROPDOWN SETUP
+========================= */
+function setupDropdown(buttonId, dropdownId, blockFunction) {
+  const button = document.getElementById(buttonId);
+  const dropdown = document.getElementById(dropdownId);
+
+  if (!button || !dropdown) return;
+
+  button.addEventListener("click", function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (blockFunction) {
+      const allowed = blockFunction(event);
+
+      if (!allowed) {
+        return;
+      }
+    }
+
+    document.querySelectorAll(".nav-dropdown").forEach(function (item) {
+      if (item !== dropdown) {
+        item.classList.remove("open");
+      }
+    });
+
+    dropdown.classList.toggle("open");
+  });
+
+  dropdown.addEventListener("click", function (event) {
+    event.stopPropagation();
+  });
+}
+
+/* =========================
+   HEADER DROPDOWNS
+========================= */
+setupDropdown("donateMenuBtn", "donateDropdown");
+setupDropdown("fundraiseMenuBtn", "fundraiseDropdown", blockFundraiseIfDonee);
+setupDropdown("aboutMenuBtn", "aboutDropdown");
+setupDropdown("profileMenuBtn", "profileDropdown");
+
+/* =========================
+   LOGIN / PROFILE
+========================= */
+const signinHeaderBtn = document.getElementById("signinHeaderBtn");
+const profileDropdown = document.getElementById("profileDropdown");
+const headerAvatar = document.getElementById("headerAvatar");
+const headerName = document.getElementById("headerName");
+const signOutBtn = document.getElementById("signOutBtn");
 
 document.querySelectorAll(".auth-required").forEach(function (link) {
   link.addEventListener("click", requireLogin);
@@ -175,7 +251,7 @@ const detailTabs = document.querySelectorAll(".detail-tab");
 const detailPanels = document.querySelectorAll(".detail-panel");
 
 const MIN_TIME = 10000;
-const MIN_SCROLL = 30; 
+const MIN_SCROLL = 30;
 
 /* =========================
    SAFE JSON
@@ -319,7 +395,6 @@ function calculateDaysLeft(startDate, endDate) {
 
   let baseDate = today;
 
-  // campaign not started yet
   if (start && start > today) {
     baseDate = start;
   }
@@ -567,10 +642,12 @@ function renderCampaignDetail() {
   const goalAmount = Number(currentCampaign.fundraise_goal) || 0;
   const donorCount = Number(currentCampaign.donor_count) || 0;
   const progress = calculateProgress(currentAmount, goalAmount);
+
   const daysLeft = calculateDaysLeft(
-    activity.start_date,
-    activity.end_date
+    currentCampaign.start_date,
+    currentCampaign.end_date
   );
+
   const remainingAmount = goalAmount - currentAmount;
 
   if (detailTitle) {
@@ -689,10 +766,18 @@ detailTabs.forEach(function (tab) {
 });
 
 if (scrollDonateBtn) {
-  scrollDonateBtn.addEventListener("click", function () {
+  scrollDonateBtn.addEventListener("click", function (event) {
     if (!isLoggedIn()) {
       alert("Please sign in first before making a donation.");
       window.location.href = "login.html";
+      return;
+    }
+
+    if (isFundraiser()) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      alert("Fundraiser users are not allowed to donate.");
       return;
     }
 
@@ -745,10 +830,18 @@ if (donationInput) {
    POST /donations
 ========================= */
 if (donateNowBtn) {
-  donateNowBtn.addEventListener("click", async function () {
+  donateNowBtn.addEventListener("click", async function (event) {
     if (!isLoggedIn()) {
       alert("Please sign in first before making a donation.");
       window.location.href = "login.html";
+      return;
+    }
+
+    if (isFundraiser()) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      alert("Fundraiser users are not allowed to donate.");
       return;
     }
 

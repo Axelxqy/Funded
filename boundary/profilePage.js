@@ -9,44 +9,6 @@
 ============================================================ */
 
 /* =========================
-   DROPDOWN SETUP
-========================= */
-function setupDropdown(buttonId, dropdownId) {
-  const button = document.getElementById(buttonId);
-  const dropdown = document.getElementById(dropdownId);
-
-  if (!button || !dropdown) return;
-
-  button.addEventListener("click", function (event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    document.querySelectorAll(".nav-dropdown").forEach(function (item) {
-      if (item !== dropdown) {
-        item.classList.remove("open");
-      }
-    });
-
-    dropdown.classList.toggle("open");
-  });
-
-  dropdown.addEventListener("click", function (event) {
-    event.stopPropagation();
-  });
-}
-
-setupDropdown("donateMenuBtn", "donateDropdown");
-setupDropdown("fundraiseMenuBtn", "fundraiseDropdown");
-setupDropdown("aboutMenuBtn", "aboutDropdown");
-setupDropdown("profileMenuBtn", "profileDropdown");
-
-document.addEventListener("click", function () {
-  document.querySelectorAll(".nav-dropdown").forEach(function (item) {
-    item.classList.remove("open");
-  });
-});
-
-/* =========================
    ELEMENTS
 ========================= */
 const userIdInput = document.getElementById("userIdInput");
@@ -93,6 +55,7 @@ function getLoggedInUser() {
 
     return parsed;
   } catch (error) {
+    localStorage.removeItem("loggedInUser");
     return null;
   }
 }
@@ -100,6 +63,189 @@ function getLoggedInUser() {
 function saveLoggedInUser(user) {
   localStorage.setItem("loggedInUser", JSON.stringify(user));
 }
+
+function getLoggedInUserId() {
+  const user = getLoggedInUser();
+
+  if (!user) {
+    return null;
+  }
+
+  return user.user_id || user.userId || user.id || null;
+}
+
+function isLoggedIn() {
+  return getLoggedInUserId() !== null;
+}
+
+function getUserRole() {
+  const user = getLoggedInUser();
+
+  if (!user || !user.role_name) {
+    return "";
+  }
+
+  return String(user.role_name).toLowerCase().trim();
+}
+
+function isDonee() {
+  return getUserRole() === "donee";
+}
+
+function isFundraiser() {
+  const role = getUserRole();
+
+  return (
+    role === "fundraiser" ||
+    role === "fund raiser" ||
+    role === "fund_raiser"
+  );
+}
+
+function requireLogin(event) {
+  if (isLoggedIn()) {
+    return true;
+  }
+
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  alert("Please sign in first to continue.");
+  window.location.href = "login.html";
+
+  return false;
+}
+
+/* =========================
+   ROLE BLOCKING
+========================= */
+function blockFundraiseIfDonee(event) {
+  if (!isLoggedIn()) {
+    return requireLogin(event);
+  }
+
+  if (isDonee()) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    alert("Donee users cannot access Fundraise functions.");
+    return false;
+  }
+
+  return true;
+}
+
+function blockDonateIfFundraiser(event) {
+  if (!isLoggedIn()) {
+    return requireLogin(event);
+  }
+
+  if (isFundraiser()) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    alert("Fundraiser users cannot access Donee functions.");
+    return false;
+  }
+
+  return true;
+}
+
+/* =========================
+   DROPDOWN SETUP
+========================= */
+function setupDropdown(buttonId, dropdownId, blockFunction) {
+  const button = document.getElementById(buttonId);
+  const dropdown = document.getElementById(dropdownId);
+
+  if (!button || !dropdown) return;
+
+  button.addEventListener("click", function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (blockFunction) {
+      const allowed = blockFunction(event);
+
+      if (!allowed) {
+        return;
+      }
+    }
+
+    document.querySelectorAll(".nav-dropdown").forEach(function (item) {
+      if (item !== dropdown) {
+        item.classList.remove("open");
+      }
+    });
+
+    dropdown.classList.toggle("open");
+  });
+
+  dropdown.addEventListener("click", function (event) {
+    event.stopPropagation();
+  });
+}
+
+/* =========================
+   HEADER DROPDOWNS
+========================= */
+
+// Fundraiser cannot open Donee dropdown
+setupDropdown("donateMenuBtn", "donateDropdown", blockDonateIfFundraiser);
+
+// Donee cannot open Fundraise dropdown
+setupDropdown("fundraiseMenuBtn", "fundraiseDropdown", blockFundraiseIfDonee);
+
+// Normal dropdowns
+setupDropdown("aboutMenuBtn", "aboutDropdown");
+setupDropdown("profileMenuBtn", "profileDropdown");
+
+document.addEventListener("click", function () {
+  document.querySelectorAll(".nav-dropdown").forEach(function (item) {
+    item.classList.remove("open");
+  });
+});
+
+/* =========================
+   PROTECT LINKS BASED ON ROLE
+========================= */
+function protectRoleLinks() {
+  const allLinks = document.querySelectorAll("a");
+
+  allLinks.forEach(function (link) {
+    const href = link.getAttribute("href");
+
+    if (!href) return;
+
+    const lowerHref = href.toLowerCase();
+
+    const isDoneeLink =
+      lowerHref.includes("browsecampaign.html") ||
+      lowerHref.includes("mydonation.html") ||
+      lowerHref.includes("mydonationview.html") ||
+      lowerHref.includes("campaigndetail.html");
+
+    const isFundraiserLink =
+      lowerHref.includes("startcampaign.html") ||
+      lowerHref.includes("mycampaign.html");
+
+    if (isDoneeLink) {
+      link.addEventListener("click", function (event) {
+        blockDonateIfFundraiser(event);
+      });
+    }
+
+    if (isFundraiserLink) {
+      link.addEventListener("click", function (event) {
+        blockFundraiseIfDonee(event);
+      });
+    }
+  });
+}
+
+protectRoleLinks();
 
 /* =========================
    HELPERS
@@ -117,7 +263,7 @@ function setInputsDisabled(disabled) {
   if (dobInput) dobInput.disabled = disabled;
   if (phoneInput) phoneInput.disabled = disabled;
 
-  /* Role is always read-only */
+  // Role is always read-only
   if (roleInput) {
     roleInput.disabled = true;
   }
@@ -238,6 +384,13 @@ async function renderUser(user) {
 
   const roleName = await loadRoleName(user);
 
+  const updatedStorageUser = {
+    ...user,
+    role_name: roleName,
+  };
+
+  saveLoggedInUser(updatedStorageUser);
+
   applyRoleBasedHeader(roleName);
 
   const fullName = `${firstName} ${lastName}`.trim() || "User";
@@ -263,13 +416,6 @@ async function renderUser(user) {
   if (headerName) {
     headerName.textContent = firstName || roleName || "User";
   }
-
-  const updatedStorageUser = {
-    ...user,
-    role_name: roleName,
-  };
-
-  saveLoggedInUser(updatedStorageUser);
 }
 
 /* =========================
@@ -281,6 +427,7 @@ async function loadProfile() {
 
   if (!loggedInUser || !loggedInUser.user_id) {
     setMessage("No logged in user found. Please login again.", true);
+    window.location.href = "login.html";
     return;
   }
 
@@ -386,5 +533,8 @@ if (signOutBtn) {
   });
 }
 
+/* =========================
+   START PAGE
+========================= */
 setInputsDisabled(true);
 loadProfile();
